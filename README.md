@@ -1,6 +1,11 @@
 # pyremap
+[![Documentation Status](http://readthedocs.org/projects/pyremap/badge/?version=latest)](http://pyremap.readthedocs.io/en/latest/?badge=latest)
 
 Python remapping tools for climate and earth system models.
+
+## Documentation
+
+[http://pyremap.readthedocs.io](http://pyremap.readthedocs.io)
 
 ## Installation
 
@@ -26,7 +31,7 @@ conda activate pyremap
 ```
 
 Then, get the code from:
- [https://github.com/xylar/pyremap](https://github.com/xylar/pyremap)
+[https://github.com/xylar/pyremap](https://github.com/xylar/pyremap)
 
 
 ## Examples
