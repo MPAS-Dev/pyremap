@@ -20,4 +20,5 @@ setup(name='pyremap',
           'Programming Language :: Python :: 3.7',
           'Topic :: Scientific/Engineering',
       ],
-      packages=find_packages())
+      packages=find_packages(),
+      package_data={'pyremap.test': ['test*/*', 'test*/*/*']})
