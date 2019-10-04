@@ -15,7 +15,7 @@ environment with the following packages:
  * python >= 3.6
  * numpy
  * scipy
- * netCDF4
+ * netcdf4
  * xarray >= 0.10.0
  * dask
  * nco >= 4.8.1
@@ -25,7 +25,7 @@ These can be installed via the conda command:
 ```
 conda config --add channels conda-forge
 conda config --set channel_priority strict
-conda create -n pyremap python=3.7 numpy scipy netCDF4 "xarray>=0.10.0" dask \
+conda create -n pyremap python=3.7 numpy scipy netcdf4 "xarray>=0.10.0" dask \
     "nco>=4.8.1" pyproj
 conda activate pyremap
 ```
