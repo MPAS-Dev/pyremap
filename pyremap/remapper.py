@@ -97,8 +97,8 @@ class Remapper(object):
 
         # }}}
 
-    def build_mapping_file(self, method='bilinear',
-                           additionalArgs=None, logger=None):  # {{{
+    def build_mapping_file(self, method='bilinear', additionalArgs=None,
+                           logger=None, mpiTasks=1):  # {{{
         '''
         Given a source file defining either an MPAS mesh or a lat-lon grid and
         a destination file or set of arrays defining a lat-lon grid, constructs
@@ -116,6 +116,10 @@ class Remapper(object):
 
         logger : ``logging.Logger``, optional
             A logger to which ncclimo output should be redirected
+
+        mpiTasks : int, optional
+            The number of MPI tasks (a number > 1 implies that
+            ESMF_RegridWeightGen will be called with ``mpirun``)
 
         Raises
         ------
@@ -141,7 +145,9 @@ class Remapper(object):
             # a valid weight file already exists, so nothing to do
             return
 
-        if find_executable('ESMF_RegridWeightGen') is None:
+        rwgPath = find_executable('ESMF_RegridWeightGen')
+
+        if rwgPath is None:
             raise OSError('ESMF_RegridWeightGen not found. Make sure esmf '
                           'package is installed via\n'
                           'latest nco: \n'
@@ -153,13 +159,16 @@ class Remapper(object):
         self.sourceDescriptor.to_scrip(_get_temp_path())
         self.destinationDescriptor.to_scrip(_get_temp_path())
 
-        args = ['ESMF_RegridWeightGen',
+        args = [rwgPath,
                 '--source', self.sourceDescriptor.scripFileName,
                 '--destination', self.destinationDescriptor.scripFileName,
                 '--weight', self.mappingFileName,
                 '--method', method,
                 '--netcdf4',
                 '--no_log']
+
+        if mpiTasks > 1:
+            args = ['mpirun', '-np', '{}'.format(mpiTasks)] + args
 
         if self.sourceDescriptor.regional:
             args.append('--src_regional')
