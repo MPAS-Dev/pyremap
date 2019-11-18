@@ -25,8 +25,15 @@ parser.add_argument('-o', dest='outFileName', required=True, type=str,
                     help="Output file name")
 parser.add_argument('-r', dest='resolution', required=True, type=float,
                     help="Output resolution")
+parser.add_argument('-m', dest='method', required=False, default="bilinear",
+                    help="Method: {'bilinear', 'neareststod', 'conserve'}")
+parser.add_argument('-t', dest='mpiTasks', required=False, type=int, default=1,
+                    help="Number of MPI tasks (default = 1)")
 args = parser.parse_args()
 
+
+if args.method not in ['bilinear', 'neareststod', 'conserve']:
+    raise ValueError('Unexpected method {}'.format(args.method))
 
 dsIn = xarray.open_dataset(args.inFileName)
 
@@ -56,11 +63,12 @@ outMeshName = '{}x{}km_{}km_Antarctic_stereo'.format(Lx, Ly, args.resolution)
 outDescriptor = ProjectionGridDescriptor.create(projection, xOut, yOut,
                                                 outMeshName)
 
-mappingFileName = 'map_{}_to_{}.nc'.format(inMeshName, outMeshName)
+mappingFileName = 'map_{}_to_{}_{}.nc'.format(inMeshName, outMeshName,
+                                              args.method)
 
 remapper = Remapper(inDescriptor, outDescriptor, mappingFileName)
 
-remapper.build_mapping_file(method='bilinear')
+remapper.build_mapping_file(method=args.method, mpiTasks=args.mpiTasks)
 
 dsOut = remapper.remap(dsIn, renormalizationThreshold=0.01)
 dsOut.to_netcdf(args.outFileName)

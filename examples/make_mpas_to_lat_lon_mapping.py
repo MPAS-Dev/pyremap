@@ -37,7 +37,7 @@ inDescriptor = MpasMeshDescriptor(inGridFileName, inGridName)
 outDescriptor = get_lat_lon_descriptor(dLon=0.5, dLat=0.5)
 outGridName = outDescriptor.meshName
 
-mappingFileName = 'map_{}_to_{}.nc'.format(inGridName, outGridName)
+mappingFileName = 'map_{}_to_{}_bilinear.nc'.format(inGridName, outGridName)
 
 
 remapper = Remapper(inDescriptor, outDescriptor, mappingFileName)
