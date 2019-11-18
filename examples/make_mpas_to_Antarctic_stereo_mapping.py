@@ -39,11 +39,12 @@ outDescriptor = get_polar_descriptor(Lx=6000., Ly=6000., dx=10., dy=10.,
                                      projection='antarctic')
 outGridName = outDescriptor.meshName
 
-mappingFileName = 'map_{}_to_{}.nc'.format(inGridName, outGridName)
+mappingFileName = 'map_{}_to_{}_conserve.nc'.format(inGridName, outGridName)
 
 remapper = Remapper(inDescriptor, outDescriptor, mappingFileName)
 
-remapper.build_mapping_file(method='bilinear')
+# conservative remapping with 4 MPI tasks (using mpirun)
+remapper.build_mapping_file(method='conserve', mpiTasks=4)
 
 outFileName = 'temp_{}.nc'.format(outGridName)
 ds = xarray.open_dataset(inGridFileName)
