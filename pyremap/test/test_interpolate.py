@@ -8,12 +8,12 @@
 # Additional copyright and license information can be found in the LICENSE file
 # distributed with this code, or at
 # https://raw.githubusercontent.com/MPAS-Dev/MPAS-Analysis/master/LICENSE
-'''
+"""
 Unit test infrastructure for horizontal interpolation.
 
 Xylar Asay-Davis
 04/06/2017
-'''
+"""
 
 import pytest
 import shutil
@@ -45,7 +45,7 @@ class TestInterp(TestCase):
         timeSeriesFileName = str(self.datadir.join('timeSeries.0002-01-01.nc'))
         descriptor = MpasMeshDescriptor(mpasMeshFileName, meshName='oQU240')
 
-        return (descriptor, mpasMeshFileName, timeSeriesFileName)
+        return descriptor, mpasMeshFileName, timeSeriesFileName
 
     def get_latlon_file_descriptor(self):
         latLonGridFileName = str(self.datadir.join('SST_annual_1870-1900.nc'))
@@ -53,7 +53,7 @@ class TestInterp(TestCase):
                                                latVarName='lat',
                                                lonVarName='lon')
 
-        return (descriptor, latLonGridFileName)
+        return descriptor, latLonGridFileName
 
     def get_latlon_array_descriptor(self):
         lat = numpy.linspace(-90., 90., 91)
@@ -83,7 +83,7 @@ class TestInterp(TestCase):
         weightFileName = '{}/weights_{}.nc'.format(self.test_dir, suffix)
         outFileName = '{}/remapped_{}.nc'.format(self.test_dir, suffix)
         refFileName = '{}/ref_{}.nc'.format(self.datadir, suffix)
-        return (weightFileName, outFileName, refFileName)
+        return weightFileName, outFileName, refFileName
 
     def build_remapper(self, sourceDescriptor, destinationDescriptor,
                        weightFileName):
@@ -108,10 +108,10 @@ class TestInterp(TestCase):
 
             assert os.path.exists(outFileName)
             dsRemapped = xarray.open_dataset(outFileName)
-            # drop some extra vairables added by ncremap that aren't in the
+            # drop some extra variables added by ncremap that aren't in the
             # reference data set
-            dsRemapped = dsRemapped.drop(['lat_bnds', 'lon_bnds', 'gw',
-                                          'area'])
+            dsRemapped = dsRemapped.drop_vars(['lat_bnds', 'lon_bnds', 'gw',
+                                               'area'])
             self.assertDatasetApproxEqual(dsRemapped, dsRef)
 
         # now, try in-memory remapping
@@ -120,13 +120,13 @@ class TestInterp(TestCase):
         self.assertDatasetApproxEqual(dsRemapped, dsRef)
 
     def test_mpas_to_latlon_file(self):
-        '''
+        """
         test horizontal interpolation from an MPAS mesh to a destination
         lat/lon grid determined from a file containing 'lat' and 'lon' coords
 
         Xylar Asay-Davis
         04/06/2017
-        '''
+        """
 
         weightFileName, outFileName, refFileName = \
             self.get_file_names(suffix='mpas_to_latlon_file')
@@ -142,13 +142,13 @@ class TestInterp(TestCase):
                          remapper, remap_file=True)
 
     def test_mpas_to_latlon_array(self):
-        '''
+        """
         test horizontal interpolation from an MPAS mesh to a destination
         lat/lon grid determined from config options 'lat' and 'lon'.
 
         Xylar Asay-Davis
         04/06/2017
-        '''
+        """
 
         weightFileName, outFileName, refFileName = \
             self.get_file_names(suffix='mpas_to_latlon_array')
@@ -163,13 +163,13 @@ class TestInterp(TestCase):
                          remapper, remap_file=True)
 
     def test_latlon_file_to_latlon_array(self):
-        '''
+        """
         test horizontal interpolation from a lat/lon grid to a destination
         lat/lon grid determined from config options 'lat' and 'lon'.
 
         Xylar Asay-Davis
         04/06/2017
-        '''
+        """
 
         weightFileName, outFileName, refFileName = \
             self.get_file_names(suffix='latlon_file_to_latlon_array')
@@ -184,13 +184,13 @@ class TestInterp(TestCase):
                          remapper, remap_file=True)
 
     def test_mpas_to_stereographic_array(self):
-        '''
+        """
         test horizontal interpolation from an MPAS mesh to a destination
         stereographic grid.
 
         Xylar Asay-Davis
         04/06/2017
-        '''
+        """
 
         weightFileName, outFileName, refFileName = \
             self.get_file_names(suffix='mpas_to_stereographic_array')
@@ -208,13 +208,13 @@ class TestInterp(TestCase):
                          remapper, remap_file=False)
 
     def test_latlon_file_to_stereographic_array(self):
-        '''
+        """
         test horizontal interpolation from a lat/lon grid to a destination
         stereographic grid.
 
         Xylar Asay-Davis
         04/06/2017
-        '''
+        """
 
         weightFileName, outFileName, refFileName = \
             self.get_file_names(suffix='latlon_file_to_stereographic_array')
@@ -232,14 +232,14 @@ class TestInterp(TestCase):
                          remapper, remap_file=False)
 
     def test_stereographic_array_to_latlon_array(self):
-        '''
+        """
         test horizontal interpolation from a stereographic grid to a
         destination lat/lon grid determined from config options 'lat' and
         'lon'.
 
         Xylar Asay-Davis
         04/06/2017
-        '''
+        """
 
         weightFileName, outFileName, refFileName = \
             self.get_file_names(suffix='stereographic_array_to_latlon_array')

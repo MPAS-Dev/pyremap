@@ -19,25 +19,25 @@ from pyremap.mesh_descriptor import MeshDescriptor, interp_extrap_corners_2d, \
 
 
 class LatLon2DGridDescriptor(MeshDescriptor):  # {{{
-    '''
+    """
     A class for describing a lat-lon grid that may not be a tensor grid
     (lat/lon are 2D arrays).  The grid is assumed to be regional, since this
     is difficult to determine just from the lat/lon values.  The calling code
     should set ``regional = False`` for global grids with 2D lat/lon
-    '''
+    """
     # Authors
     # -------
     # Xylar Asay-Davis
 
     def __init__(self):  # {{{
-        '''
+        """
         Constructor stores the file name
 
         Parameters
         ----------
         fileName : str
             The path of the file containing the MPAS mesh
-        '''
+        """
         # Authors
         # -------
         # Xylar Asay-Davis
@@ -48,7 +48,7 @@ class LatLon2DGridDescriptor(MeshDescriptor):  # {{{
     @classmethod
     def read(cls, fileName=None, ds=None, latVarName='lat',
              lonVarName='lon'):  # {{{
-        '''
+        """
         Read the lat-lon grid from a file with the given lat/lon var names.
 
         Parameters
@@ -63,7 +63,7 @@ class LatLon2DGridDescriptor(MeshDescriptor):  # {{{
 
         latVarName, lonVarName : str, optional
             The name of the latitude and longitude variables in the grid file
-        '''
+        """
         # Authors
         # -------
         # Xylar Asay-Davis
@@ -99,14 +99,14 @@ class LatLon2DGridDescriptor(MeshDescriptor):  # {{{
         return descriptor  # }}}
 
     def to_scrip(self, scripFileName):  # {{{
-        '''
+        """
         Given a lat-lon grid file, create a SCRIP file based on the grid.
 
         Parameters
         ----------
         scripFileName : str
             The path to which the SCRIP file should be written
-        '''
+        """
         # Authors
         # -------
         # Xylar Asay-Davis
@@ -138,9 +138,9 @@ class LatLon2DGridDescriptor(MeshDescriptor):  # {{{
 
     def _set_coords(self, latVarName, lonVarName, latDimName,
                     lonDimName):  # {{{
-        '''
+        """
         Set up a coords dict with lat and lon
-        '''
+        """
         self.latVarName = latVarName
         self.lonVarName = lonVarName
         self.coords = {latVarName: {'dims': (latDimName, lonDimName),

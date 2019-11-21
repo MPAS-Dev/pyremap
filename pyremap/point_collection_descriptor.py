@@ -17,7 +17,7 @@ from pyremap.mesh_descriptor import MeshDescriptor, _create_scrip
 
 
 class PointCollectionDescriptor(MeshDescriptor):  # {{{
-    '''
+    """
     A class for describing a collection of points
 
     Author
@@ -27,11 +27,11 @@ class PointCollectionDescriptor(MeshDescriptor):  # {{{
     Last Modified
     -------------
     04/19/2017
-    '''
+    """
 
     def __init__(self, lats, lons, collectionName,
                  units='degrees', outDimension='nPoints'):  # {{{
-        '''
+        """
         Constructor stores
 
         Parameters
@@ -58,7 +58,7 @@ class PointCollectionDescriptor(MeshDescriptor):  # {{{
         Last Modified
         -------------
         04/19/2017
-        '''
+        """
 
         self.meshName = collectionName
 
@@ -80,14 +80,14 @@ class PointCollectionDescriptor(MeshDescriptor):  # {{{
         # }}}
 
     def to_scrip(self, scripFileName):  # {{{
-        '''
+        """
         Given an MPAS mesh file, create a SCRIP file based on the mesh.
 
         Parameters
         ----------
         scripFileName : str
             The path to which the SCRIP file should be written
-        '''
+        """
         # Authors
         # ------
         # Xylar Asay-Davis

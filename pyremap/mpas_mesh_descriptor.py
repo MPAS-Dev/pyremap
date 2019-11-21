@@ -18,15 +18,15 @@ from pyremap.mesh_descriptor import MeshDescriptor, _create_scrip
 
 
 class MpasMeshDescriptor(MeshDescriptor):  # {{{
-    '''
+    """
     A class for describing an MPAS mesh
-    '''
+    """
     # Authors
     # -------
     # Xylar Asay-Davis
 
     def __init__(self, fileName, meshName=None):  # {{{
-        '''
+        """
         Constructor stores the file name
 
         Parameters
@@ -39,7 +39,7 @@ class MpasMeshDescriptor(MeshDescriptor):  # {{{
             ``'oRRS18to6'``).  If not provided, the data set in ``fileName``
             must have a global attribute ``meshName`` that will be used
             instead.
-        '''
+        """
         # Authors
         # -------
         # Xylar Asay-Davis
@@ -68,14 +68,14 @@ class MpasMeshDescriptor(MeshDescriptor):  # {{{
         ds.close()  # }}}
 
     def to_scrip(self, scripFileName):  # {{{
-        '''
+        """
         Given an MPAS mesh file, create a SCRIP file based on the mesh.
 
         Parameters
         ----------
         scripFileName : str
             The path to which the SCRIP file should be written
-        '''
+        """
         # Authors
         # -------
         # Xylar Asay-Davis

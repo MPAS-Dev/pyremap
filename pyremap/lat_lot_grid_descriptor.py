@@ -25,8 +25,11 @@ def get_lat_lon_descriptor(dLon, dLat, lonMin=-180., lonMax=180., latMin=-90.,
 
     Parameters
     ----------
-    dLon, dLat :  float`
-        Resolution of the lon-lat grid in degrees
+    dLon, dLat : float
+        Resolution of the lat/lon grid in degrees
+
+    lonMin, lonMax, latMin, latMax : float, optional
+        Bounds of the lat/lon grid
 
     Returns
     -------
@@ -48,22 +51,22 @@ def get_lat_lon_descriptor(dLon, dLat, lonMin=-180., lonMax=180., latMin=-90.,
 
 
 class LatLonGridDescriptor(MeshDescriptor):  # {{{
-    '''
-    A class for describing a lat-lon grid
-    '''
+    """
+    A class for describing a lat/lon grid
+    """
     # Authors
     # -------
     # Xylar Asay-Davis
 
     def __init__(self):  # {{{
-        '''
+        """
         Constructor stores the file name
 
         Parameters
         ----------
         fileName : str
             The path of the file containing the MPAS mesh
-        '''
+        """
         # Authors
         # -------
         # Xylar Asay-Davis
@@ -74,22 +77,22 @@ class LatLonGridDescriptor(MeshDescriptor):  # {{{
     @classmethod
     def read(cls, fileName=None, ds=None, latVarName='lat',
              lonVarName='lon'):  # {{{
-        '''
-        Read the lat-lon grid from a file with the given lat/lon var names.
+        """
+        Read the lat/lon grid from a file with the given lat/lon var names.
 
         Parameters
         ----------
         fileName : str, optional
-            The path of the file containing the lat-lon grid (if ``ds`` is not
+            The path of the file containing the lat/lon grid (if ``ds`` is not
             supplied directly)
 
         ds : ``xarray.Dataset`` object, optional
-            The path of the file containing the lat-lon grid (if supplied,
+            The path of the file containing the lat/lon grid (if supplied,
             ``fileName`` will be ignored)
 
         latVarName, lonVarName : str, optional
             The name of the latitude and longitude variables in the grid file
-        '''
+        """
         # Authors
         # -------
         # Xylar Asay-Davis
@@ -126,8 +129,8 @@ class LatLonGridDescriptor(MeshDescriptor):  # {{{
 
     @classmethod
     def create(cls, latCorner, lonCorner, units='degrees'):  # {{{
-        '''
-        Create the lat-lon grid with the given arrays and units.
+        """
+        Create the lat/lon grid with the given arrays and units.
 
         Parameters
         ----------
@@ -137,7 +140,7 @@ class LatLonGridDescriptor(MeshDescriptor):  # {{{
 
         units : {'degrees', 'radians'}, optional
             The units of `latCorner` and `lonCorner`
-        '''
+        """
         # Authors
         # -------
         # Xylar Asay-Davis
@@ -154,14 +157,14 @@ class LatLonGridDescriptor(MeshDescriptor):  # {{{
         return descriptor  # }}}
 
     def to_scrip(self, scripFileName):  # {{{
-        '''
-        Given a lat-lon grid file, create a SCRIP file based on the grid.
+        """
+        Given a lat/lon grid file, create a SCRIP file based on the grid.
 
         Parameters
         ----------
         scripFileName : str
             The path to which the SCRIP file should be written
-        '''
+        """
         # Authors
         # -------
         # Xylar Asay-Davis
@@ -195,9 +198,9 @@ class LatLonGridDescriptor(MeshDescriptor):  # {{{
 
     def _set_coords(self, latVarName, lonVarName, latDimName,
                     lonDimName):  # {{{
-        '''
+        """
         Set up a coords dict with lat and lon
-        '''
+        """
         self.latVarName = latVarName
         self.lonVarName = lonVarName
         self.coords = {latVarName: {'dims': latDimName,

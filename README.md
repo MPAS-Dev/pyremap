@@ -16,7 +16,7 @@ environment with the following packages:
  * numpy
  * scipy
  * netcdf4
- * xarray >= 0.10.0
+ * xarray >= 0.14.1
  * dask
  * nco >= 4.8.1
  * pyproj

@@ -8,7 +8,7 @@
 # Additional copyright and license information can be found in the LICENSE file
 # distributed with this code, or at
 # https://raw.githubusercontent.com/MPAS-Dev/MPAS-Analysis/master/LICENSE
-'''
+"""
 Functions for performing interpolation
 
 Functions
@@ -17,7 +17,7 @@ build_remap_weights - constructs a mapping file containing the indices and
     weights needed to perform horizontal interpolation
 
 remap - perform horizontal interpolation on a data sets, given a mapping file
-'''
+"""
 # Authors
 # -------
 # Xylar Asay-Davis
@@ -37,18 +37,18 @@ from pyremap import MpasMeshDescriptor, \
 
 
 class Remapper(object):
-    '''
+    """
     A class for remapping fields using a given mapping file.  The weights and
     indices from the mapping file can be loaded once and reused multiple times
     to map several fields between the same source and destination grids.
-    '''
+    """
     # Authors
     # -------
     # Xylar Asay-Davis
 
     def __init__(self, sourceDescriptor, destinationDescriptor,
                  mappingFileName=None):  # {{{
-        '''
+        """
         Create the remapper and read weights and indices from the given file
         for later used in remapping fields.
 
@@ -69,7 +69,7 @@ class Remapper(object):
             This is useful if the source and destination grids are determined
             to be the same (though the Remapper does not attempt to determine
             if this is the case).
-        '''
+        """
         # Authors
         # -------
         # Xylar Asay-Davis
@@ -99,7 +99,7 @@ class Remapper(object):
 
     def build_mapping_file(self, method='bilinear', additionalArgs=None,
                            logger=None, mpiTasks=1):  # {{{
-        '''
+        """
         Given a source file defining either an MPAS mesh or a lat-lon grid and
         a destination file or set of arrays defining a lat-lon grid, constructs
         a mapping file used for interpolation between the source and
@@ -128,7 +128,7 @@ class Remapper(object):
 
         ValueError
             If sourceDescriptor or destinationDescriptor is of an unknown type
-        '''
+        """
         # Authors
         # -------
         # Xylar Asay-Davis
@@ -222,7 +222,7 @@ class Remapper(object):
 
     def remap_file(self, inFileName, outFileName, variableList=None,
                    overwrite=False, renormalize=None, logger=None):  # {{{
-        '''
+        """
         Given a source file defining either an MPAS mesh or a lat-lon grid and
         a destination file or set of arrays defining a lat-lon grid, constructs
         a mapping file used for interpolation between the source and
@@ -259,7 +259,7 @@ class Remapper(object):
         ValueError
             If ``mappingFileName`` is ``None`` (meaning no remapping is
             needed).
-        '''
+        """
         # Authors
         # -------
         # Xylar Asay-Davis
@@ -274,7 +274,7 @@ class Remapper(object):
             # a remapped file already exists, so nothing to do
             return
 
-        if isinstance(self.sourceDescriptor, (PointCollectionDescriptor)):
+        if isinstance(self.sourceDescriptor, PointCollectionDescriptor):
             raise TypeError('Source grid is a point collection, which is not'
                             'supported.')
 
@@ -370,7 +370,7 @@ class Remapper(object):
         # }}}
 
     def remap(self, ds, renormalizationThreshold=None):  # {{{
-        '''
+        """
         Given a source data set, returns a remapped version of the data set,
         possibly masked and renormalized.
 
@@ -401,7 +401,7 @@ class Remapper(object):
             (``self.src_grid_dims``).
         TypeError
             If ds is not an ``xarray.Dataset`` or ``xarray.DataArray`` object
-        '''
+        """
         # Authors
         # -------
         # Xylar Asay-Davis
@@ -417,7 +417,7 @@ class Remapper(object):
                 raise ValueError('data set and remapping source dimension {} '
                                  'don\'t have the same size: {} != {}'.format(
                                      dim, self.src_grid_dims[index],
-                                     len(ds.sizes[dim])))
+                                     ds.sizes[dim]))
 
         if isinstance(ds, xr.DataArray):
             remappedDs = self._remap_data_array(ds, renormalizationThreshold)
@@ -426,10 +426,10 @@ class Remapper(object):
             for var in ds.data_vars:
                 if self._check_drop(ds[var]):
                     drop.append(var)
-            remappedDs = ds.drop(drop)
-            remappedDs = remappedDs.apply(self._remap_data_array,
-                                          keep_attrs=True,
-                                          args=(renormalizationThreshold,))
+            remappedDs = ds.drop_vars(drop)
+            remappedDs = remappedDs.map(self._remap_data_array,
+                                        keep_attrs=True,
+                                        args=(renormalizationThreshold,))
         else:
             raise TypeError('ds not an xarray Dataset or DataArray.')
 
@@ -446,10 +446,10 @@ class Remapper(object):
         return remappedDs  # }}}
 
     def _load_mapping(self):  # {{{
-        '''
+        """
         Load weights and indices from a mapping file, if this has not already
         been done
-        '''
+        """
         # Authors
         # -------
         # Xylar Asay-Davis
@@ -517,9 +517,9 @@ class Remapper(object):
                 numpy.all(sourceDimsInArray))  # }}}
 
     def _remap_data_array(self, dataArray, renormalizationThreshold):  # {{{
-        '''
+        """
         Remap a single xarray data array
-        '''
+        """
         # Authors
         # -------
         # Xylar Asay-Davis
@@ -587,9 +587,9 @@ class Remapper(object):
 
     def _remap_numpy_array(self, inField, remapAxes,
                            renormalizationThreshold):  # {{{
-        '''
+        """
         Remap a single numpy array
-        '''
+        """
         # Authors
         # -------
         # Xylar Asay-Davis
@@ -652,7 +652,7 @@ class Remapper(object):
 
 
 def _get_temp_path():  # {{{
-    '''Returns the name of a temporary NetCDF file'''
+    """Returns the name of a temporary NetCDF file"""
     return '{}/{}.nc'.format(tempfile._get_default_tempdir(),
                              next(tempfile._get_candidate_names()))  # }}}
 

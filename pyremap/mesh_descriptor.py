@@ -8,10 +8,10 @@
 # Additional copyright and license information can be found in the LICENSE file
 # distributed with this code, or at
 # https://raw.githubusercontent.com/MPAS-Dev/MPAS-Analysis/master/LICENSE
-'''
+"""
 Base class and utilities for describing meshes and grids, including creating
 SCRIP files, used to create mapping files
-'''
+"""
 # Authors
 # -------
 # Xylar Asay-Davis
@@ -20,19 +20,19 @@ import numpy
 
 
 class MeshDescriptor(object):  # {{{
-    '''
+    """
     A class for describing a mesh
-    '''
+    """
     # Authors
     # -------
     # Xylar Asay-Davis
 
     def __init__(self):  # {{{
-        '''
+        """
         Constructor creates a common ``meshName`` member variable, ``None`` by
         default.  Each Subclass should define or use input arguments to set
         ``meshName`` to a short description of the mesh or grid.
-        '''
+        """
         # Authors
         # -------
         # Xylar Asay-Davis
@@ -40,7 +40,7 @@ class MeshDescriptor(object):  # {{{
         self.meshName = None  # }}}
 
     def to_scrip(self, scripFileName):  # {{{
-        '''
+        """
         Subclasses should overload this method to write a SCRIP file based on
         the mesh.
 
@@ -48,7 +48,7 @@ class MeshDescriptor(object):  # {{{
         ----------
         scripFileName : str
             The path to which the SCRIP file should be written
-        '''
+        """
         # Authors
         # ------
         # Xylar Asay-Davis
@@ -59,7 +59,7 @@ class MeshDescriptor(object):  # {{{
 
 
 def interp_extrap_corner(inField):  # {{{
-    '''Interpolate/extrapolate a 1D field from grid centers to grid corners'''
+    """Interpolate/extrapolate a 1D field from grid centers to grid corners"""
 
     outField = numpy.zeros(len(inField) + 1)
     outField[1:-1] = 0.5 * (inField[0:-1] + inField[1:])
@@ -70,7 +70,7 @@ def interp_extrap_corner(inField):  # {{{
 
 
 def interp_extrap_corners_2d(inField):  # {{{
-    '''Interpolate/extrapolate a 1D field from grid centers to grid corners'''
+    """Interpolate/extrapolate a 1D field from grid centers to grid corners"""
 
     temp = numpy.zeros((inField.shape[0], inField.shape[1] + 1))
     temp[:, 1:-1] = 0.5 * (inField[:, 0:-1] + inField[:, 1:])
@@ -89,7 +89,7 @@ def interp_extrap_corners_2d(inField):  # {{{
 
 def _create_scrip(outFile, grid_size, grid_corners, grid_rank, units,
                   meshName):  # {{{
-    '''
+    """
     Given a SCRIP files, creates common variables and writes common values used
     in various types of SCRIP files.
 
@@ -112,7 +112,7 @@ def _create_scrip(outFile, grid_size, grid_corners, grid_rank, units,
 
     meshName : str
         The name of the mesh
-    '''
+    """
     # Authors
     # -------
     # Xylar Asay-Davis
@@ -145,7 +145,7 @@ def _create_scrip(outFile, grid_size, grid_corners, grid_rank, units,
 
 
 def _unwrap_corners(inField):
-    '''Turn a 2D array of corners into an array of rectangular mesh elements'''
+    """Turn a 2D array of corners into an array of rectangular mesh elements"""
     outField = numpy.zeros(((inField.shape[0] - 1) * (inField.shape[1] - 1),
                             4))
     # corners are counterclockwise
@@ -158,6 +158,6 @@ def _unwrap_corners(inField):
 
 
 def _round_res(res):
-    '''Round the resoltuion to a reasonable number for grid names'''
+    """Round the resoltuion to a reasonable number for grid names"""
     rounded = numpy.round(res*1000.)/1000.
     return '{}'.format(rounded)

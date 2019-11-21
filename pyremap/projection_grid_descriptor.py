@@ -20,16 +20,16 @@ from pyremap.mesh_descriptor import MeshDescriptor, _create_scrip, \
 
 
 class ProjectionGridDescriptor(MeshDescriptor):  # {{{
-    '''
+    """
     A class for describing a general logically rectangular grid that can be
     defined by a `pyproj` projection.
-    '''
+    """
     # Authors
     # -------
     # Xylar Asay-Davis
 
     def __init__(self, projection):  # {{{
-        '''
+        """
         Constructor stores the projection
 
         Parameters
@@ -37,7 +37,7 @@ class ProjectionGridDescriptor(MeshDescriptor):  # {{{
         projection : ``pyproj.Proj`` object
             The projection used to map from grid x-y space to latitude and
             longitude
-        '''
+        """
         # Authors
         # -------
         # Xylar Asay-Davis
@@ -49,7 +49,7 @@ class ProjectionGridDescriptor(MeshDescriptor):  # {{{
     @classmethod
     def read(cls, projection, fileName, meshName=None, xVarName='x',
              yVarName='y'):  # {{{
-        '''
+        """
         Given a grid file with x and y coordinates defining the axes of the
         logically rectangular grid, read in the x and y coordinates and
         interpolate/extrapolate to locate corners.
@@ -70,7 +70,7 @@ class ProjectionGridDescriptor(MeshDescriptor):  # {{{
 
         xVarName, yVarName : str, optional
             The name of the x and y (in meters) variables in the grid file
-        '''
+        """
         # Authors
         # -------
         # Xylar Asay-Davis
@@ -144,14 +144,14 @@ class ProjectionGridDescriptor(MeshDescriptor):  # {{{
         return descriptor  # }}}
 
     def to_scrip(self, scripFileName):  # {{{
-        '''
+        """
         Create a SCRIP file based on the grid and projection.
 
         Parameters
         ----------
         scripFileName : str
             The path to which the SCRIP file should be written
-        '''
+        """
         # Authors
         # -------
         # Xylar Asay-Davis
@@ -187,7 +187,7 @@ class ProjectionGridDescriptor(MeshDescriptor):  # {{{
         outFile.close()  # }}}
 
     def project_to_lat_lon(self, X, Y):  # {{{
-        '''
+        """
         Given X and Y locations of points in a projection, returns the
         corresponding latitude and longitude of each point.
 
@@ -203,7 +203,7 @@ class ProjectionGridDescriptor(MeshDescriptor):  # {{{
         -------
         Lat, Lon : numpy.array with same shape as X and Y
             the latitude and longitude in degrees of the points
-        '''
+        """
         # Authors
         # -------
         # Xylar Asay-Davis
@@ -211,12 +211,12 @@ class ProjectionGridDescriptor(MeshDescriptor):  # {{{
         Lon, Lat = pyproj.transform(self.projection, self.latLonProjection,
                                     X, Y)
 
-        return (Lat, Lon)  # }}}
+        return Lat, Lon  # }}}
 
     def _set_coords(self, xVarName, yVarName, xDimName, yDimName):  # {{{
-        '''
+        """
         Set up a coords dict with x, y, lat and lon
-        '''
+        """
         self.xVarName = xVarName
         self.yVarName = yVarName
         (X, Y) = numpy.meshgrid(self.x, self.y)
