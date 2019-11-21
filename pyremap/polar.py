@@ -12,7 +12,7 @@ import pyproj
 import xarray
 import numpy
 
-from pyremap.descriptor import ProjectionGridDescriptor
+from pyremap import ProjectionGridDescriptor
 
 
 def get_arctic_stereographic_projection():

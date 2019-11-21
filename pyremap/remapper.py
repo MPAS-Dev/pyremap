@@ -31,7 +31,7 @@ from scipy.sparse import csr_matrix
 import xarray as xr
 import sys
 
-from pyremap.descriptor import MpasMeshDescriptor, \
+from pyremap import MpasMeshDescriptor, \
     LatLonGridDescriptor, LatLon2DGridDescriptor, ProjectionGridDescriptor, \
     PointCollectionDescriptor
 
