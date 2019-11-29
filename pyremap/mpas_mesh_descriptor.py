@@ -9,15 +9,12 @@
 # distributed with this code, or at
 # https://raw.githubusercontent.com/MPAS-Dev/MPAS-Analysis/master/LICENSE
 
-import netCDF4
-import numpy
-import sys
 import xarray
 
-from pyremap.mesh_descriptor import MeshDescriptor, _create_scrip
+from pyremap.mesh_descriptor import MeshDescriptor
 
 
-class MpasMeshDescriptor(MeshDescriptor):  # {{{
+class MpasMeshDescriptor(MeshDescriptor):
     """
     A class for describing an MPAS mesh
     """
@@ -25,113 +22,70 @@ class MpasMeshDescriptor(MeshDescriptor):  # {{{
     # -------
     # Xylar Asay-Davis
 
-    def __init__(self, fileName, meshName=None):  # {{{
+    def __init__(self, filename, meshname=None):
         """
         Constructor stores the file name
 
         Parameters
         ----------
-        fileName : str
+        filename : str
             The path of the file containing the MPAS mesh
 
-        meshName : str, optional
+        meshname : str, optional
             The name of the MPAS mesh (e.g. ``'oEC60to30'`` or
-            ``'oRRS18to6'``).  If not provided, the data set in ``fileName``
-            must have a global attribute ``meshName`` that will be used
+            ``'oRRS18to6'``).  If not provided, the data set in ``filename``
+            must have a global attribute ``meshname`` that will be used
             instead.
         """
-        # Authors
-        # -------
-        # Xylar Asay-Davis
 
-        ds = xarray.open_dataset(fileName)
+        super().__init__()
 
-        if meshName is None:
-            if 'meshName' not in ds.attrs:
-                raise ValueError('No meshName provided or found in file.')
-            self.meshName = ds.attrs['meshName']
-        else:
-            self.meshName = meshName
+        with xarray.open_dataset(filename) as ds:
 
-        self.fileName = fileName
-        self.regional = True
+            if meshname is None:
+                if 'meshname' not in ds.attrs:
+                    raise ValueError('No meshname provided or found in file.')
+                self.meshname = ds.attrs['meshname']
+            else:
+                self.meshname = meshname
 
-        # build coords
-        self.coords = {'latCell': {'dims': 'nCells',
-                                   'data': ds.latCell.values,
-                                   'attrs': {'units': 'radians'}},
-                       'lonCell': {'dims': 'nCells',
-                                   'data': ds.lonCell.values,
-                                   'attrs': {'units': 'radians'}}}
-        self.dims = ['nCells']
-        self.dimSize = [ds.dims[dim] for dim in self.dims]
-        ds.close()  # }}}
+            self.regional = True
 
-    def to_scrip(self, scripFileName):  # {{{
-        """
-        Given an MPAS mesh file, create a SCRIP file based on the mesh.
+            # build coords
+            self.coords = {'latCell': {'dims': 'nCells',
+                                       'data': ds.latCell.values,
+                                       'attrs': {'units': 'radians'}},
+                           'lonCell': {'dims': 'nCells',
+                                       'data': ds.lonCell.values,
+                                       'attrs': {'units': 'radians'}},
+                           'xCell': {'dims': 'nCells',
+                                     'data': ds.xCell.values,
+                                     'attrs': {'units': 'meters'}},
+                           'yCell': {'dims': 'nCells',
+                                     'data': ds.yCell.values,
+                                     'attrs': {'units': 'meters'}},
+                           'zCell': {'dims': 'nCells',
+                                     'data': ds.zCell.values,
+                                     'attrs': {'units': 'meters'}}}
 
-        Parameters
-        ----------
-        scripFileName : str
-            The path to which the SCRIP file should be written
-        """
-        # Authors
-        # -------
-        # Xylar Asay-Davis
+            self.sizes = {'nCells', ds.sizes['nCells']}
 
-        self.scripFileName = scripFileName
+        vertices_on_cell = ds.verticesOnCell.values-1
+        vertex_count_on_cells = ds.nVerticesOnCell.values
 
-        inFile = netCDF4.Dataset(self.fileName, 'r')
-        outFile = netCDF4.Dataset(scripFileName, 'w')
+        self.set_lat_lon_vertices(
+            ds.latVertex.values, ds.lonVertex.values,
+            vertices_on_cell=vertices_on_cell,
+            vertex_count_on_cells=vertex_count_on_cells,
+            degrees=False)
 
-        # Get info from input file
-        latCell = inFile.variables['latCell'][:]
-        lonCell = inFile.variables['lonCell'][:]
-        latVertex = inFile.variables['latVertex'][:]
-        lonVertex = inFile.variables['lonVertex'][:]
-        verticesOnCell = inFile.variables['verticesOnCell'][:]
-        nEdgesOnCell = inFile.variables['nEdgesOnCell'][:]
-        nCells = len(inFile.dimensions['nCells'])
-        maxVertices = len(inFile.dimensions['maxEdges'])
-        areaCell = inFile.variables['areaCell'][:]
-        sphereRadius = float(inFile.sphere_radius)
+        self.set_cartesian_vertices(
+            ds.xVertex.values, ds.yVertex.values, ds.zVertex.values,
+            vertices_on_cell=vertices_on_cell,
+            vertex_count_on_cells=vertex_count_on_cells)
 
-        _create_scrip(outFile, grid_size=nCells, grid_corners=maxVertices,
-                      grid_rank=1, units='radians', meshName=self.meshName)
+        self.set_lat_lon_cell_centers(ds.latCell.values, ds.lonCell.values,
+                                      degrees=False)
 
-        grid_area = outFile.createVariable('grid_area', 'f8', ('grid_size',))
-        grid_area.units = 'radian^2'
-        # SCRIP uses square radians
-        grid_area[:] = areaCell[:] / (sphereRadius**2)
-
-        outFile.variables['grid_center_lat'][:] = latCell[:]
-        outFile.variables['grid_center_lon'][:] = lonCell[:]
-        outFile.variables['grid_dims'][:] = nCells
-        outFile.variables['grid_imask'][:] = 1
-
-        # grid corners:
-        grid_corner_lon = numpy.zeros((nCells, maxVertices))
-        grid_corner_lat = numpy.zeros((nCells, maxVertices))
-        for iVertex in range(maxVertices):
-            cellIndices = numpy.arange(nCells)
-            # repeat the last vertex wherever iVertex > nEdgesOnCell
-            localVertexIndices = numpy.minimum(nEdgesOnCell - 1, iVertex)
-            vertexIndices = verticesOnCell[cellIndices, localVertexIndices] - 1
-            grid_corner_lat[cellIndices, iVertex] = latVertex[vertexIndices]
-            grid_corner_lon[cellIndices, iVertex] = lonVertex[vertexIndices]
-
-        outFile.variables['grid_corner_lat'][:] = grid_corner_lat[:]
-        outFile.variables['grid_corner_lon'][:] = grid_corner_lon[:]
-
-        # Update history attribute of netCDF file
-        if hasattr(inFile, 'history'):
-            newhist = '\n'.join([getattr(inFile, 'history'),
-                                 ' '.join(sys.argv[:])])
-        else:
-            newhist = sys.argv[:]
-        setattr(outFile, 'history', newhist)
-
-        inFile.close()
-        outFile.close()  # }}}
-    # }}}
+        self.set_cartesian_cell_centers(ds.xCell.values, ds.yCell.values,
+                                        ds.zCell.values)
