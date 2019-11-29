@@ -9,234 +9,246 @@
 # distributed with this code, or at
 # https://raw.githubusercontent.com/MPAS-Dev/MPAS-Analysis/master/LICENSE
 
-import netCDF4
 import numpy
-import sys
 import pyproj
 import xarray
 
-from pyremap.mesh_descriptor import MeshDescriptor, _create_scrip, \
-    _unwrap_corners, interp_extrap_corner
+from pyremap.mesh_descriptor import MeshDescriptor
 
 
-class ProjectionGridDescriptor(MeshDescriptor):  # {{{
+class ProjectionGridDescriptor(MeshDescriptor):
     """
     A class for describing a general logically rectangular grid that can be
     defined by a `pyproj` projection.
-    """
-    # Authors
-    # -------
-    # Xylar Asay-Davis
 
-    def __init__(self, projection):  # {{{
+    Attributes
+    ----------
+    projection : ``pyproj.Proj`` object
+        The projection used to map from grid x-y space to latitude and
+        longitude or ``None`` if the grid is a lat/lon grid
+
+    lat_lon_projection : ``pyproj.Proj`` object
+        The reference projection used to get lat/lon from x/y
+    """
+
+    def __init__(self, projection=None, ds=None, filename=None, meshname=None,
+                 x=None, y=None, xbnds=None, ybnds=None, xvarname='x',
+                 yvarname='y', xdimname=None, ydimname=None,  units=None):
         """
         Constructor stores the projection
 
         Parameters
         ----------
-        projection : ``pyproj.Proj`` object
+        projection : pyproj.Proj, optional
             The projection used to map from grid x-y space to latitude and
-            longitude
-        """
-        # Authors
-        # -------
-        # Xylar Asay-Davis
+            longitude.  If none is provided, the grid is a lat/lon grid
 
-        self.projection = projection
-        self.latLonProjection = pyproj.Proj(proj='latlong', datum='WGS84')
-        self.regional = True
+        ds : xarray.Dataset, optional
+            A data set to read coordinates from.  One of ``ds`` or ``filename``
+            must be provided
 
-    @classmethod
-    def read(cls, projection, fileName, meshName=None, xVarName='x',
-             yVarName='y'):  # {{{
-        """
-        Given a grid file with x and y coordinates defining the axes of the
-        logically rectangular grid, read in the x and y coordinates and
-        interpolate/extrapolate to locate corners.
+        filename : str, optional
+            The path of the file containing the grid data.  One of ``ds`` or
+            ``filename`` must be provided
 
-        Parameters
-        ----------
-        projection : pyproj.Proj object
-            The projection used to map from grid x-y space to latitude and
-            longitude
-
-        fileName : str
-            The path of the file containing the grid data
-
-        meshName : str, optional
+        meshname : str, optional
             The name of the grid (e.g. ``'10km_Antarctic_stereo'``).  If not
-            provided, the data set in ``fileName`` must have a global
-            attribute ``meshName`` that will be used instead.
+            provided, the data set in ``filename`` must have a global
+            attribute ``meshname`` that will be used instead.
 
-        xVarName, yVarName : str, optional
-            The name of the x and y (in meters) variables in the grid file
-        """
-        # Authors
-        # -------
-        # Xylar Asay-Davis
+        meshname : str
+            The name of the grid (e.g. ``'10km_Antarctic_stereo'``)
 
-        descriptor = cls(projection)
-
-        ds = xarray.open_dataset(fileName)
-
-        if meshName is None:
-            if 'meshName' not in ds.attrs:
-                raise ValueError('No meshName provided or found in file.')
-            descriptor.meshName = ds.attrs['meshName']
-        else:
-            descriptor.meshName = meshName
-
-        # Get info from input file
-        descriptor.x = numpy.array(ds[xVarName].values, float)
-        descriptor.y = numpy.array(ds[yVarName].values, float)
-
-        descriptor._set_coords(xVarName, yVarName, ds[xVarName].dims[0],
-                               ds[yVarName].dims[0])
-
-        # interp/extrap corners
-        descriptor.xCorner = interp_extrap_corner(descriptor.x)
-        descriptor.yCorner = interp_extrap_corner(descriptor.y)
-
-        # Update history attribute of netCDF file
-        if 'history' in ds.attrs:
-            descriptor.history = '\n'.join([ds.attrs['history'],
-                                            ' '.join(sys.argv[:])])
-        else:
-            descriptor.history = sys.argv[:]
-        return descriptor  # }}}
-
-    @classmethod
-    def create(cls, projection, x, y, meshName):  # {{{
-        """
-        Given x and y coordinates defining the axes of the logically
-        rectangular grid, save the coordinates interpolate/extrapolate to
-        locate corners.
-
-        Parameters
-        ----------
-        projection: pyproj.Proj
-            The projection for the grid
-
-        x, y : 1D numpy.arrays
+        x, y : numpy array, optional
             One dimensional arrays defining the x and y coordinates of grid
             cell centers.
 
-        meshName : str
-            The name of the grid (e.g. ``'10km_Antarctic_stereo'``)
+        xbnds, ybnds : numpy.arrays, optional
+            2D arrays of bounds for each x and y cell, with size len(x) by 2
+            and len(y) by 2, respectively.  These are interpolated and
+            extrapolated from ``x`` and ``y`` if not provided.
+
+        xvarname, yvarname : str, optional
+            The name of the x and y variables in the grid file
+
+        xdimname, ydimname : str, optional
+            The name of the x and y dimensions, the same as xvarname and
+            yvarname by default
+
+        units : str, optional
+            Will be taken from the ``units`` attribute of ``xvarname`` if not
+            explicitly provided
         """
-        # Authors
-        # -------
-        # Xylar Asay-Davis
 
-        descriptor = cls(projection)
+        super().__init__()
 
-        descriptor.meshName = meshName
+        self.projection = projection
+        self.lat_lon_projection = pyproj.Proj(proj='latlong', datum='WGS84')
 
-        descriptor.x = x
-        descriptor.y = y
+        coords_provided = ((x is not None and y is not None) or
+                           (xbnds is not None and ybnds is not None))
 
-        descriptor._set_coords('x', 'y', 'x', 'y')
+        if ds is None and filename is None and not coords_provided:
+            raise ValueError('Must provide ds, filename, x and y, or xbnds '
+                             'and ybnds.')
 
-        # interp/extrap corners
-        descriptor.xCorner = interp_extrap_corner(descriptor.x)
-        descriptor.yCorner = interp_extrap_corner(descriptor.y)
-        descriptor.history = sys.argv[:]
-        return descriptor  # }}}
+        if coords_provided:
+            if x is None:
+                x = 0.5 * (xbnds[:, 0] + xbnds[:, 1])
 
-    def to_scrip(self, scripFileName):  # {{{
-        """
-        Create a SCRIP file based on the grid and projection.
+            if y is None:
+                y = 0.5 * (ybnds[:, 0] + ybnds[:, 1])
 
-        Parameters
-        ----------
-        scripFileName : str
-            The path to which the SCRIP file should be written
-        """
-        # Authors
-        # -------
-        # Xylar Asay-Davis
+            if xbnds is None:
+                xbnds = MeshDescriptor.interp_extrap_corner(x)
 
-        self.scripFileName = scripFileName
+            if ybnds is None:
+                ybnds = MeshDescriptor.interp_extrap_corner(y)
 
-        outFile = netCDF4.Dataset(scripFileName, 'w')
+            if xdimname is None:
+                xdimname = xvarname
 
-        nx = len(self.x)
-        ny = len(self.y)
+            if ydimname is None:
+                ydimname = yvarname
 
-        grid_size = nx * ny
+        else:
+            if ds is None:
+                ds = xarray.open_dataarray(filename)
 
-        _create_scrip(outFile, grid_size=grid_size, grid_corners=4,
-                      grid_rank=2, units='degrees', meshName=self.meshName)
+            if meshname is None:
+                meshname = ds.attrs['meshname']
 
-        (X, Y) = numpy.meshgrid(self.x, self.y)
-        (XCorner, YCorner) = numpy.meshgrid(self.xCorner, self.yCorner)
+            # Get info from input file
+            x = numpy.array(ds[xvarname].values, float)
+            y = numpy.array(ds[yvarname].values, float)
 
-        (Lat, Lon) = self.project_to_lat_lon(X, Y)
-        (LatCorner, LonCorner) = self.project_to_lat_lon(XCorner, YCorner)
+            if 'bounds' in ds[xvarname].attrs:
+                xbvarname = ds[xvarname].attrs['bounds']
+                xbnds = numpy.array(ds[xbvarname].values, float)
+            else:
+                xbnds = MeshDescriptor.interp_extrap_corner(x)
 
-        outFile.variables['grid_center_lat'][:] = Lat.flat
-        outFile.variables['grid_center_lon'][:] = Lon.flat
-        outFile.variables['grid_dims'][:] = [nx, ny]
-        outFile.variables['grid_imask'][:] = 1
+            if 'bounds' in ds[yvarname].attrs:
+                ybvarname = ds[yvarname].attrs['bounds']
+                ybnds = numpy.array(ds[ybvarname].values, float)
+            else:
+                ybnds = MeshDescriptor.interp_extrap_corner(y)
 
-        outFile.variables['grid_corner_lat'][:] = _unwrap_corners(LatCorner)
-        outFile.variables['grid_corner_lon'][:] = _unwrap_corners(LonCorner)
+            if units is None:
+                if 'units' not in ds[xvarname].attrs:
+                    raise ValueError('No units were provided.')
+                units = ds[xvarname].attrs['units']
 
-        setattr(outFile, 'history', self.history)
+            xdimname = ds[xvarname].dims[0]
+            ydimname = ds[yvarname].dims[0]
 
-        outFile.close()  # }}}
+        self._set_coords(x, y, xbnds, ybnds, xvarname, yvarname,
+                         xdimname, ydimname, units, meshname)
 
-    def project_to_lat_lon(self, X, Y):  # {{{
+        # Update history attribute of netCDF file
+        if 'history' in ds.attrs:
+            self.history = '\n'.join([ds.attrs['history'], self.history])
+
+    def project_to_lon_lat(self, X, Y, units):
         """
         Given X and Y locations of points in a projection, returns the
         corresponding latitude and longitude of each point.
 
         Parameters
         ----------
-        outFile : file pointer
-            A SCRIP file opened in write mode
-
-        X, Y : 1D or 2D numpy.array
+        X, Y : numpy.array
             X and y arrays of points in in the projection
+
+        units : str
+            The units of X and Y if this is a lat/lon grid
 
         Returns
         -------
         Lat, Lon : numpy.array with same shape as X and Y
             the latitude and longitude in degrees of the points
         """
-        # Authors
-        # -------
-        # Xylar Asay-Davis
 
-        Lon, Lat = pyproj.transform(self.projection, self.latLonProjection,
-                                    X, Y)
+        if self.projection is None:
+            if 'degree' in units:
+                Lon = X
+                Lat = Y
+            else:
+                Lon = numpy.rad2deg(X)
+                Lat = numpy.rad2deg(Y)
+        else:
+            Lon, Lat = pyproj.transform(self.projection,
+                                        self.lat_lon_projection,
+                                        X, Y)
 
-        return Lat, Lon  # }}}
+        return Lon, Lat
 
-    def _set_coords(self, xVarName, yVarName, xDimName, yDimName):  # {{{
+    def _set_coords(self, x, y, xbnds, ybnds, xvarname, yvarname, xdimname,
+                    ydimname, units, meshname):
         """
         Set up a coords dict with x, y, lat and lon
         """
-        self.xVarName = xVarName
-        self.yVarName = yVarName
-        (X, Y) = numpy.meshgrid(self.x, self.y)
-        (Lat, Lon) = self.project_to_lat_lon(X, Y)
+        dx = MeshDescriptor._round_res(abs(x[1] - x[0]))
+        dy = MeshDescriptor._round_res(abs(y[1] - y[0]))
 
-        self.coords = {xVarName: {'dims': xDimName,
-                                  'data': self.x,
-                                  'attrs': {'units': 'meters'}},
-                       yVarName: {'dims': yDimName,
-                                  'data': self.y,
-                                  'attrs': {'units': 'meters'}},
-                       'lat': {'dims': (xDimName, yDimName),
-                               'data': Lat,
-                               'attrs': {'units': 'degrees'}},
-                       'lon': {'dims': (xDimName, yDimName),
-                               'data': Lon,
-                               'attrs': {'units': 'degrees'}}}
+        if meshname is None:
+            meshname = '{}x{}{}'.format(dx, dy, units)
 
-        self.dims = [xDimName, yDimName]
-        self.dimSize = [len(self.x), len(self.y)]
-        # }}}
+        self.meshname = meshname
 
-    # }}}
+        if self.projection is None:
+            # lat/lon grid
+            lon_range = xbnds[-1, 1] - xbnds[0, 0]
+            lat_range = ybnds[-1, 1] - ybnds[0, 0]
+            if 'rad' in units:
+                lon_range = numpy.rad2deg(lon_range)
+                lat_range = numpy.rad2deg(lat_range)
+
+            # does the grid cover the full sphere?
+            self.regional = (numpy.abs(lon_range - 360.) > 1e-10 or
+                             numpy.abs(lat_range - 180.) > 1e-10)
+        else:
+            self.regional = True
+
+        (X, Y) = numpy.meshgrid(x, y)
+        (Lon, Lat) = self.project_to_lon_lat(X, Y, units)
+        self.set_lon_lat_cell_centers(Lon, Lat, degrees=True)
+
+        xbndsname = '{}_bnds'.format(xvarname)
+        ybndsname = '{}_bnds'.format(yvarname)
+
+        # make bounds into a 2D array as expected by set_lat_lon_vertices
+        xb = numpy.zeros(len(x)+1)
+        xb[0:-1] = xbnds[:, 0]
+        xb[-1] = xbnds[-1, 1]
+
+        yb = numpy.zeros(len(y)+1)
+        yb[0:-1] = ybnds[:, 0]
+        yb[-1] = ybnds[-1, 1]
+
+        Xc, Yc = numpy.meshgrid(xb, yb)
+        (Lonc, Latc) = self.project_to_lon_lat(Xc, Yc, units)
+
+        self.set_lon_lat_vertices(Lonc, Latc)
+
+        self.coords = {xvarname: {'dims': xdimname,
+                                  'data': x,
+                                  'attrs': {'units': units,
+                                            'bounds': xbndsname}},
+                       xbndsname: {'dims': (xdimname, 'bnds'),
+                                   'data': xbnds},
+                       yvarname: {'dims': ydimname,
+                                  'data': y,
+                                  'attrs': {'units': units,
+                                            'bounds': ybndsname}},
+                       ybndsname: {'dims': (ydimname, 'bnds'),
+                                   'data': ybnds}}
+        if self.projection is not None:
+            self.coords['lat'] = {'dims': (ydimname, xdimname),
+                                  'data': Lat,
+                                  'attrs': {'units': 'degrees'}}
+            self.coords['lon'] = {'dims': (ydimname, xdimname),
+                                  'data': Lon,
+                                  'attrs': {'units': 'degrees'}}
+
+        self.sizes = {xdimname: len(x),
+                      ydimname: len(y)}
