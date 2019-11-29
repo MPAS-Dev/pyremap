@@ -70,11 +70,12 @@ def get_polar_descriptor_from_file(fileName, projection='antarctic'):
     Lx = int((x[-1] - x[0])/1000.)
     Ly = int((y[-1] - y[0])/1000.)
 
-    meshName = '{}x{}km_{}km_Antarctic_stereo'.format(Lx, Ly, dx)
+    meshname = '{}x{}km_{}km_Antarctic_stereo'.format(Lx, Ly, dx)
 
     projection = _get_projection(projection)
 
-    descriptor = ProjectionGridDescriptor.create(projection, x, y, meshName)
+    descriptor = ProjectionGridDescriptor(projection=projection, x=x, y=y,
+                                          meshname=meshname)
 
     return descriptor
 
@@ -101,7 +102,7 @@ def get_polar_descriptor(Lx, Ly, dx, dy, projection='antarctic'):
         A descriptor of the Antarctic grid
     """
 
-    meshName = '{}x{}km_{}km_Antarctic_stereo'.format(Lx, Ly, dx)
+    meshname = '{}x{}km_{}km_Antarctic_stereo'.format(Lx, Ly, dx)
 
     xMax = 0.5 * Lx * 1e3
     nx = int(Lx / dx) + 1
@@ -113,7 +114,8 @@ def get_polar_descriptor(Lx, Ly, dx, dy, projection='antarctic'):
 
     projection = _get_projection(projection)
 
-    descriptor = ProjectionGridDescriptor.create(projection, x, y, meshName)
+    descriptor = ProjectionGridDescriptor(projection=projection, x=x, y=y,
+                                          meshname=meshname)
 
     return descriptor
 
