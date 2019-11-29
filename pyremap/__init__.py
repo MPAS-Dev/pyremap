@@ -1,7 +1,6 @@
 from pyremap.mpas_mesh_descriptor import MpasMeshDescriptor
-from pyremap.lat_lot_grid_descriptor import LatLonGridDescriptor, \
-    get_lat_lon_descriptor
-from pyremap.lat_lot_2d_grid_descriptor import LatLon2DGridDescriptor
+from pyremap.lon_lat_grid_descriptor import LonLatGridDescriptor
+from pyremap.lon_lat_2d_grid_descriptor import LonLat2DGridDescriptor
 from pyremap.projection_grid_descriptor import ProjectionGridDescriptor
 from pyremap.point_collection_descriptor import PointCollectionDescriptor
 
