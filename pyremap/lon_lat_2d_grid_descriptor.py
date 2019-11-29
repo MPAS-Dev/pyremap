@@ -11,6 +11,7 @@
 
 import numpy
 import xarray
+from collections import OrderedDict
 
 from pyremap.mesh_descriptor import MeshDescriptor
 
@@ -123,11 +124,13 @@ class LonLat2DGridDescriptor(MeshDescriptor):
 
         self.set_lon_lat_vertices(lonvert, latvert)
 
-        self.coords = {latvarname: {'dims': (ydimname, xdimname),
-                                    'data': lat,
-                                    'attrs': {'units': units}},
-                       lonvarname: {'dims': (ydimname, xdimname),
-                                    'data': lon,
-                                    'attrs': {'units': units}}}
+        self.coords = OrderedDict(
+            [(latvarname, {'dims': (ydimname, xdimname),
+                           'data': lat,
+                           'attrs': {'units': units}}),
+             (lonvarname, {'dims': (ydimname, xdimname),
+                           'data': lon,
+                           'attrs': {'units': units}})])
 
-        self.sizes = {xdimname: lat.shape[1], ydimname: lat.shape[0]}
+        self.sizes = OrderedDict([(xdimname, lat.shape[1]),
+                                  (ydimname, lat.shape[0])])

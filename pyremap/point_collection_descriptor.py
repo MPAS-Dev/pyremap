@@ -10,6 +10,7 @@
 # https://raw.githubusercontent.com/MPAS-Dev/MPAS-Analysis/master/LICENSE
 
 import numpy
+from collections import OrderedDict
 
 from pyremap.mesh_descriptor import MeshDescriptor
 
@@ -48,16 +49,17 @@ class PointCollectionDescriptor(MeshDescriptor):
 
         self.regional = True
         # build coords
-        self.coords = {'lat': {'dims': out_dimension,
-                               'data': lats,
-                               'attrs': {'units': units}},
-                       'lon': {'dims': out_dimension,
-                               'data': lons,
-                               'attrs': {'units': units}}}
-        self.sizes = {out_dimension: len(lats)}
+        self.coords = OrderedDict(
+            [('lat', {'dims': out_dimension,
+                      'data': lats,
+                      'attrs': {'units': units}}),
+             ('lon', {'dims': out_dimension,
+                      'data': lons,
+                      'attrs': {'units': units}})])
+        self.sizes = OrderedDict([(out_dimension, len(lats))])
 
         degrees = 'degree' in units
-        self.set_lat_lon_cell_centers(lats, lons, degrees=degrees)
+        self.set_lon_lat_cell_centers(lats, lons, degrees=degrees)
 
         point_count = len(lats)
         lonvert = numpy.zeros((point_count, 4))
@@ -69,6 +71,6 @@ class PointCollectionDescriptor(MeshDescriptor):
 
         vertices_on_cell = numpy.arange(4*point_count).reshape(point_count, 4)
 
-        self.set_lat_lon_vertices(latvert, lonvert,
+        self.set_lon_lat_vertices(latvert, lonvert,
                                   vertices_on_cell=vertices_on_cell,
                                   degrees=degrees)

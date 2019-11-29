@@ -95,6 +95,6 @@ class LonLatGridDescriptor(ProjectionGridDescriptor):
         lat = numpy.linspace(lat_min, lat_max, nlat)
         lon = numpy.linspace(lon_min, lon_max, nlon)
 
-        descriptor = LatLonGridDescriptor(lon=lon, lat=lat, units='degrees')
+        descriptor = LonLatGridDescriptor(lon=lon, lat=lat, units='degrees')
 
         return descriptor

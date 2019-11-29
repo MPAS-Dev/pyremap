@@ -54,11 +54,11 @@ class MeshDescriptor(object):
     regional : bool
         If this is a regional or global grid
 
-    sizes : dict
+    sizes : OrderedDict
         A dictionary of cell dimensions and their sizes (1 entry for meshes,
         2 for grids)
 
-    coords : dict
+    coords : OrderedDict
         A dictionary of xarray-style coordinates used to supply destination
         datasets and NetCDF files with appropriate coordinates after remapping
 

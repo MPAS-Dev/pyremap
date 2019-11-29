@@ -8,19 +8,6 @@
 # Additional copyright and license information can be found in the LICENSE file
 # distributed with this code, or at
 # https://raw.githubusercontent.com/MPAS-Dev/MPAS-Analysis/master/LICENSE
-"""
-Functions for performing interpolation
-
-Functions
----------
-build_remap_weights - constructs a mapping file containing the indices and
-    weights needed to perform horizontal interpolation
-
-remap - perform horizontal interpolation on a data sets, given a mapping file
-"""
-# Authors
-# -------
-# Xylar Asay-Davis
 
 import subprocess
 import tempfile
@@ -28,11 +15,10 @@ import os
 from distutils.spawn import find_executable
 import numpy
 from scipy.sparse import csr_matrix
-import xarray as xr
+import xarray
 import sys
 
-from pyremap import MpasMeshDescriptor, \
-    LatLonGridDescriptor, LatLon2DGridDescriptor, ProjectionGridDescriptor, \
+from pyremap import MpasMeshDescriptor, ProjectionGridDescriptor, \
     PointCollectionDescriptor
 
 
@@ -41,64 +27,63 @@ class Remapper(object):
     A class for remapping fields using a given mapping file.  The weights and
     indices from the mapping file can be loaded once and reused multiple times
     to map several fields between the same source and destination grids.
-    """
-    # Authors
-    # -------
-    # Xylar Asay-Davis
 
-    def __init__(self, sourceDescriptor, destinationDescriptor,
-                 mappingFileName=None):  # {{{
+    Attributes
+    ----------
+    src_descrip : ``shared.grid.MeshDescriptor``
+        An object used to write a scrip file and to determine the type of
+        the source mesh or grid.
+
+    dst_descrip : ``shared.grid.MeshDescriptor``
+        An object used to write a scrip files and to determine the type of
+        the destination mesh or grid.
+
+    mapping_filename : str
+        The path where the mapping file containing interpolation weights
+        and indices will be written and/or read.  If ``None``,
+        no interpolation is performed and data sets are returned unchanged.
+        This is useful if the source and destination grids are determined
+        to be the same (though the Remapper does not attempt to determine
+        if this is the case).
+    """
+
+    def __init__(self, src_descrip, dst_descrip,
+                 mapping_filename=None):
         """
         Create the remapper and read weights and indices from the given file
         for later used in remapping fields.
 
         Parameters
         ----------
-        sourceDescriptor : ``shared.grid.MeshDescriptor``
+        src_descrip : MeshDescriptor
             An object used to write a scrip file and to determine the type of
             the source mesh or grid.
 
-        destinationDescriptor : ``shared.grid.MeshDescriptor``
+        dst_descrip : MeshDescriptor
             An object used to write a scrip files and to determine the type of
             the destination mesh or grid.
 
-        mappingFileName : str, optional
+        mapping_filename : str, optional
             The path where the mapping file containing interpolation weights
             and indices will be written and/or read.  If ``None``,
             no interpolation is performed and data sets are returned unchanged.
             This is useful if the source and destination grids are determined
-            to be the same (though the Remapper does not attempt to determine
+            to be the same (though ``Remapper`` does not attempt to determine
             if this is the case).
         """
-        # Authors
-        # -------
-        # Xylar Asay-Davis
 
-        if isinstance(sourceDescriptor, PointCollectionDescriptor):
-            raise TypeError("sourceDescriptor of type "
-                            "PointCollectionDescriptor is not supported.")
-        if not isinstance(sourceDescriptor,
-                          (MpasMeshDescriptor,  LatLonGridDescriptor,
-                           LatLon2DGridDescriptor, ProjectionGridDescriptor)):
-            raise TypeError("sourceDescriptor is not of a recognized type.")
+        if isinstance(src_descrip, PointCollectionDescriptor):
+            raise TypeError("PointCollectionDescriptor can only be a "
+                            "destination.")
 
-        if not isinstance(destinationDescriptor,
-                          (MpasMeshDescriptor,  LatLonGridDescriptor,
-                           LatLon2DGridDescriptor, ProjectionGridDescriptor,
-                           PointCollectionDescriptor)):
-            raise TypeError(
-                "destinationDescriptor is not of a recognized type.")
+        self.src_descrip = src_descrip
+        self.dst_descrip = dst_descrip
+        self.mapping_filename = mapping_filename
 
-        self.sourceDescriptor = sourceDescriptor
-        self.destinationDescriptor = destinationDescriptor
-        self.mappingFileName = mappingFileName
+        self._mapping_loaded = False
 
-        self.mappingLoaded = False
-
-        # }}}
-
-    def build_mapping_file(self, method='bilinear', additionalArgs=None,
-                           logger=None, mpiTasks=1):  # {{{
+    def build_mapping_file(self, method='bilinear', software='esmf',
+                           additional_args=None, logger=None, mpitasks=1):
         """
         Given a source file defining either an MPAS mesh or a lat-lon grid and
         a destination file or set of arrays defining a lat-lon grid, constructs
@@ -109,45 +94,40 @@ class Remapper(object):
         ----------
         method : {'bilinear', 'neareststod', 'conserve'}, optional
             The method of interpolation used, see documentation for
-            `ESMF_RegridWeightGen` for details.
+            ``ESMF_RegridWeightGen`` for details.
 
-        additionalArgs : list of str, optional
+        software : {'esmf'}, optional
+            The software for creating the mapping file, currently only
+            ``ESMF_RegridWeightGen`` is supported.
+
+        additional_args : list of str, optional
             A list of additional arguments to ``ESMF_RegridWeightGen``
 
-        logger : ``logging.Logger``, optional
+        logger : logging.Logger, optional
             A logger to which ncclimo output should be redirected
 
-        mpiTasks : int, optional
+        mpitasks : int, optional
             The number of MPI tasks (a number > 1 implies that
             ESMF_RegridWeightGen will be called with ``mpirun``)
-
-        Raises
-        ------
-        OSError
-            If ``ESMF_RegridWeightGen`` is not in the system path.
-
-        ValueError
-            If sourceDescriptor or destinationDescriptor is of an unknown type
         """
-        # Authors
-        # -------
-        # Xylar Asay-Davis
 
-        if isinstance(self.destinationDescriptor,
+        if isinstance(self.dst_descrip,
                       PointCollectionDescriptor) and \
                 method not in ['bilinear', 'neareststod']:
             raise ValueError("method {} not supported for destination "
                              "grid of type PointCollectionDescriptor."
                              "".format(method))
 
-        if self.mappingFileName is None or \
-                os.path.exists(self.mappingFileName):
+        if self.mapping_filename is None or \
+                os.path.exists(self.mapping_filename):
             # a valid weight file already exists, so nothing to do
             return
 
-        rwgPath = find_executable('ESMF_RegridWeightGen')
+        if software != 'esmf':
+            raise ValueError('Unknown software {}'.format(software))
+        erwg_path = find_executable('ESMF_RegridWeightGen')
 
-        if rwgPath is None:
+        if erwg_path is None:
             raise OSError('ESMF_RegridWeightGen not found. Make sure esmf '
                           'package is installed via\n'
                           'latest nco: \n'
@@ -156,32 +136,34 @@ class Remapper(object):
                           'channel.')
 
         # Write source and destination SCRIP files in temporary locations
-        self.sourceDescriptor.to_scrip(_get_temp_path())
-        self.destinationDescriptor.to_scrip(_get_temp_path())
+        src_filename = _get_temp_path()
+        dst_filename = _get_temp_path()
+        self.src_descrip.to_scrip(src_filename)
+        self.dst_descrip.to_scrip(dst_filename)
 
-        args = [rwgPath,
-                '--source', self.sourceDescriptor.scripFileName,
-                '--destination', self.destinationDescriptor.scripFileName,
-                '--weight', self.mappingFileName,
+        args = [erwg_path,
+                '--source', src_filename,
+                '--destination', dst_filename,
+                '--weight', self.mapping_filename,
                 '--method', method,
                 '--netcdf4',
                 '--no_log']
 
-        if mpiTasks > 1:
-            args = ['mpirun', '-np', '{}'.format(mpiTasks)] + args
+        if mpitasks > 1:
+            args = ['mpirun', '-np', '{}'.format(mpitasks)] + args
 
-        if self.sourceDescriptor.regional:
+        if self.src_descrip.regional:
             args.append('--src_regional')
 
-        if self.destinationDescriptor.regional:
+        if self.dst_descrip.regional:
             args.append('--dst_regional')
 
-        if self.sourceDescriptor.regional or \
-                self.destinationDescriptor.regional:
+        if self.src_descrip.regional or \
+                self.dst_descrip.regional:
             args.append('--ignore_unmapped')
 
-        if additionalArgs is not None:
-            args.extend(additionalArgs)
+        if additional_args is not None:
+            args.extend(additional_args)
 
         if logger is None:
             print('running: {}'.format(' '.join(args)))
@@ -215,13 +197,11 @@ class Remapper(object):
                                                     ' '.join(args))
 
         # remove the temporary SCRIP files
-        os.remove(self.sourceDescriptor.scripFileName)
-        os.remove(self.destinationDescriptor.scripFileName)
+        os.remove(src_filename)
+        os.remove(dst_filename)
 
-        # }}}
-
-    def remap_file(self, inFileName, outFileName, variableList=None,
-                   overwrite=False, renormalize=None, logger=None):  # {{{
+    def remap_file(self, infilename, outfilename, varlist=None,
+                   overwrite=False, renormalize=None, logger=None):
         """
         Given a source file defining either an MPAS mesh or a lat-lon grid and
         a destination file or set of arrays defining a lat-lon grid, constructs
@@ -230,13 +210,13 @@ class Remapper(object):
 
         Parameters
         ----------
-        inFileName : str
+        infilename : str
             The path to the file containing a data set on the source grid
 
-        outFileName : str
+        outfilename : str
             The path where the data on the destination grid should be written
 
-        variableList : list of str, optional
+        varlist : list of str, optional
             A list of variables to be mapped.  By default, all variables are
             mapped
 
@@ -257,24 +237,21 @@ class Remapper(object):
             If ``ncremap`` is not in the system path.
 
         ValueError
-            If ``mappingFileName`` is ``None`` (meaning no remapping is
+            If ``mapping_filename`` is ``None`` (meaning no remapping is
             needed).
         """
-        # Authors
-        # -------
-        # Xylar Asay-Davis
 
-        if self.mappingFileName is None:
+        if self.mapping_filename is None:
             raise ValueError('No mapping file was given because remapping is '
                              'not necessary. The calling\n'
                              'code should simply use the constents of {} '
-                             'directly.'.format(inFileName))
+                             'directly.'.format(infilename))
 
-        if not overwrite and os.path.exists(outFileName):
+        if not overwrite and os.path.exists(outfilename):
             # a remapped file already exists, so nothing to do
             return
 
-        if isinstance(self.sourceDescriptor, PointCollectionDescriptor):
+        if isinstance(self.src_descrip, PointCollectionDescriptor):
             raise TypeError('Source grid is a point collection, which is not'
                             'supported.')
 
@@ -286,52 +263,42 @@ class Remapper(object):
                           'channel.')
 
         args = ['ncremap',
-                '-i', inFileName,
-                '-m', self.mappingFileName,
+                '-i', infilename,
+                '-m', self.mapping_filename,
                 '--vrb=1',
-                '-o', outFileName]
+                '-o', outfilename]
 
-        regridArgs = []
+        regird_args = []
 
         if renormalize is not None:
-            regridArgs.append('--renormalize={}'.format(renormalize))
+            regird_args.append('--renormalize={}'.format(renormalize))
 
-        if isinstance(self.sourceDescriptor, LatLonGridDescriptor):
-            regridArgs.extend(['--rgr lat_nm={}'.format(
-                self.sourceDescriptor.latVarName),
+        if isinstance(self.src_descrip, ProjectionGridDescriptor):
+            regird_args.extend(['--rgr lat_nm={}'.format(
+                self.src_descrip.yvarname),
                 '--rgr lon_nm={}'.format(
-                self.sourceDescriptor.lonVarName)])
-        elif isinstance(self.sourceDescriptor, ProjectionGridDescriptor):
-            regridArgs.extend(['--rgr lat_nm={}'.format(
-                self.sourceDescriptor.yVarName),
-                '--rgr lon_nm={}'.format(
-                self.sourceDescriptor.xVarName)])
+                self.src_descrip.xvarname)])
 
-        if isinstance(self.destinationDescriptor, LatLonGridDescriptor):
-            regridArgs.extend(['--rgr lat_nm_out={}'.format(
-                self.destinationDescriptor.latVarName),
-                '--rgr lon_nm_out={}'.format(
-                self.destinationDescriptor.lonVarName)])
-        elif isinstance(self.destinationDescriptor, ProjectionGridDescriptor):
-            regridArgs.extend(['--rgr lat_dmn_nm={}'.format(
-                self.destinationDescriptor.xVarName),
+        if isinstance(self.dst_descrip, ProjectionGridDescriptor):
+            regird_args.extend(['--rgr lat_dmn_nm={}'.format(
+                self.dst_descrip.yvarname),
                 '--rgr lon_dmn_nm={}'.format(
-                self.destinationDescriptor.yVarName),
+                self.dst_descrip.xvarname),
                 '--rgr lat_nm_out=lat', '--rgr lon_nm_out=lon'])
-        if isinstance(self.destinationDescriptor, PointCollectionDescriptor):
-            regridArgs.extend(['--rgr lat_nm_out=lat', '--rgr lon_nm_out=lon'])
+        if isinstance(self.dst_descrip, PointCollectionDescriptor):
+            regird_args.extend(['--rgr lat_nm_out=lat', '--rgr lon_nm_out=lon'])
 
-        if len(regridArgs) > 0:
-            args.extend(['-R', ' '.join(regridArgs)])
+        if len(regird_args) > 0:
+            args.extend(['-R', ' '.join(regird_args)])
 
-        if isinstance(self.sourceDescriptor, MpasMeshDescriptor):
+        if isinstance(self.src_descrip, MpasMeshDescriptor):
             # Note: using the -C (climatology) flag for now because otherwise
             #       ncremap tries to add a _FillValue attribute that might
             #       already be present and quits with an error
             args.extend(['-P', 'mpas', '-C'])
 
-        if variableList is not None:
-            args.extend(['-v', ','.join(variableList)])
+        if varlist is not None:
+            args.extend(['-v', ','.join(varlist)])
 
         # set an environment variable to make sure we're not using czender's
         # local version of NCO instead of one we have intentionally loaded
@@ -367,9 +334,8 @@ class Remapper(object):
             if process.returncode != 0:
                 raise subprocess.CalledProcessError(process.returncode,
                                                     ' '.join(args))
-        # }}}
 
-    def remap(self, ds, renormalizationThreshold=None):  # {{{
+    def remap(self, ds, renorm_thresh=None):
         """
         Given a source data set, returns a remapped version of the data set,
         possibly masked and renormalized.
@@ -380,14 +346,14 @@ class Remapper(object):
             The dimention(s) along ``self.sourceDimNames`` must match
             ``self.src_grid_dims`` read from the mapping file.
 
-        renormalizationThreshold : float, optional
+        renorm_thresh : float, optional
             The minimum weight of a denstination cell after remapping, below
             which it is masked out, or ``None`` for no renormalization and
             masking.
 
         Returns
         -------
-        remappedDs : `xarray.Dataset`` or ``xarray.DataArray``
+        ds_remap : `xarray.Dataset`` or ``xarray.DataArray``
             Returns a remapped data set (or data array) where dimensions other
             than ``self.sourceDimNames`` are the same as in ``ds`` and the
             dimension(s) given by ``self.sourceDimNames`` have been replaced by
@@ -402,258 +368,242 @@ class Remapper(object):
         TypeError
             If ds is not an ``xarray.Dataset`` or ``xarray.DataArray`` object
         """
-        # Authors
-        # -------
-        # Xylar Asay-Davis
 
-        if self.mappingFileName is None:
+        if self.mapping_filename is None:
             # No remapping is needed
             return ds
 
         self._load_mapping()
 
-        for index, dim in enumerate(self.sourceDescriptor.dims):
-            if self.src_grid_dims[index] != ds.sizes[dim]:
+        for dim, size in self.src_descrip.sizes.items():
+            if size != ds.sizes[dim]:
                 raise ValueError('data set and remapping source dimension {} '
                                  'don\'t have the same size: {} != {}'.format(
-                                     dim, self.src_grid_dims[index],
+                                     dim, size,
                                      ds.sizes[dim]))
 
-        if isinstance(ds, xr.DataArray):
-            remappedDs = self._remap_data_array(ds, renormalizationThreshold)
-        elif isinstance(ds, xr.Dataset):
+        if isinstance(ds, xarray.DataArray):
+            ds_remap = self._remap_data_array(ds, renorm_thresh)
+        elif isinstance(ds, xarray.Dataset):
             drop = []
             for var in ds.data_vars:
                 if self._check_drop(ds[var]):
                     drop.append(var)
-            remappedDs = ds.drop_vars(drop)
-            remappedDs = remappedDs.map(self._remap_data_array,
-                                        keep_attrs=True,
-                                        args=(renormalizationThreshold,))
+            ds_remap = ds.drop_vars(drop)
+            ds_remap = ds_remap.map(self._remap_data_array,
+                                    keep_attrs=True,
+                                    args=(renorm_thresh,))
         else:
             raise TypeError('ds not an xarray Dataset or DataArray.')
 
         # Update history attribute of netCDF file
-        if 'history' in remappedDs.attrs:
-            newhist = '\n'.join([remappedDs.attrs['history'],
+        if 'history' in ds_remap.attrs:
+            newhist = '\n'.join([ds_remap.attrs['history'],
                                  ' '.join(sys.argv[:])])
         else:
-            newhist = sys.argv[:]
-        remappedDs.attrs['history'] = newhist
+            newhist = ' '.join(sys.argv[:])
+        ds_remap.attrs['history'] = newhist
 
-        remappedDs.attrs['meshName'] = self.destinationDescriptor.meshName
+        ds_remap.attrs['meshname'] = self.dst_descrip.meshname
 
-        return remappedDs  # }}}
+        return ds_remap
 
-    def _load_mapping(self):  # {{{
+    def _load_mapping(self):
         """
         Load weights and indices from a mapping file, if this has not already
         been done
         """
-        # Authors
-        # -------
-        # Xylar Asay-Davis
 
-        if self.mappingLoaded:
+        if self._mapping_loaded:
             return
 
-        dsMapping = xr.open_dataset(self.mappingFileName)
-        n_a = dsMapping.dims['n_a']
-        n_b = dsMapping.dims['n_b']
+        ds_mapping = xarray.open_dataset(self.mapping_filename)
+        n_a = ds_mapping.dims['n_a']
+        n_b = ds_mapping.dims['n_b']
 
-        nSourceDims = len(self.sourceDescriptor.dims)
-        src_grid_rank = dsMapping.dims['src_grid_rank']
-        nDestinationDims = len(self.destinationDescriptor.dims)
-        dst_grid_rank = dsMapping.dims['dst_grid_rank']
+        src_dim_count = len(self.src_descrip.sizes)
+        src_grid_rank = ds_mapping.dims['src_grid_rank']
+        dst_dim_count = len(self.dst_descrip.sizes)
+        dst_grid_rank = ds_mapping.dims['dst_grid_rank']
 
         # check that the mapping file has the right number of dimensions
-        if nSourceDims != src_grid_rank or \
-                nDestinationDims != dst_grid_rank:
+        if src_dim_count != src_grid_rank or \
+                dst_dim_count != dst_grid_rank:
             raise ValueError('The number of source and/or '
                              'destination dimensions does not\n'
                              'match the expected number of source and '
                              'destination dimensions in the mapping\n'
                              'file. {} != {} and/or {} != {}'.format(
-                                 nSourceDims, src_grid_rank,
-                                 nDestinationDims, dst_grid_rank))
+                                 src_dim_count, src_grid_rank,
+                                 dst_dim_count, dst_grid_rank))
 
         # grid dimensions need to be reversed because they are in Fortran order
-        self.src_grid_dims = dsMapping['src_grid_dims'].values[::-1]
-        self.dst_grid_dims = dsMapping['dst_grid_dims'].values[::-1]
+        self.src_grid_dims = ds_mapping['src_grid_dims'].values[::-1]
+        self.dst_grid_dims = ds_mapping['dst_grid_dims'].values[::-1]
 
         # now, check that each source and destination dimension is right
-        for index in range(len(self.sourceDescriptor.dims)):
-            dim = self.sourceDescriptor.dims[index]
-            dimSize = self.sourceDescriptor.dimSize[index]
-            checkDimSize = self.src_grid_dims[index]
-            if dimSize != checkDimSize:
-                raise ValueError('source mesh descriptor and remapping source '
-                                 'dimension {} don\'t have the same size: \n'
-                                 '{} != {}'.format(dim, dimSize, checkDimSize))
-        for index in range(len(self.destinationDescriptor.dims)):
-            dim = self.destinationDescriptor.dims[index]
-            dimSize = self.destinationDescriptor.dimSize[index]
-            checkDimSize = self.dst_grid_dims[index]
-            if dimSize != checkDimSize:
-                raise ValueError('dest. mesh descriptor and remapping dest. '
-                                 'dimension {} don\'t have the same size: \n'
-                                 '{} != {}'.format(dim, dimSize, checkDimSize))
+        Remapper._check_dims(self.src_descrip.sizes,  self.src_grid_dims)
+        Remapper._check_dims(self.dst_descrip.sizes,  self.dst_grid_dims)
 
-        self.frac_b = dsMapping['frac_b'].values
+        self.frac_b = ds_mapping['frac_b'].values
 
-        col = dsMapping['col'].values - 1
-        row = dsMapping['row'].values - 1
-        S = dsMapping['S'].values
+        col = ds_mapping['col'].values - 1
+        row = ds_mapping['row'].values - 1
+        S = ds_mapping['S'].values
         self.matrix = csr_matrix((S, (row, col)), shape=(n_b, n_a))
 
-        self.mappingLoaded = True  # }}}
+        self._mapping_loaded = True
 
-    def _check_drop(self, dataArray):  # {{{
-        sourceDims = self.sourceDescriptor.dims
+    @staticmethod
+    def _check_dims(sizes, grid_dims):
+        for index, (dim, dim_size) in enumerate(sizes.items()):
+            check_dim_size = grid_dims[index]
+            if dim_size != check_dim_size:
+                raise ValueError('mesh descriptor and remapping '
+                                 'dimension {} don\'t have the same size: \n'
+                                 '{} != {}'.format(dim, dim_size,
+                                                   check_dim_size))
 
-        sourceDimsInArray = [dim in dataArray.dims for dim in sourceDims]
+    def _check_drop(self, da):
+        src_dims = self.src_descrip.sizes.keys()
 
-        return (numpy.any(sourceDimsInArray) and not
-                numpy.all(sourceDimsInArray))  # }}}
+        src_dims_in_array = [dim in da.dims for dim in src_dims]
 
-    def _remap_data_array(self, dataArray, renormalizationThreshold):  # {{{
+        return (numpy.any(src_dims_in_array) and not
+                numpy.all(src_dims_in_array))
+
+    def _remap_data_array(self, da, renorm_thresh):
         """
         Remap a single xarray data array
         """
-        # Authors
-        # -------
-        # Xylar Asay-Davis
 
-        sourceDims = self.sourceDescriptor.dims
-        destDims = self.destinationDescriptor.dims
+        src_dims = self.src_descrip.sizes.keys()
+        dst_dims = self.dst_descrip.dims
 
-        sourceDimsInArray = [dim in dataArray.dims for dim in sourceDims]
+        src_dims_in_array = [dim in da.dims for dim in src_dims]
 
-        if not numpy.any(sourceDimsInArray):
+        if not numpy.any(src_dims_in_array):
             # no remapping is needed
-            return dataArray
+            return da
 
-        if not numpy.all(sourceDimsInArray):
+        if not numpy.all(src_dims_in_array):
             # no remapping is possible so the variable array should have been
             # dropped
             raise ValueError('Data array with some (but not all) required '
                              'source dims cannot be remapped\n'
                              'and should have been dropped.')
 
-        # make a list of dims and remapAxes
+        # make a list of dims and remap_axes
         dims = []
-        remapAxes = []
-        destDimsAdded = False
-        for index, dim in enumerate(dataArray.dims):
-            if dim in sourceDims:
-                remapAxes.append(index)
-                if not destDimsAdded:
-                    dims.extend(destDims)
-                    destDimsAdded = True
+        remap_axes = []
+        dst_dims_added = False
+        for index, dim in enumerate(da.dims):
+            if dim in src_dims:
+                remap_axes.append(index)
+                if not dst_dims_added:
+                    dims.extend(dst_dims)
+                    dst_dims_added = True
             else:
                 dims.append(dim)
 
         # make a dict of coords
-        coordDict = {}
+        coord_dict = {}
         # copy unmodified coords
-        for coord in dataArray.coords:
-            sourceDimInCoord = numpy.any([dim in dataArray.coords[coord].dims
-                                          for dim in sourceDims])
-            if not sourceDimInCoord:
-                coordDict[coord] = {'dims': dataArray.coords[coord].dims,
-                                    'data': dataArray.coords[coord].values}
+        for coord in da.coords:
+            src_dim_in_coord = numpy.any([dim in da.coords[coord].dims
+                                          for dim in src_dims])
+            if not src_dim_in_coord:
+                coord_dict[coord] = {'dims': da.coords[coord].dims,
+                                     'data': da.coords[coord].values,
+                                     'attrs': da.coords[coord.attrs]}
 
         # add dest coords
-        coordDict.update(self.destinationDescriptor.coords)
+        coord_dict.update(self.dst_descrip.coords)
 
         # remap the values
-        field = dataArray.values
+        field = da.values
         mask = numpy.isnan(field)
         if numpy.count_nonzero(mask) > 0:
             field = numpy.ma.masked_array(field, mask)
-        remappedField = self._remap_numpy_array(field, remapAxes,
-                                                renormalizationThreshold)
+        remapped_field = self._remap_numpy_array(field, remap_axes,
+                                                 renorm_thresh)
 
-        arrayDict = {'coords': coordDict,
-                     'attrs': dataArray.attrs,
-                     'dims': dims,
-                     'data': remappedField,
-                     'name': dataArray.name}
+        array_dict = {'coords': coord_dict,
+                      'attrs': da.attrs,
+                      'dims': dims,
+                      'data': remapped_field,
+                      'name': da.name}
 
         # make a new data array
-        remappedArray = xr.DataArray.from_dict(arrayDict)
+        da_remap = xarray.DataArray.from_dict(array_dict)
 
-        return remappedArray  # }}}
+        return da_remap
 
-    def _remap_numpy_array(self, inField, remapAxes,
-                           renormalizationThreshold):  # {{{
+    def _remap_numpy_array(self, in_field, remap_axes,
+                           renorm_thresh):
         """
         Remap a single numpy array
         """
-        # Authors
-        # -------
-        # Xylar Asay-Davis
 
-        # permute the dimensions of inField so the axes to remap are first,
+        # permute the dimensions of in_field so the axes to remap are first,
         # then flatten the remapping and the extra dimensions separately for
         # the matrix multiply
-        extraAxes = [axis for axis in numpy.arange(inField.ndim)
-                     if axis not in remapAxes]
+        extra_axes = [axis for axis in numpy.arange(in_field.ndim)
+                      if axis not in remap_axes]
 
-        newShape = [numpy.prod([inField.shape[axis] for axis in remapAxes])]
-        if len(extraAxes) > 0:
-            extraShape = [inField.shape[axis] for axis in extraAxes]
-            newShape.append(numpy.prod(extraShape))
+        new_shape = [numpy.prod([in_field.shape[axis] for axis in remap_axes])]
+        if len(extra_axes) > 0:
+            extra_shape = [in_field.shape[axis] for axis in extra_axes]
+            new_shape.append(numpy.prod(extra_shape))
         else:
-            extraShape = []
-            newShape.append(1)
+            extra_shape = []
+            new_shape.append(1)
 
-        permutedAxes = remapAxes + extraAxes
+        permuted_axes = remap_axes + extra_axes
 
         # permute axes so the remapped dimension(s) come first and "flatten"
         # the remapping dimension
-        inField = inField.transpose(permutedAxes).reshape(newShape)
+        in_field = in_field.transpose(permuted_axes).reshape(new_shape)
 
-        masked = (isinstance(inField, numpy.ma.MaskedArray) and
-                  renormalizationThreshold is not None)
+        masked = (isinstance(in_field, numpy.ma.MaskedArray) and
+                  renorm_thresh is not None)
         if masked:
-            inMask = numpy.array(numpy.logical_not(inField.mask), float)
-            outField = self.matrix.dot(inMask * inField)
-            outMask = self.matrix.dot(inMask)
-            mask = outMask > renormalizationThreshold
+            in_mask = numpy.array(numpy.logical_not(in_field.mask), float)
+            out_field = self.matrix.dot(in_mask * in_field)
+            out_mask = self.matrix.dot(in_mask)
+            mask = out_mask > renorm_thresh
         else:
-            outField = self.matrix.dot(inField)
-            # make frac_b match the shape of outField
-            outMask = numpy.reshape(self.frac_b, (len(self.frac_b), 1)).repeat(
-                newShape[1], axis=1)
-            mask = outMask > 0.
+            out_field = self.matrix.dot(in_field)
+            # make frac_b match the shape of out_field
+            out_mask = numpy.reshape(self.frac_b, (len(self.frac_b), 1)).repeat(
+                new_shape[1], axis=1)
+            mask = out_mask > 0.
 
-        # normalize the result based on outMask
-        outField[mask] /= outMask[mask]
-        outField = numpy.ma.masked_array(outField,
-                                         mask=numpy.logical_not(mask))
+        # normalize the result based on out_mask
+        out_field[mask] /= out_mask[mask]
+        out_field = numpy.ma.masked_array(out_field,
+                                          mask=numpy.logical_not(mask))
 
-        destRemapDimCount = len(self.dst_grid_dims)
-        outDimCount = len(extraShape) + destRemapDimCount
+        dst_remap_dim_count = len(self.dst_grid_dims)
+        out_dim_count = len(extra_shape) + dst_remap_dim_count
 
         # "unflatten" the remapped dimension(s)
-        destShape = list(self.dst_grid_dims) + extraShape
-        outField = numpy.reshape(outField, destShape)
+        dst_shape = list(self.dst_grid_dims) + extra_shape
+        out_field = numpy.reshape(out_field, dst_shape)
 
         # "unpermute" the axes to be in the expected order
-        index = numpy.amin(remapAxes)
-        unpermuteAxes = list(numpy.arange(destRemapDimCount, outDimCount))
-        unpermuteAxes = (unpermuteAxes[0:index] +
-                         list(numpy.arange(destRemapDimCount)) +
-                         unpermuteAxes[index:])
-        outField = numpy.transpose(outField, axes=unpermuteAxes)
+        index = numpy.amin(remap_axes)
+        unpermute_axes = list(numpy.arange(dst_remap_dim_count, out_dim_count))
+        unpermute_axes = (unpermute_axes[0:index] +
+                          list(numpy.arange(dst_remap_dim_count)) +
+                          unpermute_axes[index:])
+        out_field = numpy.transpose(out_field, axes=unpermute_axes)
 
-        return outField  # }}}
+        return out_field
 
 
-def _get_temp_path():  # {{{
+# noinspection PyProtectedMember
+def _get_temp_path():
     """Returns the name of a temporary NetCDF file"""
     return '{}/{}.nc'.format(tempfile._get_default_tempdir(),
-                             next(tempfile._get_candidate_names()))  # }}}
-
-# vim: ai ts=4 sts=4 et sw=4 ft=python
+                             next(tempfile._get_candidate_names()))

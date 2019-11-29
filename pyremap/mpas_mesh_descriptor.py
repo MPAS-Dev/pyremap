@@ -10,6 +10,7 @@
 # https://raw.githubusercontent.com/MPAS-Dev/MPAS-Analysis/master/LICENSE
 
 import xarray
+from collections import OrderedDict
 
 from pyremap.mesh_descriptor import MeshDescriptor
 
@@ -51,30 +52,30 @@ class MpasMeshDescriptor(MeshDescriptor):
 
             self.regional = True
 
-            # build coords
-            self.coords = {'latCell': {'dims': 'nCells',
-                                       'data': ds.latCell.values,
-                                       'attrs': {'units': 'radians'}},
-                           'lonCell': {'dims': 'nCells',
-                                       'data': ds.lonCell.values,
-                                       'attrs': {'units': 'radians'}},
-                           'xCell': {'dims': 'nCells',
-                                     'data': ds.xCell.values,
-                                     'attrs': {'units': 'meters'}},
-                           'yCell': {'dims': 'nCells',
-                                     'data': ds.yCell.values,
-                                     'attrs': {'units': 'meters'}},
-                           'zCell': {'dims': 'nCells',
-                                     'data': ds.zCell.values,
-                                     'attrs': {'units': 'meters'}}}
+            self.coords = OrderedDict()
+            self.coords['latCell'] = {'dims': 'nCells',
+                                      'data': ds.latCell.values,
+                                      'attrs': {'units': 'radians'}}
+            self.coords['lonCell'] = {'dims': 'nCells',
+                                      'data': ds.lonCell.values,
+                                      'attrs': {'units': 'radians'}}
+            self.coords['xCell'] = {'dims': 'nCells',
+                                    'data': ds.xCell.values,
+                                    'attrs': {'units': 'meters'}}
+            self.coords['yCell'] = {'dims': 'nCells',
+                                    'data': ds.yCell.values,
+                                    'attrs': {'units': 'meters'}}
+            self.coords['zCell'] = {'dims': 'nCells',
+                                    'data': ds.zCell.values,
+                                    'attrs': {'units': 'meters'}}
 
-            self.sizes = {'nCells', ds.sizes['nCells']}
+            self.sizes = OrderedDict([('nCells', ds.sizes['nCells'])])
 
         vertices_on_cell = ds.verticesOnCell.values-1
         vertex_count_on_cells = ds.nVerticesOnCell.values
 
-        self.set_lat_lon_vertices(
-            ds.latVertex.values, ds.lonVertex.values,
+        self.set_lon_lat_vertices(
+            ds.lonVertex.values, ds.latVertex.values,
             vertices_on_cell=vertices_on_cell,
             vertex_count_on_cells=vertex_count_on_cells,
             degrees=False)
@@ -84,7 +85,7 @@ class MpasMeshDescriptor(MeshDescriptor):
             vertices_on_cell=vertices_on_cell,
             vertex_count_on_cells=vertex_count_on_cells)
 
-        self.set_lat_lon_cell_centers(ds.latCell.values, ds.lonCell.values,
+        self.set_lon_lat_cell_centers(ds.lonCell.values, ds.latCell.values,
                                       degrees=False)
 
         self.set_cartesian_cell_centers(ds.xCell.values, ds.yCell.values,

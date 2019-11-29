@@ -34,7 +34,7 @@ inGridFileName = 'ocean.QU.240km.151209.nc'
 inDescriptor = MpasMeshDescriptor(inGridFileName, inGridName)
 
 # modify the resolution of the global lat-lon grid as desired
-outDescriptor = get_lat_lon_descriptor(dLon=0.5, dLat=0.5)
+outDescriptor = get_lat_lon_descriptor(dLon=0.1, dLat=0.1)
 outGridName = outDescriptor.meshName
 
 mappingFileName = 'map_{}_to_{}_bilinear.nc'.format(inGridName, outGridName)
@@ -42,7 +42,7 @@ mappingFileName = 'map_{}_to_{}_bilinear.nc'.format(inGridName, outGridName)
 
 remapper = Remapper(inDescriptor, outDescriptor, mappingFileName)
 
-remapper.build_mapping_file(method='bilinear')
+remapper.build_mapping_file(method='bilinear', mpiTasks=8)
 
 outFileName = 'temp_{}.nc'.format(outGridName)
 ds = xarray.open_dataset(inGridFileName)
