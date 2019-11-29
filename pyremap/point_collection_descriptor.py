@@ -9,122 +9,66 @@
 # distributed with this code, or at
 # https://raw.githubusercontent.com/MPAS-Dev/MPAS-Analysis/master/LICENSE
 
-import netCDF4
 import numpy
-import sys
 
-from pyremap.mesh_descriptor import MeshDescriptor, _create_scrip
+from pyremap.mesh_descriptor import MeshDescriptor
 
 
-class PointCollectionDescriptor(MeshDescriptor):  # {{{
+class PointCollectionDescriptor(MeshDescriptor):
     """
     A class for describing a collection of points
-
-    Author
-    ------
-    Xylar Asay-Davis
-
-    Last Modified
-    -------------
-    04/19/2017
     """
 
-    def __init__(self, lats, lons, collectionName,
-                 units='degrees', outDimension='nPoints'):  # {{{
+    def __init__(self, lats, lons, collection_name,
+                 units='degrees', out_dimension='nPoints'):
         """
         Constructor stores
 
         Parameters
         ----------
 
-        lats, lons : 1D numpy arrays
+        lats, lons : numpy array
             The latitude and longitude of each point
 
-        collectionName : str
+        collection_name : str
             A unique name for the collection of transects, used in the names
             of files containing data mapped to these points.
 
         units : {'degrees', 'radians'}, optional
             The units of ``lats`` and ``lons``
 
-        outDimension : str, optional
+        out_dimension : str, optional
             The name of the dimension corresponding to the points (i.e. the
             "horizontal" dimension of the point collection)
-
-        Author
-        ------
-        Xylar Asay-Davis
-
-        Last Modified
-        -------------
-        04/19/2017
         """
 
-        self.meshName = collectionName
+        super().__init__()
+
+        self.meshname = collection_name
 
         self.regional = True
-
-        self.lat = lats
-        self.lon = lons
-        self.units = units
-
         # build coords
-        self.coords = {'lat': {'dims': outDimension,
-                               'data': self.lat,
+        self.coords = {'lat': {'dims': out_dimension,
+                               'data': lats,
                                'attrs': {'units': units}},
-                       'lon': {'dims': outDimension,
-                               'data': self.lon,
+                       'lon': {'dims': out_dimension,
+                               'data': lons,
                                'attrs': {'units': units}}}
-        self.dims = [outDimension]
-        self.dimSize = [len(self.lat)]
-        # }}}
+        self.sizes = {out_dimension: len(lats)}
 
-    def to_scrip(self, scripFileName):  # {{{
-        """
-        Given an MPAS mesh file, create a SCRIP file based on the mesh.
+        degrees = 'degree' in units
+        self.set_lat_lon_cell_centers(lats, lons, degrees=degrees)
 
-        Parameters
-        ----------
-        scripFileName : str
-            The path to which the SCRIP file should be written
-        """
-        # Authors
-        # ------
-        # Xylar Asay-Davis
+        point_count = len(lats)
+        lonvert = numpy.zeros((point_count, 4))
+        latvert = numpy.zeros((point_count, 4))
+        # just repeat the center lat and lon
+        for vert_index in range(4):
+            lonvert[:, vert_index] = lons
+            latvert[:, vert_index] = lats
 
-        self.scripFileName = scripFileName
+        vertices_on_cell = numpy.arange(4*point_count).reshape(point_count, 4)
 
-        outFile = netCDF4.Dataset(scripFileName, 'w')
-
-        nPoints = len(self.lat)
-
-        _create_scrip(outFile, grid_size=nPoints,
-                      grid_corners=4,
-                      grid_rank=1, units=self.units, meshName=self.meshName)
-
-        grid_area = outFile.createVariable('grid_area', 'f8', ('grid_size',))
-        grid_area.units = 'radian^2'
-        # SCRIP uses square radians
-        grid_area[:] = numpy.zeros(nPoints)
-
-        outFile.variables['grid_center_lat'][:] = self.lat
-        outFile.variables['grid_center_lon'][:] = self.lon
-        outFile.variables['grid_dims'][:] = nPoints
-        outFile.variables['grid_imask'][:] = 1
-
-        # grid corners:
-        grid_corner_lon = numpy.zeros((nPoints, 4))
-        grid_corner_lat = numpy.zeros((nPoints, 4))
-        # just repeate the center lat and lon
-        for iVertex in range(4):
-            grid_corner_lat[:, iVertex] = self.lat
-            grid_corner_lon[:, iVertex] = self.lon
-
-        outFile.variables['grid_corner_lat'][:] = grid_corner_lat[:]
-        outFile.variables['grid_corner_lon'][:] = grid_corner_lon[:]
-
-        # Update history attribute of netCDF file
-        setattr(outFile, 'history', ' '.join(sys.argv[:]))
-
-        outFile.close()  # }}}
-# }}}
+        self.set_lat_lon_vertices(latvert, lonvert,
+                                  vertices_on_cell=vertices_on_cell,
+                                  degrees=degrees)
