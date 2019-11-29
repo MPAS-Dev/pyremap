@@ -12,6 +12,7 @@
 import numpy
 import xarray
 import netCDF4
+import sys
 
 
 class MeshDescriptor(object):
@@ -20,7 +21,7 @@ class MeshDescriptor(object):
 
     Attributes
     ----------
-    mesh_name : str
+    meshname : str
         The name of the mesh, used as an attribute in NetCDF files and in
         mapping file names.
 
@@ -49,6 +50,22 @@ class MeshDescriptor(object):
 
     cell_count : numpy array
         The number of cells, 1D for meshes and 2D for structured grids
+
+    regional : bool
+        If this is a regional or global grid
+
+    sizes : dict
+        A dictionary of cell dimensions and their sizes (1 entry for meshes,
+        2 for grids)
+
+    coords : dict
+        A dictionary of xarray-style coordinates used to supply destination
+        datasets and NetCDF files with appropriate coordinates after remapping
+
+    history : str
+        A history string to be written to output files for provenance.  When
+        grids are read from files that contain a history attribute, the previous
+        history should be prepended on this string.
     """
 
     def __init__(self):
@@ -56,7 +73,7 @@ class MeshDescriptor(object):
         Constructor simply sets all attributes to None.
         """
 
-        self.mesh_name = None
+        self.meshname = None
         # variables related to vertices on cells of a grid or mesh
         self.lat_vertices = None
         self.lon_vertices = None
@@ -76,15 +93,23 @@ class MeshDescriptor(object):
 
         self.cell_count = None
 
-    def set_lat_lon_vertices(self, lat_vertices, lon_vertices,
-                             vertices_on_cell=None, vertex_count_on_cells=None,
+        self.regional = None
+
+        self.sizes = None
+        self.coords = None
+
+        self.history = ' '.join(sys.argv[:])
+
+    def set_lon_lat_vertices(self, lon_vertices, lat_vertices,
+                             vertices_on_cell=None,
+                             vertex_count_on_cells=None,
                              degrees=False):
         """
         Set the latitude and longitude of vertices around each finite volume
         cell.
         Parameters
         ----------
-        lat_vertices, lon_vertices : numpy array
+        lon_vertices, lat_vertices : numpy array
             latitude and longitude of vertices.  1D array for meshes, 2D for
             structured grids.  Each array should have the same size.  Use
             ``numpy.meshgrid`` or ``numpy.ndgrid`` to turn 1D grid dimensions
@@ -109,17 +134,17 @@ class MeshDescriptor(object):
         """
 
         if lat_vertices.shape != lon_vertices.shape:
-            raise ValueError('lat_vertices and lon_vertices must have the same '
+            raise ValueError('lon_vertices and lat_vertices must have the same '
                              'shape')
 
         self._set_cell_count_from_vertices(vertices_on_cell, lat_vertices)
 
         if degrees:
-            self.lat_vertices = numpy.deg2rad(lat_vertices)
             self.lon_vertices = numpy.deg2rad(lon_vertices)
+            self.lat_vertices = numpy.deg2rad(lat_vertices)
         else:
-            self.lat_vertices = lat_vertices
             self.lon_vertices = lon_vertices
+            self.lat_vertices = lat_vertices
 
         self.vertices_on_cell = vertices_on_cell
         self.vertex_count_on_cells = vertex_count_on_cells
@@ -164,13 +189,13 @@ class MeshDescriptor(object):
         self.vertices_on_cell = vertices_on_cell
         self.vertex_count_on_cells = vertex_count_on_cells
 
-    def set_lat_lon_cell_centers(self, lat_cells, lon_cells, degrees=False):
+    def set_lon_lat_cell_centers(self, lon_cells, lat_cells, degrees=False):
         """
         Set the latitude and longitude of vertices around each finite volume
         cell.
         Parameters
         ----------
-        lat_cells, lon_cells : numpy array
+        lon_cells, lat_cells : numpy array
             latitude and longitude of cell centers.  1D array for meshes, 2D for
             structured grids.  Each array should have the same size.  Use
             ``numpy.meshgrid`` or ``numpy.ndgrid`` to turn 1D grid dimensions
@@ -188,11 +213,11 @@ class MeshDescriptor(object):
         self._set_cell_count_from_cells(lat_cells)
 
         if degrees:
-            self.lat_cells = lat_cells
-            self.lon_cells = lon_cells
+            self.lon_cells = numpy.deg2rad(lon_cells)
+            self.lat_cells = numpy.deg2rad(lat_cells)
         else:
-            self.lat_cells = numpy.rad2deg(lat_cells)
-            self.lon_cells = numpy.rad2deg(lon_cells)
+            self.lon_cells = lon_cells
+            self.lat_cells = lat_cells
 
     def set_cartesian_cell_centers(self, x_cells, y_cells, z_cells):
         """
@@ -215,17 +240,6 @@ class MeshDescriptor(object):
 
         self.x_cells, self.y_cells, self.z_cells = \
             MeshDescriptor._normalize(x_cells, y_cells, z_cells)
-
-    def set_mesh_name(self, mesh_name):
-        """
-        Set the name of the mesh
-        Parameters
-        ----------
-        mesh_name: str
-            The mesh name, included in mapping file names and as an attribute
-            in SCRIP files.
-        """
-        self.mesh_name = mesh_name
 
     def to_scrip(self, scrip_file_name):
         """
@@ -264,8 +278,8 @@ class MeshDescriptor(object):
         ds['grid_imask'] = ['grid_rank', numpy.ones(cell_count, dtype=int)]
         ds.grid_imask.attrs['units'] = 'unitless'
 
-        if self.mesh_name is not None:
-            ds.attrs['mesh_name'] = self.mesh_name
+        if self.meshname is not None:
+            ds.attrs['meshname'] = self.meshname
 
         encoding_dict = {}
         variable_names = list(ds.data_vars.keys()) + list(ds.coords.keys())
@@ -281,7 +295,9 @@ class MeshDescriptor(object):
 
             if dtype.type is numpy.string_:
                 encoding_dict[variable_name] = {'dtype': str}
-                
+
+        ds.attrs['history'] = self.history
+
         ds.to_netcdf(scrip_file_name, format='NETCDF4', encoding=encoding_dict)
 
     def _set_cell_count_from_vertices(self, vertices_on_cell,
@@ -407,11 +423,13 @@ class MeshDescriptor(object):
         out_field : numpy array
             The field interpolated or extrapolated to 1D corners
         """
-        out_field = numpy.zeros(len(in_field) + 1)
-        out_field[1:-1] = 0.5 * (in_field[0:-1] + in_field[1:])
+        out_field = numpy.zeros(len(in_field), 2)
+        # interpolate the middle
+        out_field[1:, 0] = 0.5 * (in_field[0:-1] + in_field[1:])
+        out_field[0:-1, 1] = out_field[1:, 0]
         # extrapolate the ends
-        out_field[0] = 1.5 * in_field[0] - 0.5 * in_field[1]
-        out_field[-1] = 1.5 * in_field[-1] - 0.5 * in_field[-2]
+        out_field[0, 0] = 1.5 * in_field[0] - 0.5 * in_field[1]
+        out_field[-1, 1] = 1.5 * in_field[-1] - 0.5 * in_field[-2]
         return out_field
 
     @staticmethod
