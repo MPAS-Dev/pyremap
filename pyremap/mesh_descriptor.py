@@ -11,8 +11,9 @@
 
 import numpy
 import xarray
-import netCDF4
 import sys
+
+from pyremap import write_netcdf
 
 
 class MeshDescriptor(object):
@@ -258,47 +259,31 @@ class MeshDescriptor(object):
 
         ds = xarray.Dataset()
 
-        ds['grid_dims'] = ['grid_rank', self.cell_count]
+        ds['grid_dims'] = (('grid_rank',), self.cell_count[::-1])
 
         if self.lat_cells is not None and self.lon_cells is not None:
-            ds['grid_center_lat'] = ['grid_size', self.lat_cells.flat]
+            ds['grid_center_lat'] = (('grid_size',), self.lat_cells.flat)
             ds.grid_center_lat.attrs['units'] = 'radians'
-            ds['grid_center_lon'] = ['grid_size', self.lon_cells.flat]
+            ds['grid_center_lon'] = (('grid_size',), self.lon_cells.flat)
             ds.grid_center_lon.attrs['units'] = 'radians'
 
         if self.lat_vertices is not None and self.lon_vertices is not None:
-            ds['grid_corner_lat'] = [('grid_size', 'grid_corners'),
-                                     self._unravel_vertices(self.lat_vertices)]
-            ds.grid_center_lat.attrs['units'] = 'radians'
-            ds['grid_corner_lon'] = [('grid_size', 'grid_corners'),
-                                     self._unravel_vertices(self.lon_vertices)]
-            ds.grid_center_lon.attrs['units'] = 'radians'
+            ds['grid_corner_lat'] = (('grid_size', 'grid_corners'),
+                                     self._unravel_vertices(self.lat_vertices))
+            ds.grid_corner_lat.attrs['units'] = 'radians'
+            ds['grid_corner_lon'] = (('grid_size', 'grid_corners'),
+                                     self._unravel_vertices(self.lon_vertices))
+            ds.grid_corner_lon.attrs['units'] = 'radians'
 
         cell_count = numpy.product(self.cell_count)
-        ds['grid_imask'] = ['grid_rank', numpy.ones(cell_count, dtype=int)]
+        ds['grid_imask'] = (('grid_size',), numpy.ones(cell_count, dtype=int))
         ds.grid_imask.attrs['units'] = 'unitless'
 
         if self.meshname is not None:
             ds.attrs['meshname'] = self.meshname
 
-        encoding_dict = {}
-        variable_names = list(ds.data_vars.keys()) + list(ds.coords.keys())
-        for variable_name in variable_names:
-            dtype = ds[variable_name].dtype
-
-            # add fill values for types that have them
-            for fill_type in netCDF4.default_fillvals:
-                if dtype == numpy.dtype(fill_type):
-                    encoding_dict[variable_name] = \
-                        {'_FillValue': netCDF4.default_fillvals[fill_type]}
-                    break
-
-            if dtype.type is numpy.string_:
-                encoding_dict[variable_name] = {'dtype': str}
-
         ds.attrs['history'] = self.history
-
-        ds.to_netcdf(scrip_file_name, format='NETCDF4', encoding=encoding_dict)
+        write_netcdf(ds, scrip_file_name, format='NETCDF4')
 
     def _set_cell_count_from_vertices(self, vertices_on_cell,
                                       field_on_vertices):
@@ -371,7 +356,7 @@ class MeshDescriptor(object):
             for vert_index in range(max_verts):
                 cell_indices = numpy.arange(cell_count)
                 # repeat last vertex where vert_index > vertex_count_on_cells
-                local_vert_index = numpy.minimum(self.vertex_count_on_cells,
+                local_vert_index = numpy.minimum(self.vertex_count_on_cells-1,
                                                  vert_index)
                 vert_indices = \
                     self.vertices_on_cell[cell_indices, local_vert_index]
@@ -423,7 +408,7 @@ class MeshDescriptor(object):
         out_field : numpy array
             The field interpolated or extrapolated to 1D corners
         """
-        out_field = numpy.zeros(len(in_field), 2)
+        out_field = numpy.zeros((len(in_field), 2))
         # interpolate the middle
         out_field[1:, 0] = 0.5 * (in_field[0:-1] + in_field[1:])
         out_field[0:-1, 1] = out_field[1:, 0]

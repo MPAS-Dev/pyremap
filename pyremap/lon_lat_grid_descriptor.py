@@ -83,18 +83,25 @@ class LonLatGridDescriptor(ProjectionGridDescriptor):
             Resolution of the lat/lon grid in degrees
 
         lon_min, lon_max, lat_min, lat_max : float, optional
-            Bounds of the lat/lon grid
+            Bounds of the lat/lon grid in degrees
 
         Returns
         -------
         descriptor : ``LatLonGridDescriptor`` object
             A descriptor of the lat/lon grid
         """
-        nlat = int((lat_max - lat_min) / dlat) + 1
-        nlon = int((lon_max - lon_min) / dlon) + 1
-        lat = numpy.linspace(lat_min, lat_max, nlat)
-        lon = numpy.linspace(lon_min, lon_max, nlon)
+        nlat = int((lat_max - lat_min) / dlat)
+        nlon = int((lon_max - lon_min) / dlon)
+        latbnds = numpy.zeros((nlat, 2))
+        latbnds[:, 0] = numpy.linspace(lat_min, lat_max-dlat, nlat)
+        latbnds[:, 1] = numpy.linspace(lat_min+dlat, lat_max, nlat)
+        lonbnds = numpy.zeros((nlon, 2))
+        lonbnds[:, 0] = numpy.linspace(lon_min, lon_max-dlon, nlon)
+        lonbnds[:, 1] = numpy.linspace(lon_min+dlon, lon_max, nlon)
+        lat = 0.5*(latbnds[:, 0] + latbnds[:, 1])
+        lon = 0.5*(lonbnds[:, 0] + lonbnds[:, 1])
 
-        descriptor = LonLatGridDescriptor(lon=lon, lat=lat, units='degrees')
+        descriptor = LonLatGridDescriptor(lon=lon, lat=lat, lonbnds=lonbnds,
+                                          latbnds=latbnds, units='degrees')
 
         return descriptor

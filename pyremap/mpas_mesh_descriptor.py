@@ -53,26 +53,26 @@ class MpasMeshDescriptor(MeshDescriptor):
             self.regional = True
 
             self.coords = OrderedDict()
-            self.coords['latCell'] = {'dims': 'nCells',
+            self.coords['latCell'] = {'dims': ('nCells',),
                                       'data': ds.latCell.values,
                                       'attrs': {'units': 'radians'}}
-            self.coords['lonCell'] = {'dims': 'nCells',
+            self.coords['lonCell'] = {'dims': ('nCells',),
                                       'data': ds.lonCell.values,
                                       'attrs': {'units': 'radians'}}
-            self.coords['xCell'] = {'dims': 'nCells',
+            self.coords['xCell'] = {'dims': ('nCells',),
                                     'data': ds.xCell.values,
                                     'attrs': {'units': 'meters'}}
-            self.coords['yCell'] = {'dims': 'nCells',
+            self.coords['yCell'] = {'dims': ('nCells',),
                                     'data': ds.yCell.values,
                                     'attrs': {'units': 'meters'}}
-            self.coords['zCell'] = {'dims': 'nCells',
+            self.coords['zCell'] = {'dims': ('nCells',),
                                     'data': ds.zCell.values,
                                     'attrs': {'units': 'meters'}}
 
             self.sizes = OrderedDict([('nCells', ds.sizes['nCells'])])
 
-        vertices_on_cell = ds.verticesOnCell.values-1
-        vertex_count_on_cells = ds.nVerticesOnCell.values
+        vertices_on_cell = ds.verticesOnCell.values - 1
+        vertex_count_on_cells = ds.nEdgesOnCell.values
 
         self.set_lon_lat_vertices(
             ds.lonVertex.values, ds.latVertex.values,

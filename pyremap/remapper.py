@@ -19,7 +19,7 @@ import xarray
 import sys
 
 from pyremap import MpasMeshDescriptor, ProjectionGridDescriptor, \
-    PointCollectionDescriptor
+    PointCollectionDescriptor, MeshDescriptor, write_netcdf
 
 
 class Remapper(object):
@@ -262,11 +262,12 @@ class Remapper(object):
                           'Note: this presumes use of the conda-forge '
                           'channel.')
 
-        args = ['ncremap',
-                '-i', infilename,
-                '-m', self.mapping_filename,
-                '--vrb=1',
-                '-o', outfilename]
+        tempfiles = []
+
+        infilename, unpermute_dims = self._permute_dimensions(infilename)
+        if bool(unpermute_dims):
+            # we permuted som dimensions and saved to a temp file
+            tempfiles.append(infilename)
 
         regird_args = []
 
@@ -279,14 +280,35 @@ class Remapper(object):
                 '--rgr lon_nm={}'.format(
                 self.src_descrip.xvarname)])
 
+        add_coords = False
         if isinstance(self.dst_descrip, ProjectionGridDescriptor):
-            regird_args.extend(['--rgr lat_dmn_nm={}'.format(
-                self.dst_descrip.yvarname),
-                '--rgr lon_dmn_nm={}'.format(
-                self.dst_descrip.xvarname),
-                '--rgr lat_nm_out=lat', '--rgr lon_nm_out=lon'])
+            if self.dst_descrip.projection is None:
+                regird_args.extend(
+                    ['--rgr lat_dmn_nm={}'.format(self.dst_descrip.ydimname),
+                     '--rgr lon_dmn_nm={}'.format(self.dst_descrip.xdimname),
+                     '--rgr lat_nm_out={}'.format(self.dst_descrip.yvarname),
+                     '--rgr lon_nm_out={}'.format(self.dst_descrip.xdimname)])
+            else:
+                add_coords = True
+                regird_args.extend(
+                    ['--rgr lat_dmn_nm={}'.format(self.dst_descrip.ydimname),
+                     '--rgr lon_dmn_nm={}'.format(self.dst_descrip.xdimname),
+                     '--rgr lat_nm_out=lat', '--rgr lon_nm_out=lon'])
+
         if isinstance(self.dst_descrip, PointCollectionDescriptor):
             regird_args.extend(['--rgr lat_nm_out=lat', '--rgr lon_nm_out=lon'])
+
+        if add_coords or bool(unpermute_dims):
+            remap_filename = _get_temp_path()
+            tempfiles.append(remap_filename)
+        else:
+            remap_filename = outfilename
+
+        args = ['ncremap',
+                '-i', infilename,
+                '-m', self.mapping_filename,
+                '--vrb=1',
+                '-o', remap_filename]
 
         if len(regird_args) > 0:
             args.extend(['-R', ' '.join(regird_args)])
@@ -334,6 +356,36 @@ class Remapper(object):
             if process.returncode != 0:
                 raise subprocess.CalledProcessError(process.returncode,
                                                     ' '.join(args))
+
+        if bool(unpermute_dims):
+            # we permuted som dimensions, so we need to unpermute them
+            if add_coords:
+                unpermute_filename = _get_temp_path()
+                tempfiles.append(unpermute_filename)
+            else:
+                unpermute_filename = outfilename
+            self._unpermute_dimensions(remap_filename, unpermute_filename,
+                                       unpermute_dims)
+            remap_filename = unpermute_filename
+
+        if add_coords:
+            # add missing x and y coordinates
+            ds = xarray.open_dataset(remap_filename)
+            # load into memory because we're going to write to the same file
+            ds.load()
+            ds.close()
+
+            for name, coord in self.dst_descrip.coords.items():
+                if name in ds:
+                    if name not in ds.coords:
+                        # make sure this is a coordinate
+                        ds.coords[name] = ds[name]
+                if name not in ds:
+                    ds.coords[name] = xarray.DataArray.from_dict(coord)
+            write_netcdf(ds, outfilename)
+
+        for filename in tempfiles:
+            os.remove(filename)
 
     def remap(self, ds, renorm_thresh=None):
         """
@@ -393,6 +445,11 @@ class Remapper(object):
             ds_remap = ds_remap.map(self._remap_data_array,
                                     keep_attrs=True,
                                     args=(renorm_thresh,))
+
+            for name, coord in self.dst_descrip.coords.items():
+                if name not in ds_remap.coords:
+                    ds_remap.coords[name] = xarray.DataArray.from_dict(coord)
+
         else:
             raise TypeError('ds not an xarray Dataset or DataArray.')
 
@@ -454,6 +511,54 @@ class Remapper(object):
 
         self._mapping_loaded = True
 
+    def _permute_dimensions(self, infilename):
+        src_dims = list(self.src_descrip.sizes.keys())
+        dst_dims = list(self.dst_descrip.sizes.keys())
+        ds = xarray.open_dataset(infilename)
+        varnames = list(ds.data_vars.keys()) + list(ds.coords.keys())
+        unpermute_dims = {}
+        for name in varnames:
+            var = ds[name]
+            orig = list(var.dims)
+            new = list(orig)
+            unpermute = list(orig)
+            dims_in_var = all([dim in orig for dim in src_dims])
+
+            if dims_in_var:
+                addIndex = len(orig)
+                for dim in src_dims:
+                    if dim in new:
+                        index = new.index(dim)
+                        # move it to the end
+                        new.append(new.pop(index))
+                        unpermute.pop(index)
+                        addIndex = min(addIndex, index)
+
+                if new != orig:
+                    # we've permuted dims
+                    unpermute[addIndex:addIndex] = dst_dims
+                    unpermute_dims[name] = unpermute
+                    ds[name] = var.transpose(*new, transpose_coords=True)
+
+        if bool(unpermute_dims):
+            # we add something to the unpermuted dimensions dict, so we need to
+            # write out the permuted
+            permuted_filename = _get_temp_path()
+            write_netcdf(ds, permuted_filename)
+        else:
+            permuted_filename = infilename
+
+        return permuted_filename, unpermute_dims
+
+    # noinspection PyMethodMayBeStatic
+    def _unpermute_dimensions(self, remap_filename, unpermute_filename,
+                              unpermute_dims):
+        ds = xarray.open_dataset(remap_filename)
+        for name, dims in unpermute_dims.items():
+            if name in ds:
+                ds[name] = ds[name].transpose(*dims, transpose_coords=True)
+        write_netcdf(ds, unpermute_filename)
+
     @staticmethod
     def _check_dims(sizes, grid_dims):
         for index, (dim, dim_size) in enumerate(sizes.items()):
@@ -478,7 +583,7 @@ class Remapper(object):
         """
 
         src_dims = self.src_descrip.sizes.keys()
-        dst_dims = self.dst_descrip.dims
+        dst_dims = self.dst_descrip.sizes.keys()
 
         src_dims_in_array = [dim in da.dims for dim in src_dims]
 
@@ -515,10 +620,13 @@ class Remapper(object):
             if not src_dim_in_coord:
                 coord_dict[coord] = {'dims': da.coords[coord].dims,
                                      'data': da.coords[coord].values,
-                                     'attrs': da.coords[coord.attrs]}
+                                     'attrs': da.coords[coord].attrs}
 
         # add dest coords
-        coord_dict.update(self.dst_descrip.coords)
+        for name, coord in self.dst_descrip.coords.items():
+            coord_dims = coord['dims']
+            if all([dim in dims for dim in coord_dims]):
+                coord_dict[name] = coord
 
         # remap the values
         field = da.values

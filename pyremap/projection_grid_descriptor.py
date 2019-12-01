@@ -34,6 +34,9 @@ class ProjectionGridDescriptor(MeshDescriptor):
     xvarname, yvarname : str
         The names of the x and y coordinates, used to add coordinates after
         remapping if this is a destination grid
+
+    xvarname, yvarname : str
+        The name of the x and y dimensions
     """
 
     def __init__(self, projection=None, ds=None, filename=None, meshname=None,
@@ -82,7 +85,8 @@ class ProjectionGridDescriptor(MeshDescriptor):
 
         units : str, optional
             Will be taken from the ``units`` attribute of ``xvarname`` if not
-            explicitly provided
+            explicitly provided, or meters if x and y and/or xbnds and ybnds
+            are provided
         """
 
         super().__init__()
@@ -116,11 +120,14 @@ class ProjectionGridDescriptor(MeshDescriptor):
             if ydimname is None:
                 ydimname = yvarname
 
+            if units is None:
+                units = 'meters'
+
         else:
             if ds is None:
-                ds = xarray.open_dataarray(filename)
+                ds = xarray.open_dataset(filename)
 
-            if meshname is None:
+            if meshname is None and 'meshname' in ds.attrs:
                 meshname = ds.attrs['meshname']
 
             # Get info from input file
@@ -151,7 +158,7 @@ class ProjectionGridDescriptor(MeshDescriptor):
                          xdimname, ydimname, units, meshname)
 
         # Update history attribute of netCDF file
-        if 'history' in ds.attrs:
+        if ds is not None and 'history' in ds.attrs:
             self.history = '\n'.join([ds.attrs['history'], self.history])
 
     def project_to_lon_lat(self, X, Y, units):
@@ -194,6 +201,8 @@ class ProjectionGridDescriptor(MeshDescriptor):
         """
         self.xvarname = xvarname
         self.yvarname = yvarname
+        self.xdimname = xdimname
+        self.ydimname = ydimname
 
         dx = MeshDescriptor._round_res(abs(x[1] - x[0]))
         dy = MeshDescriptor._round_res(abs(y[1] - y[0]))
@@ -239,13 +248,13 @@ class ProjectionGridDescriptor(MeshDescriptor):
         self.set_lon_lat_vertices(Lonc, Latc)
 
         self.coords = OrderedDict(
-            [(xvarname, {'dims': xdimname,
+            [(xvarname, {'dims': (xdimname,),
                          'data': x,
                          'attrs': {'units': units,
                                    'bounds': xbndsname}}),
              (xbndsname, {'dims': (xdimname, 'bnds'),
                           'data': xbnds}),
-             (yvarname, {'dims': ydimname,
+             (yvarname, {'dims': (ydimname,),
                          'data': y,
                          'attrs': {'units': units,
                                    'bounds': ybndsname}}),
@@ -259,4 +268,5 @@ class ProjectionGridDescriptor(MeshDescriptor):
                                   'data': Lon,
                                   'attrs': {'units': 'degrees'}}
 
-        self.sizes = OrderedDict([(xdimname, len(x)), (ydimname, len(y))])
+        # y first, then x
+        self.sizes = OrderedDict([(ydimname, len(y)), (xdimname, len(x))])
