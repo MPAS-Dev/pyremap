@@ -59,6 +59,10 @@ class MeshDescriptor(object):
         A dictionary of cell dimensions and their sizes (1 entry for meshes,
         2 for grids)
 
+    lon_lat_coords : list
+        Names of the lat and lon coordinates or ``None`` for default
+        ['lat', 'lon']
+
     coords : OrderedDict
         A dictionary of xarray-style coordinates used to supply destination
         datasets and NetCDF files with appropriate coordinates after remapping
@@ -98,6 +102,7 @@ class MeshDescriptor(object):
 
         self.sizes = None
         self.coords = None
+        self.lon_lat_coords = None
 
         self.history = ' '.join(sys.argv[:])
 
