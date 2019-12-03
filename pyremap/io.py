@@ -14,13 +14,17 @@ import netCDF4
 
 
 def write_netcdf(ds, filename, fill_values=netCDF4.default_fillvals,
-                 format='NETCDF4'):
+                 format='NETCDF4', always_fill=True):
     '''Write an xarray Dataset with NetCDF4 fill values where needed'''
     encoding_dict = {}
     varnames = list(ds.data_vars.keys()) + list(ds.coords.keys())
     for varname in varnames:
         is_numeric = numpy.issubdtype(ds[varname].dtype, numpy.number)
-        if is_numeric and numpy.any(numpy.isnan(ds[varname])):
+        if always_fill:
+            fill = is_numeric
+        else:
+            fill = is_numeric and numpy.any(numpy.isnan(ds[varname]))
+        if fill:
             dtype = ds[varname].dtype
             for fill_type in fill_values:
                 if dtype == numpy.dtype(fill_type):
