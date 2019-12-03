@@ -56,6 +56,7 @@ class PointCollectionDescriptor(MeshDescriptor):
              ('lon', {'dims': out_dimension,
                       'data': lons,
                       'attrs': {'units': units}})])
+        self.lon_lat_coords = ['lat', 'lon']
         self.sizes = OrderedDict([(out_dimension, len(lats))])
 
         degrees = 'degree' in units

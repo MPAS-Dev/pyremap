@@ -69,6 +69,7 @@ class MpasMeshDescriptor(MeshDescriptor):
                                     'data': ds.zCell.values,
                                     'attrs': {'units': 'meters'}}
 
+            self.lon_lat_coords = ['latCell', 'lonCell']
             self.sizes = OrderedDict([('nCells', ds.sizes['nCells'])])
 
         vertices_on_cell = ds.verticesOnCell.values - 1

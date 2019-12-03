@@ -30,13 +30,6 @@ class ProjectionGridDescriptor(MeshDescriptor):
 
     lat_lon_projection : pyproj.Proj
         The reference projection used to get lat/lon from x/y
-
-    xvarname, yvarname : str
-        The names of the x and y coordinates, used to add coordinates after
-        remapping if this is a destination grid
-
-    xvarname, yvarname : str
-        The name of the x and y dimensions
     """
 
     def __init__(self, projection=None, ds=None, filename=None, meshname=None,
@@ -199,15 +192,10 @@ class ProjectionGridDescriptor(MeshDescriptor):
         """
         Set up a coords dict with x, y, lat and lon
         """
-        self.xvarname = xvarname
-        self.yvarname = yvarname
-        self.xdimname = xdimname
-        self.ydimname = ydimname
-
-        dx = MeshDescriptor._round_res(abs(x[1] - x[0]))
-        dy = MeshDescriptor._round_res(abs(y[1] - y[0]))
 
         if meshname is None:
+            dx = MeshDescriptor._round_res(abs(x[1] - x[0]))
+            dy = MeshDescriptor._round_res(abs(y[1] - y[0]))
             meshname = '{}x{}{}'.format(dx, dy, units)
 
         self.meshname = meshname
@@ -245,22 +233,25 @@ class ProjectionGridDescriptor(MeshDescriptor):
         Xc, Yc = numpy.meshgrid(xb, yb)
         (Lonc, Latc) = self.project_to_lon_lat(Xc, Yc, units)
 
-        self.set_lon_lat_vertices(Lonc, Latc)
+        self.set_lon_lat_vertices(Lonc, Latc, degrees=True)
 
         self.coords = OrderedDict(
             [(xvarname, {'dims': (xdimname,),
                          'data': x,
                          'attrs': {'units': units,
                                    'bounds': xbndsname}}),
-             (xbndsname, {'dims': (xdimname, 'bnds'),
+             (xbndsname, {'dims': (xdimname, 'nbnds'),
                           'data': xbnds}),
              (yvarname, {'dims': (ydimname,),
                          'data': y,
                          'attrs': {'units': units,
                                    'bounds': ybndsname}}),
-             (ybndsname, {'dims': (ydimname, 'bnds'),
+             (ybndsname, {'dims': (ydimname, 'nbnds'),
                           'data': ybnds})])
-        if self.projection is not None:
+        if self.projection is None:
+            self.lon_lat_coords = [yvarname, xvarname]
+        else:
+            self.lon_lat_coords = ['lat', 'lon']
             self.coords['lat'] = {'dims': (ydimname, xdimname),
                                   'data': Lat,
                                   'attrs': {'units': 'degrees'}}

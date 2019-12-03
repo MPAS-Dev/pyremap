@@ -98,7 +98,7 @@ class LonLat2DGridDescriptor(MeshDescriptor):
             latvert = numpy.array(ds[latvertname].values, float)
 
         self._set_coords(lon, lat, lonvert, latvert, latvarname, lonvarname,
-                         ds[latvarname].dims[0], ds[latvarname].dims[1],
+                         ds[latvarname].dims[1], ds[latvarname].dims[0],
                          units, meshname)
 
         # Update history attribute of netCDF file
@@ -124,6 +124,8 @@ class LonLat2DGridDescriptor(MeshDescriptor):
 
         self.set_lon_lat_vertices(lonvert, latvert)
 
+        self.lon_lat_coords = [latvarname, lonvarname]
+
         self.coords = OrderedDict(
             [(latvarname, {'dims': (ydimname, xdimname),
                            'data': lat,
@@ -132,5 +134,5 @@ class LonLat2DGridDescriptor(MeshDescriptor):
                            'data': lon,
                            'attrs': {'units': units}})])
 
-        self.sizes = OrderedDict([(xdimname, lat.shape[1]),
-                                  (ydimname, lat.shape[0])])
+        self.sizes = OrderedDict([(ydimname, lat.shape[1]),
+                                  (xdimname, lat.shape[0])])
