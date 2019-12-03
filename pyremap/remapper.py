@@ -18,8 +18,7 @@ from scipy.sparse import csr_matrix
 import xarray
 import sys
 
-from pyremap import MpasMeshDescriptor, ProjectionGridDescriptor, \
-    PointCollectionDescriptor, MeshDescriptor, write_netcdf
+from pyremap import PointCollectionDescriptor, MeshDescriptor, write_netcdf
 
 
 class Remapper(object):
@@ -271,32 +270,34 @@ class Remapper(object):
 
         regird_args = []
 
-        if renormalize is not None:
-            regird_args.append('--renormalize={}'.format(renormalize))
+        src_coords = self.src_descrip.lon_lat_coords
+        if src_coords is not None:
+            regird_args.extend(
+                ['--rgr lat_nm={}'.format(src_coords[0]),
+                 '--rgr lon_nm={}'.format(src_coords[1])])
 
-        if isinstance(self.src_descrip, ProjectionGridDescriptor):
-            regird_args.extend(['--rgr lat_nm={}'.format(
-                self.src_descrip.yvarname),
-                '--rgr lon_nm={}'.format(
-                self.src_descrip.xvarname)])
+        dst_coords = self.dst_descrip.lon_lat_coords
+        if dst_coords is not None:
+            regird_args.extend(
+                ['--rgr lat_nm_out={}'.format(dst_coords[0]),
+                 '--rgr lon_nm_out={}'.format(dst_coords[1])])
+
+        dst_dims = list(self.dst_descrip.sizes.keys())
+        if len(dst_dims) == 2:
+            regird_args.extend(
+                ['--rgr lat_dmn_nm={}'.format(dst_dims[0]),
+                 '--rgr lon_dmn_nm={}'.format(dst_dims[1])])
+        elif len(dst_dims) == 1:
+            regird_args.extend(
+                ['--rgr col_nm={}'.format(dst_dims[0])])
 
         add_coords = False
-        if isinstance(self.dst_descrip, ProjectionGridDescriptor):
-            if self.dst_descrip.projection is None:
-                regird_args.extend(
-                    ['--rgr lat_dmn_nm={}'.format(self.dst_descrip.ydimname),
-                     '--rgr lon_dmn_nm={}'.format(self.dst_descrip.xdimname),
-                     '--rgr lat_nm_out={}'.format(self.dst_descrip.yvarname),
-                     '--rgr lon_nm_out={}'.format(self.dst_descrip.xdimname)])
-            else:
+        if self.dst_descrip.coords is not None:
+            if src_coords is None:
                 add_coords = True
-                regird_args.extend(
-                    ['--rgr lat_dmn_nm={}'.format(self.dst_descrip.ydimname),
-                     '--rgr lon_dmn_nm={}'.format(self.dst_descrip.xdimname),
-                     '--rgr lat_nm_out=lat', '--rgr lon_nm_out=lon'])
-
-        if isinstance(self.dst_descrip, PointCollectionDescriptor):
-            regird_args.extend(['--rgr lat_nm_out=lat', '--rgr lon_nm_out=lon'])
+            else:
+                add_coords = any([name not in src_coords for name in
+                                  self.dst_descrip.coords.keys()])
 
         if add_coords or bool(unpermute_dims):
             remap_filename = _get_temp_path()
@@ -310,14 +311,11 @@ class Remapper(object):
                 '--vrb=1',
                 '-o', remap_filename]
 
+        if renormalize is not None:
+            args.append('--renormalization_threshold={}'.format(renormalize))
+
         if len(regird_args) > 0:
             args.extend(['-R', ' '.join(regird_args)])
-
-        if isinstance(self.src_descrip, MpasMeshDescriptor):
-            # Note: using the -C (climatology) flag for now because otherwise
-            #       ncremap tries to add a _FillValue attribute that might
-            #       already be present and quits with an error
-            args.extend(['-P', 'mpas', '-C'])
 
         if varlist is not None:
             args.extend(['-v', ','.join(varlist)])
@@ -376,12 +374,8 @@ class Remapper(object):
             ds.close()
 
             for name, coord in self.dst_descrip.coords.items():
-                if name in ds:
-                    if name not in ds.coords:
-                        # make sure this is a coordinate
-                        ds.coords[name] = ds[name]
-                if name not in ds:
-                    ds.coords[name] = xarray.DataArray.from_dict(coord)
+                # should overwrite coords if they already exist
+                ds.coords[name] = xarray.DataArray.from_dict(coord)
             write_netcdf(ds, outfilename)
 
         for filename in tempfiles:
@@ -516,6 +510,12 @@ class Remapper(object):
         dst_dims = list(self.dst_descrip.sizes.keys())
         ds = xarray.open_dataset(infilename)
         varnames = list(ds.data_vars.keys()) + list(ds.coords.keys())
+
+        # skip variables or coordinates that are going to be replaced by output
+        # coordinates
+        varnames = [name for name in varnames if name not in
+                    self.dst_descrip.coords]
+
         unpermute_dims = {}
         for name in varnames:
             var = ds[name]
@@ -673,24 +673,32 @@ class Remapper(object):
         # the remapping dimension
         in_field = in_field.transpose(permuted_axes).reshape(new_shape)
 
-        masked = (isinstance(in_field, numpy.ma.MaskedArray) and
-                  renorm_thresh is not None)
-        if masked:
-            in_mask = numpy.array(numpy.logical_not(in_field.mask), float)
-            out_field = self.matrix.dot(in_mask * in_field)
-            out_mask = self.matrix.dot(in_mask)
-            mask = out_mask > renorm_thresh
-        else:
-            out_field = self.matrix.dot(in_field)
-            # make frac_b match the shape of out_field
-            out_mask = numpy.reshape(self.frac_b, (len(self.frac_b), 1)).repeat(
-                new_shape[1], axis=1)
-            mask = out_mask > 0.
+        masked = isinstance(in_field, numpy.ma.MaskedArray)
+        threshold = renorm_thresh is not None
+        if threshold:
+            if masked:
+                in_mask = numpy.array(numpy.logical_not(in_field.mask), float)
+                out_field = self.matrix.dot(in_mask * in_field)
+                out_mask = self.matrix.dot(in_mask)
+                mask = out_mask > renorm_thresh
+            else:
+                out_field = self.matrix.dot(in_field)
+                # make frac_b match the shape of out_field
+                out_mask = numpy.reshape(self.frac_b,
+                                         (len(self.frac_b), 1)).repeat(
+                    new_shape[1], axis=1)
+                mask = out_mask > renorm_thresh
 
-        # normalize the result based on out_mask
-        out_field[mask] /= out_mask[mask]
-        out_field = numpy.ma.masked_array(out_field,
-                                          mask=numpy.logical_not(mask))
+            # normalize the result based on out_mask
+            out_field[mask] /= out_mask[mask]
+            out_field = numpy.ma.masked_array(out_field,
+                                              mask=numpy.logical_not(mask))
+        else:
+            if masked:
+                in_mask = numpy.array(numpy.logical_not(in_field.mask), float)
+                out_field = self.matrix.dot(in_mask * in_field)
+            else:
+                out_field = self.matrix.dot(in_field)
 
         dst_remap_dim_count = len(self.dst_grid_dims)
         out_dim_count = len(extra_shape) + dst_remap_dim_count
