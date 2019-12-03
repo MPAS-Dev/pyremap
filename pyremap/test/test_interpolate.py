@@ -112,6 +112,17 @@ class TestInterp(TestCase):
                                               meshname=meshname, units='meters')
         return descriptor
 
+    def get_points_descriptor(self, npoints=1000):
+
+        numpy.random.seed(seed=0)
+        lon = 360.*numpy.random.rand(npoints) - 180.
+        lat = 180.*numpy.random.rand(npoints) - 90.
+        meshname = 'random_points'
+        descriptor = PointCollectionDescriptor(
+            lats=lat, lons=lon, collection_name=meshname, units='degrees',
+            out_dimension='npoints')
+        return descriptor
+
     def get_file_names(self, suffix):
         mapping_filename = '{}/weights_{}.nc'.format(self.test_dir, suffix)
         outfilename = '{}/remapped_{}.nc'.format(self.test_dir, suffix)
@@ -148,12 +159,8 @@ class TestInterp(TestCase):
 
             assert os.path.exists(outfilename)
             ds_remapped = self.drop_extras(xarray.open_dataset(outfilename))
-            print(outfilename)
-            # drop some extra variables added by ncremap that aren't in the
-            # reference data set
-            varnames = [var for var in ['lat_bnds', 'lon_bnds', 'gw', 'area']
-                        if var in ds_remapped]
-            ds_remapped = ds_remapped.drop_vars(varnames)
+            print(ds_remapped.data_vars, ds_ref.data_vars)
+            print(ds_remapped.coords, ds_ref.coords)
             self.assertDatasetApproxEqual(ds_remapped, ds_ref)
 
         # now, try in-memory remapping
@@ -161,14 +168,12 @@ class TestInterp(TestCase):
         ds_remapped = remapper.remap(
             ds=ds, renorm_thresh=renorm)
         ds_remapped = self.drop_extras(ds_remapped)
-        print(ds_remapped.data_vars)
-        print(ds_remapped.coords)
         self.assertDatasetApproxEqual(ds_remapped, ds_ref)
 
     def drop_extras(self, ds, extra_vars=None):
         if extra_vars is None:
             extra_vars = ['lat_bnds', 'lon_bnds', 'gw', 'area', 'x_bnds',
-                          'y_bnds']
+                          'y_bnds', 'lat_vertices', 'lon_vertices']
         varnames = [var for var in extra_vars if var in ds]
         ds = ds.drop_vars(varnames)
         return ds
@@ -415,3 +420,21 @@ class TestInterp(TestCase):
 
         self.check_remap(infilename, outfilename, ref_filename,
                          remapper, remap_file=True, renorm=None)
+
+    def test_lon_lat_to_points(self):
+        """
+        test horizontal interpolation from a lat/lon grid to a destination
+        stereographic grid.
+        """
+
+        mapping_filename, outfilename, ref_filename = \
+            self.get_file_names(suffix='lon_lat_to_points')
+
+        src_descrip, lon_lat_grid_filename = self.get_lon_lat_file_descriptor()
+        dst_descrip = self.get_points_descriptor()
+
+        remapper = self.build_remapper(src_descrip, dst_descrip,
+                                       mapping_filename)
+
+        self.check_remap(lon_lat_grid_filename, outfilename, ref_filename,
+                         remapper, remap_file=True)

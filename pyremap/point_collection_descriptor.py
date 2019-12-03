@@ -63,12 +63,12 @@ class PointCollectionDescriptor(MeshDescriptor):
         self.set_lon_lat_cell_centers(lats, lons, degrees=degrees)
 
         point_count = len(lats)
-        lonvert = numpy.zeros((point_count, 4))
-        latvert = numpy.zeros((point_count, 4))
+        lonvert = numpy.zeros((point_count*4,))
+        latvert = numpy.zeros((point_count*4,))
         # just repeat the center lat and lon
         for vert_index in range(4):
-            lonvert[:, vert_index] = lons
-            latvert[:, vert_index] = lats
+            lonvert[vert_index::4] = lons
+            latvert[vert_index::4] = lats
 
         vertices_on_cell = numpy.arange(4*point_count).reshape(point_count, 4)
 
