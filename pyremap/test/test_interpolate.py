@@ -39,7 +39,6 @@ class TestInterp(TestCase):
     def tearDown(self):
         # Remove the directory after the test
         shutil.rmtree(self.test_dir)
-        #pass
 
     def get_mpas_descriptor(self):
         mpas_mesh_filename = str(self.datadir.join('mpasMesh.nc'))
@@ -47,7 +46,7 @@ class TestInterp(TestCase):
             str(self.datadir.join('timeSeries.0002-01-01.nc'))
         outfilename = '{}/unmapped_mpas.nc'.format(self.test_dir)
         # add fill values
-        write_netcdf(xarray.open_dataset(time_series_filename),outfilename,
+        write_netcdf(xarray.open_dataset(time_series_filename), outfilename,
                      always_fill=True)
         descriptor = MpasMeshDescriptor(mpas_mesh_filename, meshname='oQU240')
 
@@ -95,7 +94,6 @@ class TestInterp(TestCase):
                                               meshname=meshname)
         return descriptor, infilename
 
-
     def get_stereographic_array_descriptor(self, res=100e3):
 
         # projection for BEDMAP2 and other common Antarctic data sets
@@ -112,6 +110,7 @@ class TestInterp(TestCase):
                                               meshname=meshname, units='meters')
         return descriptor
 
+    # noinspection PyArgumentList
     def get_points_descriptor(self, npoints=1000):
 
         numpy.random.seed(seed=0)
@@ -159,8 +158,6 @@ class TestInterp(TestCase):
 
             assert os.path.exists(outfilename)
             ds_remapped = self.drop_extras(xarray.open_dataset(outfilename))
-            print(ds_remapped.data_vars, ds_ref.data_vars)
-            print(ds_remapped.coords, ds_ref.coords)
             self.assertDatasetApproxEqual(ds_remapped, ds_ref)
 
         # now, try in-memory remapping
@@ -335,6 +332,7 @@ class TestInterp(TestCase):
                          remapper, remap_file=True)
 
     def test_lat_lon_2d_to_lat_lon(self):
+        """Test a 2D (non-tensor) lon/lat grid to a lon/lat tensor grid"""
         mapping_filename, outfilename, ref_filename = \
             self.get_file_names(suffix='lon_lat_2d_to_lon_lat')
 
@@ -348,6 +346,7 @@ class TestInterp(TestCase):
                          remapper, remap_file=True)
 
     def test_stereographic_to_stereographic(self):
+        """Test remapping from one stereographic grid to another"""
         mapping_filename, outfilename, ref_filename = \
             self.get_file_names(suffix='stereographic_to_stereographic')
 
@@ -362,7 +361,7 @@ class TestInterp(TestCase):
     def test_mpas_to_stereographic_nearest(self):
         """
         test horizontal interpolation from an MPAS mesh to a destination
-        stereographic grid.
+        stereographic grid using nearest-neighbor interpolation
         """
 
         mapping_filename, outfilename, ref_filename = \
@@ -382,8 +381,8 @@ class TestInterp(TestCase):
     # noinspection PyTypeChecker
     def test_lon_lat_to_stereographic_conserve(self):
         """
-        test horizontal interpolation from an MPAS mesh to a destination
-        stereographic grid.
+        test horizontal interpolation from a lon/lat grid to a destination
+        stereographic grid with conservative interpolation
         """
 
         mapping_filename, outfilename, ref_filename = \
@@ -403,8 +402,8 @@ class TestInterp(TestCase):
     # noinspection PyTypeChecker
     def test_stereographic_to_lon_lat_conserve(self):
         """
-        test horizontal interpolation from an MPAS mesh to a destination
-        stereographic grid.
+        test horizontal interpolation from an stereographic grid to a
+        destination lon/loat grid using conservative interpolation
         """
 
         mapping_filename, outfilename, ref_filename = \
@@ -424,7 +423,7 @@ class TestInterp(TestCase):
     def test_lon_lat_to_points(self):
         """
         test horizontal interpolation from a lat/lon grid to a destination
-        stereographic grid.
+        set of points
         """
 
         mapping_filename, outfilename, ref_filename = \
@@ -438,3 +437,42 @@ class TestInterp(TestCase):
 
         self.check_remap(lon_lat_grid_filename, outfilename, ref_filename,
                          remapper, remap_file=True)
+
+    def test_lon_lat_to_mpas(self):
+        """
+        test horizontal interpolation from a lat/lon grid to a destination
+        MPAS messh.
+        """
+
+        mapping_filename, outfilename, ref_filename = \
+            self.get_file_names(suffix='lon_lat_to_mpas')
+
+        src_descrip, lon_lat_grid_filename = self.get_lon_lat_file_descriptor()
+        dst_descrip, _, _ = self.get_mpas_descriptor()
+
+        remapper = self.build_remapper(src_descrip, dst_descrip,
+                                       mapping_filename)
+
+        self.check_remap(lon_lat_grid_filename, outfilename, ref_filename,
+                         remapper, remap_file=True)
+
+    # noinspection PyTypeChecker
+    def test_stereographic_to_mpas_conserve(self):
+        """
+        test horizontal interpolation from a lat/lon grid to a destination
+        MPAS messh.
+        """
+
+        mapping_filename, outfilename, ref_filename = \
+            self.get_file_names(suffix='stereographic_to_mpas_conserve')
+
+        src_descrip = self.get_stereographic_array_descriptor(res=500e3)
+        dst_descrip, _, _ = self.get_mpas_descriptor()
+
+        infilename = self.make_stereographic_dataset(src_descrip)
+
+        remapper = self.build_remapper(src_descrip, dst_descrip,
+                                       mapping_filename, method='conserve')
+
+        self.check_remap(infilename, outfilename, ref_filename,
+                         remapper, remap_file=True, renorm=None)
