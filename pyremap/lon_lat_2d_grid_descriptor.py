@@ -29,7 +29,7 @@ class LonLat2DGridDescriptor(MeshDescriptor):
 
     def __init__(self, ds=None, filename=None, meshname=None, lonvarname='lon',
                  latvarname='lat', lonvertname=None, latvertname=None,
-                 units=None):
+                 degrees=None):
         """
         Constructor stores the projection
 
@@ -62,9 +62,9 @@ class LonLat2DGridDescriptor(MeshDescriptor):
             not provided, they are interpolated and extrapolated from
             ``lonvarname`` and ``latvarname``.
 
-        units : str, optional
-            Will be taken from the ``units`` attribute of ``lonvarname`` if not
-            explicitly provided
+        degrees : bool, optional
+            If the data is in degrees (vs. radians).  If not provided, it will
+            be inferred from the ``units`` attribute on ``lonvarname``.
         """
 
         super().__init__()
@@ -78,11 +78,11 @@ class LonLat2DGridDescriptor(MeshDescriptor):
         # Get info from input file
         lon = numpy.array(ds[lonvarname].values, float)
         lat = numpy.array(ds[latvarname].values, float)
-        if units is None:
-            if 'degree' in ds[latvarname].units:
-                units = 'degrees'
-            elif 'rad' in ds[latvarname].units:
-                units = 'radians'
+        if degrees is None:
+            if 'degree' in ds[lonvarname].units:
+                degrees = True
+            elif 'rad' in ds[lonvarname].units:
+                degrees = False
             else:
                 raise ValueError("Couldn't figure out units {}".format(
                     ds[latvarname].units))
@@ -99,40 +99,60 @@ class LonLat2DGridDescriptor(MeshDescriptor):
 
         self._set_coords(lon, lat, lonvert, latvert, latvarname, lonvarname,
                          ds[latvarname].dims[1], ds[latvarname].dims[0],
-                         units, meshname)
+                         degrees, meshname)
 
         # Update history attribute of netCDF file
         if 'history' in ds.attrs:
             self.history = '\n'.join([ds.attrs['history'], self.history])
 
     def _set_coords(self, lon, lat, lonvert, latvert, lonvarname,
-                    latvarname, xdimname,  ydimname, units, meshname):
+                    latvarname, xdimname,  ydimname, degrees, meshname):
         """
         Set up a coords dict with x, y, lat and lon
         """
-        dlon = MeshDescriptor._round_res(abs(lon[0, 1] - lon[0, 0]))
-        dlat = MeshDescriptor._round_res(abs(lat[1, 0] - lat[0, 0]))
+
+        if degrees:
+            units = 'degrees'
+        else:
+            units = 'radians'
 
         if meshname is None:
+            dlon = MeshDescriptor._round_res(abs(lon[0, 1] - lon[0, 0]))
+            dlat = MeshDescriptor._round_res(abs(lat[1, 0] - lat[0, 0]))
             meshname = '{}x{}{}'.format(dlon, dlat, units)
 
         self.meshname = meshname
 
         self.regional = True
 
-        self.set_lon_lat_cell_centers(lon, lat, degrees=True)
+        self.set_lon_lat_cell_centers(lon, lat, degrees=degrees)
 
-        self.set_lon_lat_vertices(lonvert, latvert)
+        self.set_lon_lat_vertices(lonvert, latvert, degrees=degrees)
 
         self.lon_lat_coords = [latvarname, lonvarname]
+
+        latvertvarname = '{}_vertices'.format(latvarname)
+        lonvertvarname = '{}_vertices'.format(lonvarname)
 
         self.coords = OrderedDict(
             [(latvarname, {'dims': (ydimname, xdimname),
                            'data': lat,
-                           'attrs': {'units': units}}),
+                           'attrs': {'units': '{}_north'.format(units),
+                                     'long_name': 'latitude',
+                                     'standard_name': 'latitude',
+                                     'bounds': latvertvarname}}),
              (lonvarname, {'dims': (ydimname, xdimname),
                            'data': lon,
-                           'attrs': {'units': units}})])
+                           'attrs': {'units': '{}_east'.format(units),
+                                     'long_name': 'longitude',
+                                     'standard_name': 'longitude',
+                                     'bounds': lonvertvarname}}),
+             (latvertvarname,
+              {'dims': (ydimname, xdimname, 'nv'),
+               'data': MeshDescriptor._unwrap_corners(latvert)}),
+             (lonvertvarname,
+              {'dims': (ydimname, xdimname, 'nv'),
+               'data': MeshDescriptor._unwrap_corners(lonvert)})])
 
         self.sizes = OrderedDict([(ydimname, lat.shape[1]),
                                   (xdimname, lat.shape[0])])

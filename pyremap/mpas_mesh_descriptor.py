@@ -10,6 +10,7 @@
 # https://raw.githubusercontent.com/MPAS-Dev/MPAS-Analysis/master/LICENSE
 
 import xarray
+import numpy
 from collections import OrderedDict
 
 from pyremap.mesh_descriptor import MeshDescriptor
@@ -55,39 +56,58 @@ class MpasMeshDescriptor(MeshDescriptor):
             self.coords = OrderedDict()
             self.coords['latCell'] = {'dims': ('nCells',),
                                       'data': ds.latCell.values,
-                                      'attrs': {'units': 'radians'}}
+                                      'attrs': {'units': 'radians_north',
+                                                'long_name': 'latitude',
+                                                'standard_name': 'latitude',
+                                                'bounds': 'latVertexOnCell'}}
             self.coords['lonCell'] = {'dims': ('nCells',),
                                       'data': ds.lonCell.values,
-                                      'attrs': {'units': 'radians'}}
-            self.coords['xCell'] = {'dims': ('nCells',),
-                                    'data': ds.xCell.values,
-                                    'attrs': {'units': 'meters'}}
-            self.coords['yCell'] = {'dims': ('nCells',),
-                                    'data': ds.yCell.values,
-                                    'attrs': {'units': 'meters'}}
-            self.coords['zCell'] = {'dims': ('nCells',),
-                                    'data': ds.zCell.values,
-                                    'attrs': {'units': 'meters'}}
+                                      'attrs': {'units': 'radians_east',
+                                                'long_name': 'longitude',
+                                                'standard_name': 'longitude',
+                                                'bounds': 'lonVertexOnCell'}}
+            self.coords['xCell'] = \
+                {'dims': ('nCells',),
+                 'data': ds.xCell.values,
+                 'attrs': {'units': 'm',
+                           'long_name': 'x-coordinate in Cartesian system'}}
+            self.coords['yCell'] = \
+                {'dims': ('nCells',),
+                 'data': ds.yCell.values,
+                 'attrs': {'units': 'm',
+                           'long_name': 'y-coordinate in Cartesian system'}}
+            self.coords['zCell'] = \
+                {'dims': ('nCells',),
+                 'data': ds.zCell.values,
+                 'attrs': {'units': 'm',
+                           'long_name': 'z-coordinate in Cartesian system'}}
 
             self.lon_lat_coords = ['latCell', 'lonCell']
             self.sizes = OrderedDict([('nCells', ds.sizes['nCells'])])
 
-        vertices_on_cell = ds.verticesOnCell.values - 1
-        vertex_count_on_cells = ds.nEdgesOnCell.values
+            vertices_on_cell = ds.verticesOnCell.values - 1
+            vertex_count_on_cells = ds.nEdgesOnCell.values
 
-        self.set_lon_lat_vertices(
-            ds.lonVertex.values, ds.latVertex.values,
-            vertices_on_cell=vertices_on_cell,
-            vertex_count_on_cells=vertex_count_on_cells,
-            degrees=False)
+            self.set_lon_lat_vertices(
+                ds.lonVertex.values, ds.latVertex.values,
+                vertices_on_cell=vertices_on_cell,
+                vertex_count_on_cells=vertex_count_on_cells,
+                degrees=False)
 
-        self.set_cartesian_vertices(
-            ds.xVertex.values, ds.yVertex.values, ds.zVertex.values,
-            vertices_on_cell=vertices_on_cell,
-            vertex_count_on_cells=vertex_count_on_cells)
+            self.set_cartesian_vertices(
+                ds.xVertex.values, ds.yVertex.values, ds.zVertex.values,
+                vertices_on_cell=vertices_on_cell,
+                vertex_count_on_cells=vertex_count_on_cells)
 
-        self.set_lon_lat_cell_centers(ds.lonCell.values, ds.latCell.values,
-                                      degrees=False)
+            self.set_lon_lat_cell_centers(ds.lonCell.values, ds.latCell.values,
+                                          degrees=False)
 
-        self.set_cartesian_cell_centers(ds.xCell.values, ds.yCell.values,
-                                        ds.zCell.values)
+            self.set_cartesian_cell_centers(ds.xCell.values, ds.yCell.values,
+                                            ds.zCell.values)
+
+            self.coords['latVertexOnCell'] = \
+                {'dims': ('nCells', 'maxVertices'),
+                 'data': self._unravel_vertices(ds.latVertex.values)}
+            self.coords['lonVertexOnCell'] = \
+                {'dims': ('nCells', 'maxVertices'),
+                 'data': self._unravel_vertices(ds.lonVertex.values)}

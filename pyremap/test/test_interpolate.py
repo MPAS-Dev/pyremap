@@ -58,7 +58,7 @@ class TestInterp(TestCase):
         descriptor = LonLatGridDescriptor(filename=lon_lat_grid_filename,
                                           lonvarname='lon',
                                           latvarname='lat',
-                                          units='degrees')
+                                          degrees=True)
 
         return descriptor, lon_lat_grid_filename
 
@@ -70,7 +70,7 @@ class TestInterp(TestCase):
                                             meshname=meshname,
                                             lonvarname='lon',
                                             latvarname='lat',
-                                            units='degrees')
+                                            degrees=True)
 
         return descriptor, infilename
 
@@ -107,7 +107,8 @@ class TestInterp(TestCase):
         x = numpy.linspace(-xmax, xmax, nx)
         meshname = '{}km_Antarctic_stereo'.format(int(res * 1e-3))
         descriptor = ProjectionGridDescriptor(projection=projection, x=x, y=x,
-                                              meshname=meshname, units='meters')
+                                              meshname=meshname, xunits='m',
+                                              yunits='m')
         return descriptor
 
     # noinspection PyArgumentList
@@ -149,6 +150,7 @@ class TestInterp(TestCase):
             ds_ref = remapper.remap(
                 ds=ds, renorm_thresh=renorm)
             write_netcdf(ds_ref, os.path.basename(ref_filename))
+            ds_ref = self.drop_extras(ds_ref)
 
         if remap_file:
             # first, test interpolation with ncremap

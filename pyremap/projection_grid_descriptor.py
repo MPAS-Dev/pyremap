@@ -34,7 +34,8 @@ class ProjectionGridDescriptor(MeshDescriptor):
 
     def __init__(self, projection=None, ds=None, filename=None, meshname=None,
                  x=None, y=None, xbnds=None, ybnds=None, xvarname='x',
-                 yvarname='y', xdimname=None, ydimname=None,  units=None):
+                 yvarname='y', xdimname=None, ydimname=None, xunits=None,
+                 yunits=None):
         """
         Constructor stores the projection
 
@@ -76,10 +77,10 @@ class ProjectionGridDescriptor(MeshDescriptor):
             The name of the x and y dimensions, the same as xvarname and
             yvarname by default
 
-        units : str, optional
-            Will be taken from the ``units`` attribute of ``xvarname`` if not
-            explicitly provided, or meters if x and y and/or xbnds and ybnds
-            are provided
+        xunits, yunits : str, optional
+            Will be taken from the ``units`` attribute of ``xvarname`` and
+            ``yvarname`` if not explicitly provided, or 'm' if x and y
+            and/or xbnds and ybnds are provided
         """
 
         super().__init__()
@@ -113,8 +114,10 @@ class ProjectionGridDescriptor(MeshDescriptor):
             if ydimname is None:
                 ydimname = yvarname
 
-            if units is None:
-                units = 'meters'
+            if xunits is None:
+                xunits = 'm'
+            if yunits is None:
+                yunits = 'm'
 
         else:
             if ds is None:
@@ -139,22 +142,26 @@ class ProjectionGridDescriptor(MeshDescriptor):
             else:
                 ybnds = MeshDescriptor.interp_extrap_corner(y)
 
-            if units is None:
+            if xunits is None:
                 if 'units' not in ds[xvarname].attrs:
-                    raise ValueError('No units were provided.')
-                units = ds[xvarname].attrs['units']
+                    raise ValueError('No units were provided for x.')
+                xunits = ds[xvarname].attrs['units']
+            if yunits is None:
+                if 'units' not in ds[yvarname].attrs:
+                    raise ValueError('No units were provided for y.')
+                yunits = ds[yvarname].attrs['units']
 
             xdimname = ds[xvarname].dims[0]
             ydimname = ds[yvarname].dims[0]
 
         self._set_coords(x, y, xbnds, ybnds, xvarname, yvarname,
-                         xdimname, ydimname, units, meshname)
+                         xdimname, ydimname, xunits, yunits, meshname)
 
         # Update history attribute of netCDF file
         if ds is not None and 'history' in ds.attrs:
             self.history = '\n'.join([ds.attrs['history'], self.history])
 
-    def project_to_lon_lat(self, X, Y, units):
+    def project_to_lon_lat(self, X, Y, xunits, yunits):
         """
         Given X and Y locations of points in a projection, returns the
         corresponding latitude and longitude of each point.
@@ -164,7 +171,7 @@ class ProjectionGridDescriptor(MeshDescriptor):
         X, Y : numpy.array
             X and y arrays of points in in the projection
 
-        units : str
+        xunits, yunits : str
             The units of X and Y if this is a lat/lon grid
 
         Returns
@@ -174,11 +181,13 @@ class ProjectionGridDescriptor(MeshDescriptor):
         """
 
         if self.projection is None:
-            if 'degree' in units:
+            if 'degree' in xunits:
                 Lon = X
-                Lat = Y
             else:
                 Lon = numpy.rad2deg(X)
+            if 'degree' in yunits:
+                Lat = Y
+            else:
                 Lat = numpy.rad2deg(Y)
         else:
             Lon, Lat = pyproj.transform(self.projection,
@@ -188,7 +197,7 @@ class ProjectionGridDescriptor(MeshDescriptor):
         return Lon, Lat
 
     def _set_coords(self, x, y, xbnds, ybnds, xvarname, yvarname, xdimname,
-                    ydimname, units, meshname):
+                    ydimname, xunits, yunits, meshname):
         """
         Set up a coords dict with x, y, lat and lon
         """
@@ -196,7 +205,12 @@ class ProjectionGridDescriptor(MeshDescriptor):
         if meshname is None:
             dx = MeshDescriptor._round_res(abs(x[1] - x[0]))
             dy = MeshDescriptor._round_res(abs(y[1] - y[0]))
-            meshname = '{}x{}{}'.format(dx, dy, units)
+            if 'degree' in xunits and 'degree' in yunits:
+                meshname = '{}x{}{}'.format(dx, dy, 'degrees')
+            elif xunits == yunits:
+                meshname = '{}x{}{}'.format(dx, dy, xunits)
+            else:
+                meshname = '{}{}x{}{}'.format(dx, xunits, dy, yunits)
 
         self.meshname = meshname
 
@@ -204,8 +218,9 @@ class ProjectionGridDescriptor(MeshDescriptor):
             # lat/lon grid
             lon_range = xbnds[-1, 1] - xbnds[0, 0]
             lat_range = ybnds[-1, 1] - ybnds[0, 0]
-            if 'rad' in units:
+            if 'rad' in xunits:
                 lon_range = numpy.rad2deg(lon_range)
+            if 'rad' in yunits:
                 lat_range = numpy.rad2deg(lat_range)
 
             # does the grid cover the full sphere?
@@ -215,7 +230,7 @@ class ProjectionGridDescriptor(MeshDescriptor):
             self.regional = True
 
         (X, Y) = numpy.meshgrid(x, y)
-        (Lon, Lat) = self.project_to_lon_lat(X, Y, units)
+        (Lon, Lat) = self.project_to_lon_lat(X, Y, xunits, yunits)
         self.set_lon_lat_cell_centers(Lon, Lat, degrees=True)
 
         xbndsname = '{}_bnds'.format(xvarname)
@@ -231,21 +246,38 @@ class ProjectionGridDescriptor(MeshDescriptor):
         yb[-1] = ybnds[-1, 1]
 
         Xc, Yc = numpy.meshgrid(xb, yb)
-        (Lonc, Latc) = self.project_to_lon_lat(Xc, Yc, units)
+        (Lonc, Latc) = self.project_to_lon_lat(Xc, Yc, xunits, yunits)
 
         self.set_lon_lat_vertices(Lonc, Latc, degrees=True)
+
+        if self.projection is None:
+            xlong = 'longitude'
+            xstd = 'longitude'
+            ylong = 'latitude'
+            ystd = 'latitude'
+        else:
+            xlong = 'x coordinate of projection'
+            xstd = 'projection_x_coordinate'
+            ylong = 'y coordinate of projection'
+            ystd = 'projection_y_coordinate'
 
         self.coords = OrderedDict(
             [(xvarname, {'dims': (xdimname,),
                          'data': x,
-                         'attrs': {'units': units,
-                                   'bounds': xbndsname}}),
+                         'attrs': {'units': xunits,
+                                   'long_name': xlong,
+                                   'standard_name': xstd,
+                                   'bounds': xbndsname,
+                                   'axis': 'X'}}),
              (xbndsname, {'dims': (xdimname, 'nbnds'),
                           'data': xbnds}),
              (yvarname, {'dims': (ydimname,),
                          'data': y,
-                         'attrs': {'units': units,
-                                   'bounds': ybndsname}}),
+                         'attrs': {'units': yunits,
+                                   'long_name': ylong,
+                                   'standard_name': ystd,
+                                   'bounds': ybndsname,
+                                   'axis': 'Y'}}),
              (ybndsname, {'dims': (ydimname, 'nbnds'),
                           'data': ybnds})])
         if self.projection is None:
@@ -254,10 +286,22 @@ class ProjectionGridDescriptor(MeshDescriptor):
             self.lon_lat_coords = ['lat', 'lon']
             self.coords['lat'] = {'dims': (ydimname, xdimname),
                                   'data': Lat,
-                                  'attrs': {'units': 'degrees'}}
+                                  'attrs': {'units': 'degrees_north',
+                                            'long_name': 'latitude',
+                                            'standard_name': 'latitude',
+                                            'bounds': 'lat_vertices'}}
             self.coords['lon'] = {'dims': (ydimname, xdimname),
                                   'data': Lon,
-                                  'attrs': {'units': 'degrees'}}
+                                  'attrs': {'units': 'degrees_east',
+                                            'long_name': 'longitude',
+                                            'standard_name': 'longitude',
+                                            'bounds': 'lon_vertices'}}
+            self.coords['lat_vertices'] = \
+                {'dims': (ydimname, xdimname, 'nv'),
+                 'data': MeshDescriptor._unwrap_corners(Latc)}
+            self.coords['lon_vertices'] = \
+                {'dims': (ydimname, xdimname, 'nv'),
+                 'data': MeshDescriptor._unwrap_corners(Lonc)}
 
         # y first, then x
         self.sizes = OrderedDict([(ydimname, len(y)), (xdimname, len(x))])

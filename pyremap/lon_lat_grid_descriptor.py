@@ -22,7 +22,7 @@ class LonLatGridDescriptor(ProjectionGridDescriptor):
     def __init__(self, ds=None, filename=None, meshname=None, lon=None,
                  lat=None, lonbnds=None, latbnds=None, lonvarname='lon',
                  latvarname='lat', londimname=None, latdimname=None,
-                 units=None):
+                 degrees=None):
         """
         Constructor stores the projection
 
@@ -60,16 +60,26 @@ class LonLatGridDescriptor(ProjectionGridDescriptor):
             The name of the lon and lat dimensions, the same as lonvarname and
             latvarname by default
 
-        units : str, optional
-            Will be taken from the ``units`` attribute of ``lonvarname`` if not
-            explicitly provided
+        degrees : bool, optional
+            If the data is in degrees (vs. radians).  If not provided, it will
+            be inferred from the ``units`` attribute on ``lonvarname``.
         """
+
+        if degrees is None:
+            xunits = None
+            yunits = None
+        elif degrees:
+            xunits = 'degrees_east'
+            yunits = 'degrees_north'
+        else:
+            xunits = 'radians_east'
+            yunits = 'radians_north'
 
         super().__init__(projection=None, ds=ds, filename=filename,
                          meshname=meshname, x=lon, y=lat, xbnds=lonbnds,
                          ybnds=latbnds, xvarname=lonvarname,
                          yvarname=latvarname, xdimname=londimname,
-                         ydimname=latdimname,  units=units)
+                         ydimname=latdimname,  xunits=xunits, yunits=yunits)
 
     @classmethod
     def create_constant_spacing(cls, dlon, dlat, lon_min=-180., lon_max=180.,
@@ -101,7 +111,7 @@ class LonLatGridDescriptor(ProjectionGridDescriptor):
         lat = 0.5*(latbnds[:, 0] + latbnds[:, 1])
         lon = 0.5*(lonbnds[:, 0] + lonbnds[:, 1])
 
-        descriptor = LonLatGridDescriptor(lon=lon, lat=lat, lonbnds=lonbnds,
-                                          latbnds=latbnds, units='degrees')
+        descriptor = LonLatGridDescriptor(
+            lon=lon, lat=lat, lonbnds=lonbnds, latbnds=latbnds, degrees=True)
 
         return descriptor

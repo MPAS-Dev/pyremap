@@ -346,8 +346,10 @@ class MeshDescriptor(object):
 
     def _unravel_vertices(self, field_on_vertices):
         if self.vertices_on_cell is None:
-            # this is a structured grid, so use _unwrap_corners to unravel
-            unraveled = MeshDescriptor._unwrap_corners(field_on_vertices)
+            # this is a structured grid, so use _unwrap_and_flatten_corners
+            # to unravel
+            unraveled = MeshDescriptor._unwrap_and_flatten_corners(
+                field_on_vertices)
         elif self.vertex_count_on_cells is None:
             # this is an unstructured mesh and all cells have the same
             # number of vertices
@@ -454,16 +456,26 @@ class MeshDescriptor(object):
     @staticmethod
     def _unwrap_corners(in_field):
         """
+        Turn a 2D array of corners into a 3D array of vertices for each cell
+        """
+        out_field = numpy.zeros(
+            (in_field.shape[0] - 1, in_field.shape[1] - 1, 4))
+        # corners are counterclockwise
+        out_field[:, :, 0] = in_field[0:-1, 0:-1]
+        out_field[:, :, 1] = in_field[0:-1, 1:]
+        out_field[:, :, 2] = in_field[1:, 1:]
+        out_field[:, :, 3] = in_field[1:, 0:-1]
+
+        return out_field
+
+    @staticmethod
+    def _unwrap_and_flatten_corners(in_field):
+        """
         Turn a 2D array of corners into an array of rectangular mesh elements
         """
-        cell_count = (in_field.shape[0] - 1) * (in_field.shape[1] - 1)
-        out_field = numpy.zeros((cell_count, 4))
-        # corners are counterclockwise
-        out_field[:, 0] = in_field[0:-1, 0:-1].flat
-        out_field[:, 1] = in_field[0:-1, 1:].flat
-        out_field[:, 2] = in_field[1:, 1:].flat
-        out_field[:, 3] = in_field[1:, 0:-1].flat
-
+        out_field = MeshDescriptor._unwrap_corners(in_field)
+        cell_count = out_field.shape[0] * out_field.shape[1]
+        out_field = out_field.reshape((cell_count, 4))
         return out_field
 
     @staticmethod
