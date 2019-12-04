@@ -10,18 +10,19 @@
 # distributed with this code, or at
 # https://raw.githubusercontent.com/MPAS-Dev/MPAS-Analysis/master/LICENSE
 
-'''
+"""
 Creates a mapping file that can be used with ncremap (NCO) to remap MPAS files
 to a latitude/longitude grid.
 
 Usage: Copy this script into the main MPAS-Analysis directory (up one level).
 Modify the grid name, the path to the MPAS grid file and the output grid
 resolution.
-'''
+"""
 
 import xarray
 
-from pyremap import MpasMeshDescriptor, Remapper, get_polar_descriptor
+from pyremap import MpasMeshDescriptor, Remapper, get_polar_descriptor, \
+    write_netcdf
 
 
 # replace with the MPAS mesh name
@@ -37,18 +38,19 @@ inDescriptor = MpasMeshDescriptor(inGridFileName, inGridName)
 # modify the size and resolution of the Antarctic grid as desired
 outDescriptor = get_polar_descriptor(Lx=6000., Ly=6000., dx=10., dy=10.,
                                      projection='antarctic')
-outGridName = outDescriptor.meshName
+outGridName = outDescriptor.meshname
 
 mappingFileName = 'map_{}_to_{}_conserve.nc'.format(inGridName, outGridName)
 
 remapper = Remapper(inDescriptor, outDescriptor, mappingFileName)
 
 # conservative remapping with 4 MPI tasks (using mpirun)
-remapper.build_mapping_file(method='conserve', mpiTasks=4)
+remapper.build_mapping_file(method='conserve', mpitasks=4)
 
-outFileName = 'temp_{}.nc'.format(outGridName)
+outFileName = 'sst_{}.nc'.format(outGridName)
 ds = xarray.open_dataset(inGridFileName)
 dsOut = xarray.Dataset()
-dsOut['temperature'] = ds['temperature']
+mask = ds.maxLevelCell > 0
+dsOut['sst'] = ds['temperature'].isel(nVertLevels=0).where(mask)
 dsOut = remapper.remap(dsOut)
-dsOut.to_netcdf(outFileName)
+write_netcdf(dsOut, outFileName, always_fill=False)

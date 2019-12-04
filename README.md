@@ -57,7 +57,7 @@ as well as the input file (an initial condition for the MPAS-Ocean model) and
 an example of temperature from the initial condition remapped to the new grid.
 ```
 ocean.QU.240km.151209.nc
-temp_0.5x0.5degree.nc
+sst_0.5x0.5degree.nc
 ```
 
 Second, let's try the same but to an Antarctic stereographic grid:
@@ -67,17 +67,17 @@ Second, let's try the same but to an Antarctic stereographic grid:
 Now, there's a new mapping file and example output file:
 ```
 map_oQU240_to_6000.0x6000.0km_10.0km_Antarctic_stereo.nc
-temp_6000.0x6000.0km_10.0km_Antarctic_stereo.nc
+sst_6000.0x6000.0km_10.0km_Antarctic_stereo.nc
 ```
 
 Finally, let's remap the temperature on the Antarctic grid to a lower
 resolution Antarctic grid:
 ```
-./remap_stereographic.py -i temp_6000.0x6000.0km_10.0km_Antarctic_stereo.nc \
-    -o temp_6000.0x6000.0km_20.0km_Antarctic_stereo.nc -r 20
+./remap_stereographic.py -i sst_6000.0x6000.0km_10.0km_Antarctic_stereo.nc \
+    -o sst_6000.0x6000.0km_20.0km_Antarctic_stereo.nc -r 20
 ```
 This created another mapping file and an output file:
 ```
 map_6000x6000km_10km_Antarctic_stereo_to_6000x6000km_20.0km_Antarctic_stereo.nc
-temp_6000.0x6000.0km_20.0km_Antarctic_stereo.nc
+sst_6000.0x6000.0km_20.0km_Antarctic_stereo.nc
 ```

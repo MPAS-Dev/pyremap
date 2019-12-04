@@ -1,19 +1,19 @@
 #!/usr/bin/env python
 
-'''
+"""
 Creates a mapping file and remaps the variables from an input file on an
 Antarctic grid to another grid with the same extent but a different resolution.
 The mapping file can be used with ncremap (NCO) to remap MPAS files between
 these same gridss.
 
 Usage: Copy this script into the main MPAS-Analysis directory (up one level).
-'''
+"""
 
 import numpy
 import xarray
 import argparse
 
-from pyremap import Remapper, ProjectionGridDescriptor
+from pyremap import Remapper, ProjectionGridDescriptor, write_netcdf
 from pyremap.polar import get_antarctic_stereographic_projection
 
 
@@ -47,7 +47,8 @@ inMeshName = '{}x{}km_{}km_Antarctic_stereo'.format(Lx, Ly, dx)
 
 projection = get_antarctic_stereographic_projection()
 
-inDescriptor = ProjectionGridDescriptor.create(projection, x, y, inMeshName)
+inDescriptor = ProjectionGridDescriptor(projection=projection, x=x, y=y,
+                                        meshname=inMeshName)
 
 outRes = args.resolution*1e3
 
@@ -60,15 +61,15 @@ yOut = y[0] + outRes*numpy.arange(nyOut)
 
 outMeshName = '{}x{}km_{}km_Antarctic_stereo'.format(Lx, Ly, args.resolution)
 
-outDescriptor = ProjectionGridDescriptor.create(projection, xOut, yOut,
-                                                outMeshName)
+outDescriptor = ProjectionGridDescriptor(projection=projection, x=xOut, y=yOut,
+                                         meshname=outMeshName)
 
 mappingFileName = 'map_{}_to_{}_{}.nc'.format(inMeshName, outMeshName,
                                               args.method)
 
 remapper = Remapper(inDescriptor, outDescriptor, mappingFileName)
 
-remapper.build_mapping_file(method=args.method, mpiTasks=args.mpiTasks)
+remapper.build_mapping_file(method=args.method, mpitasks=args.mpiTasks)
 
-dsOut = remapper.remap(dsIn, renormalizationThreshold=0.01)
-dsOut.to_netcdf(args.outFileName)
+dsOut = remapper.remap(ds=dsIn, renorm_thresh=0.01)
+write_netcdf(dsOut, args.outFileName, always_fill=False)
