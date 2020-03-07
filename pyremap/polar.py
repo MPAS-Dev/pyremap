@@ -101,7 +101,9 @@ def get_polar_descriptor(Lx, Ly, dx, dy, projection='antarctic'):
         A descriptor of the Antarctic grid
     """
 
-    meshName = '{}x{}km_{}km_Antarctic_stereo'.format(Lx, Ly, dx)
+    upperProj = projection[0].upper() + projection[1:]
+
+    meshName = '{}x{}km_{}km_{}_stereo'.format(Lx, Ly, dx, upperProj)
 
     xMax = 0.5 * Lx * 1e3
     nx = int(Lx / dx) + 1
