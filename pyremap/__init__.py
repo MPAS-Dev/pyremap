@@ -5,3 +5,6 @@ from pyremap.descriptor import MpasMeshDescriptor, LatLonGridDescriptor, \
 from pyremap.remapper import Remapper
 
 from pyremap.polar import get_polar_descriptor_from_file, get_polar_descriptor
+
+__version_info__ = (0, 0, 4)
+__version__ = '.'.join(str(vi) for vi in __version_info__)
