@@ -23,7 +23,7 @@ remap - perform horizontal interpolation on a data sets, given a mapping file
 # Xylar Asay-Davis
 
 import subprocess
-import tempfile
+from backports.tempfile import TemporaryDirectory
 import os
 from distutils.spawn import find_executable
 import numpy
@@ -98,7 +98,7 @@ class Remapper(object):
         # }}}
 
     def build_mapping_file(self, method='bilinear', additionalArgs=None,
-                           logger=None, mpiTasks=1):  # {{{
+                           logger=None, mpiTasks=1, tempdir=None):  # {{{
         '''
         Given a source file defining either an MPAS mesh or a lat-lon grid and
         a destination file or set of arrays defining a lat-lon grid, constructs
@@ -120,6 +120,12 @@ class Remapper(object):
         mpiTasks : int, optional
             The number of MPI tasks (a number > 1 implies that
             ESMF_RegridWeightGen will be called with ``mpirun``)
+
+        tempdir: str, optional
+            A temporary directory.  By default, a temporary directory is
+            created, typically in ``/tmp`` but on some systems such as compute
+            nodes this may not be visible to all processors in the subsequent
+            ``ESMF_RegridWeightGen`` call
 
         Raises
         ------
@@ -156,8 +162,15 @@ class Remapper(object):
                           'channel.')
 
         # Write source and destination SCRIP files in temporary locations
-        self.sourceDescriptor.to_scrip(_get_temp_path())
-        self.destinationDescriptor.to_scrip(_get_temp_path())
+        if tempdir is None:
+            tempobj = TemporaryDirectory()
+            tempdir = tempobj.name
+        else:
+            tempobj = None
+
+        self.sourceDescriptor.to_scrip('{}/src_mesh.nc'.format(tempdir))
+        self.destinationDescriptor.to_scrip(
+            '{}/dst_mesh.nc'.format(tempdir))
 
         args = [rwgPath,
                 '--source', self.sourceDescriptor.scripFileName,
@@ -214,9 +227,8 @@ class Remapper(object):
                 raise subprocess.CalledProcessError(process.returncode,
                                                     ' '.join(args))
 
-        # remove the temporary SCRIP files
-        os.remove(self.sourceDescriptor.scripFileName)
-        os.remove(self.destinationDescriptor.scripFileName)
+        if tempobj is not None:
+            tempobj.cleanup()
 
         # }}}
 
