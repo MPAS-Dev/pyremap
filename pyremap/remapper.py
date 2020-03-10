@@ -23,7 +23,7 @@ remap - perform horizontal interpolation on a data sets, given a mapping file
 # Xylar Asay-Davis
 
 import subprocess
-from backports.tempfile import TemporaryDirectory
+from tempfile import TemporaryDirectory
 import os
 from distutils.spawn import find_executable
 import numpy
