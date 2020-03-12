@@ -1,11 +1,12 @@
 # pyremap
-[![Documentation Status](http://readthedocs.org/projects/pyremap/badge/?version=latest)](http://pyremap.readthedocs.io/en/latest/?badge=latest)
+
+[![Build Status](https://travis-ci.org/MPAS-Dev/pyremap.svg?branch=master)](https://travis-ci.org/MPAS-Dev/pyremap)
 
 Python remapping tools for climate and earth system models.
 
 ## Documentation
 
-[http://pyremap.readthedocs.io](http://pyremap.readthedocs.io)
+[http://mpas-dev.github.io/pyremap/stable/](http://mpas-dev.github.io/pyremap/stable/)
 
 ## Installation
 
@@ -31,7 +32,7 @@ conda activate pyremap
 ```
 
 Then, get the code from:
-[https://github.com/xylar/pyremap](https://github.com/xylar/pyremap)
+[https://github.com/MPAS-Dev/pyremap](https://github.com/MPAS-Dev/pyremap)
 
 
 ## Examples
