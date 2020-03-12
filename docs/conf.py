@@ -12,6 +12,7 @@
 import os
 from glob import glob
 import pyremap
+from pyremap.docs.parse_quick_start import build_quick_start
 
 # -- General configuration ------------------------------------------------
 
