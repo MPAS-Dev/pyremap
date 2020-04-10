@@ -1,0 +1,23 @@
+pyremap.descriptor.PointCollectionDescriptor
+============================================
+
+.. currentmodule:: pyremap.descriptor
+
+.. autoclass:: PointCollectionDescriptor
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~PointCollectionDescriptor.__init__
+      ~PointCollectionDescriptor.to_scrip
+   
+   
+
+   
+   
+   
