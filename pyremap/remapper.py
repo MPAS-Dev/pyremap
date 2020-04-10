@@ -181,7 +181,12 @@ class Remapper(object):
                 '--no_log']
 
         if mpiTasks > 1:
-            args = ['mpirun', '-np', '{}'.format(mpiTasks)] + args
+            if 'CONDA_PREFIX' in os.environ:
+                mpirun_path = '{}/bin/mpirun'.format(os.environ['CONDA_PREFIX'])
+            else:
+                mpirun_path = 'mpirun'
+
+            args = [mpirun_path, '-np', '{}'.format(mpiTasks)] + args
 
         if self.sourceDescriptor.regional:
             args.append('--src_regional')
