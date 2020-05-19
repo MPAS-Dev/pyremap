@@ -667,10 +667,4 @@ class Remapper(object):
 
         return outField  # }}}
 
-
-def _get_temp_path():  # {{{
-    '''Returns the name of a temporary NetCDF file'''
-    return '{}/{}.nc'.format(tempfile._get_default_tempdir(),
-                             next(tempfile._get_candidate_names()))  # }}}
-
 # vim: ai ts=4 sts=4 et sw=4 ft=python
