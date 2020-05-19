@@ -30,6 +30,9 @@ import numpy
 from scipy.sparse import csr_matrix
 import xarray as xr
 import sys
+from subprocess import check_output, CalledProcessError
+import json
+import warnings
 
 from pyremap.descriptor import MpasMeshDescriptor, \
     LatLonGridDescriptor, LatLon2DGridDescriptor, ProjectionGridDescriptor, \
@@ -180,12 +183,30 @@ class Remapper(object):
                 '--netcdf4',
                 '--no_log']
 
-        if mpiTasks > 1:
-            if 'CONDA_PREFIX' in os.environ:
+        if 'CONDA_PREFIX' in os.environ:
+            # this is a conda environment, so we need to find out if esmf
+            # needs mpirun or not
+            conda_args = ['conda', 'list', 'esmf', '--json']
+            output = check_output(conda_args).decode("utf-8")
+            output = json.loads(output)
+            build_string = output[0]['build_string']
+
+            if 'mpi_mpich' in build_string or 'mpi_openmpi' in build_string:
+                # esmf was installed with MPI, so we should use mpirun
                 mpirun_path = '{}/bin/mpirun'.format(os.environ['CONDA_PREFIX'])
             else:
-                mpirun_path = 'mpirun'
+                # esmf was installed without MPI, so we shouldn't try to use it
+                if mpiTasks > 1:
+                    warnings.warn('Requesting {} MPI tasks but the MPI version '
+                                  'of ESMF is not installed'.format(mpiTasks))
+                mpirun_path = None
 
+        elif mpiTasks > 1:
+            mpirun_path = 'mpirun'
+        else:
+            mpirun_path = None
+
+        if mpirun_path is not None:
             args = [mpirun_path, '-np', '{}'.format(mpiTasks)] + args
 
         if self.sourceDescriptor.regional:
@@ -666,5 +687,6 @@ class Remapper(object):
         outField = numpy.transpose(outField, axes=unpermuteAxes)
 
         return outField  # }}}
+
 
 # vim: ai ts=4 sts=4 et sw=4 ft=python
