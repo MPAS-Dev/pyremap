@@ -464,10 +464,10 @@ class Remapper(object):
             for var in ds.data_vars:
                 if self._check_drop(ds[var]):
                     drop.append(var)
-            remappedDs = ds.drop(drop)
-            remappedDs = remappedDs.apply(self._remap_data_array,
-                                          keep_attrs=True,
-                                          args=(renormalizationThreshold,))
+            remappedDs = ds.drop_vars(drop)
+            remappedDs = remappedDs.map(self._remap_data_array,
+                                        keep_attrs=True,
+                                        args=(renormalizationThreshold,))
         else:
             raise TypeError('ds not an xarray Dataset or DataArray.')
 
