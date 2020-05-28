@@ -125,8 +125,8 @@ def to_polar(points):
     projection = get_antarctic_stereographic_projection()
     latLonProjection = pyproj.Proj(proj='latlong', datum='WGS84')
 
-    x, y = pyproj.transform(latLonProjection, projection, points[:, 0],
-                            points[:, 1], radians=False)
+    transformer = pyproj.Transformer.from_proj(latLonProjection, projection)
+    x, y = transformer.transform(points[:, 0], points[:, 1], radians=False)
     points[:, 0] = x
     points[:, 1] = y
     return points
@@ -137,8 +137,8 @@ def from_polar(points):
     projection = get_antarctic_stereographic_projection()
     latLonProjection = pyproj.Proj(proj='latlong', datum='WGS84')
 
-    lon, lat = pyproj.transform(projection, latLonProjection, points[:, 0],
-                                points[:, 1], radians=False)
+    transformer = pyproj.Transformer.from_proj(projection, latLonProjection)
+    lon, lat = transformer.transform(points[:, 0], points[:, 1], radians=False)
     points[:, 0] = lon
     points[:, 1] = lat
     return points

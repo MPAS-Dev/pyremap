@@ -110,8 +110,8 @@ class TestInterp(TestCase):
             dsRemapped = xarray.open_dataset(outFileName)
             # drop some extra vairables added by ncremap that aren't in the
             # reference data set
-            dsRemapped = dsRemapped.drop(['lat_bnds', 'lon_bnds', 'gw',
-                                          'area'])
+            dsRemapped = dsRemapped.drop_vars(['lat_bnds', 'lon_bnds', 'gw',
+                                               'area'])
             self.assertDatasetApproxEqual(dsRemapped, dsRef)
 
         # now, try in-memory remapping
