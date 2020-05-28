@@ -1,0 +1,6 @@
+pyremap.polar.get\_polar\_descriptor
+====================================
+
+.. currentmodule:: pyremap.polar
+
+.. autofunction:: get_polar_descriptor
