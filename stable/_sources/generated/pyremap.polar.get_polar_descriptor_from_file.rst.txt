@@ -1,4 +1,4 @@
-pyremap.polar.get\_polar\_descriptor\_from\_file
+﻿pyremap.polar.get\_polar\_descriptor\_from\_file
 ================================================
 
 .. currentmodule:: pyremap.polar

@@ -1,4 +1,4 @@
-pyremap.descriptor.PointCollectionDescriptor
+﻿pyremap.descriptor.PointCollectionDescriptor
 ============================================
 
 .. currentmodule:: pyremap.descriptor

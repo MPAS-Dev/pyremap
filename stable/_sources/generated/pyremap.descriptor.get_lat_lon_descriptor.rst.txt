@@ -1,4 +1,4 @@
-pyremap.descriptor.get\_lat\_lon\_descriptor
+﻿pyremap.descriptor.get\_lat\_lon\_descriptor
 ============================================
 
 .. currentmodule:: pyremap.descriptor

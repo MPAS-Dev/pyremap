@@ -1,4 +1,4 @@
-pyremap.polar.get\_antarctic\_stereographic\_projection
+﻿pyremap.polar.get\_antarctic\_stereographic\_projection
 =======================================================
 
 .. currentmodule:: pyremap.polar

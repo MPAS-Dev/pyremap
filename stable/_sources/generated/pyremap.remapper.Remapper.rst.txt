@@ -1,4 +1,4 @@
-pyremap.remapper.Remapper
+﻿pyremap.remapper.Remapper
 =========================
 
 .. currentmodule:: pyremap.remapper

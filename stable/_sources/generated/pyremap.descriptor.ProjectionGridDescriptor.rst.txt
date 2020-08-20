@@ -1,4 +1,4 @@
-pyremap.descriptor.ProjectionGridDescriptor
+﻿pyremap.descriptor.ProjectionGridDescriptor
 ===========================================
 
 .. currentmodule:: pyremap.descriptor
