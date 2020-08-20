@@ -455,7 +455,7 @@ class Remapper(object):
                 raise ValueError('data set and remapping source dimension {} '
                                  'don\'t have the same size: {} != {}'.format(
                                      dim, self.src_grid_dims[index],
-                                     len(ds.sizes[dim])))
+                                     ds.sizes[dim]))
 
         if isinstance(ds, xr.DataArray):
             remappedDs = self._remap_data_array(ds, renormalizationThreshold)
