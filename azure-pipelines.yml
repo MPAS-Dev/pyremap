@@ -1,0 +1,71 @@
+jobs:
+- job:
+  displayName: ubuntu-16.04
+  pool:
+    vmImage: 'ubuntu-16.04'
+  strategy:
+    matrix:
+      Python36:
+        python.version: '3.6'
+      Python37:
+        python.version: '3.7'
+      Python38:
+        python.version: '3.8'
+
+  steps:
+  - bash: echo "##vso[task.prependpath]$CONDA/bin"
+    displayName: Add conda to PATH
+
+  - bash: conda create --yes --quiet --name build python=$PYTHON_VERSION conda conda-build
+    displayName: Create Anaconda build environment
+
+  - bash: |
+      conda activate build
+      conda build -m "ci/python${PYTHON_VERSION}.yaml" "recipe"
+    displayName: Build pyremap
+
+  - bash: |
+      conda create --yes --quiet --name test --use-local python=$PYTHON_VERSION pyremap \
+          pytest sphinx mock sphinx_rtd_theme m2r
+    displayName: Create Anaconda test environment
+
+  - bash: |
+      conda activate test
+      pytest --pyargs pyremap
+    displayName: pytest
+
+- job:
+  displayName: macOS-10.13
+  pool:
+    vmImage: 'macOS-10.13'
+  strategy:
+    matrix:
+      Python36:
+        python.version: '3.6'
+      Python37:
+        python.version: '3.7'
+      Python38:
+        python.version: '3.8'
+
+  steps:
+  - bash: echo "##vso[task.prependpath]$CONDA/bin"
+    displayName: Add conda to PATH
+
+  - bash: conda create --yes --quiet --name build python=$PYTHON_VERSION conda conda-build
+    displayName: Create Anaconda build environment
+
+  - bash: |
+      conda activate build
+      conda build -m "ci/python${PYTHON_VERSION}.yaml" "recipe"
+    displayName: Build pyremap
+
+  - bash: |
+      conda create --yes --quiet --name test --use-local python=$PYTHON_VERSION pyremap \
+          pytest sphinx mock sphinx_rtd_theme m2r
+    displayName: Create Anaconda test environment
+
+  - bash: |
+      conda activate test
+      pytest --pyargs pyremap
+    displayName: pytest
+
