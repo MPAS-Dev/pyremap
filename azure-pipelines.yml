@@ -1,6 +1,6 @@
 jobs:
 - job:
-  displayName: ubuntu-16.04
+  displayName: linux
   pool:
     vmImage: 'ubuntu-16.04'
   strategy:
@@ -16,28 +16,34 @@ jobs:
   - bash: echo "##vso[task.prependpath]$CONDA/bin"
     displayName: Add conda to PATH
 
-  - bash: conda create --yes --quiet --name build python=$PYTHON_VERSION conda conda-build
+  - bash: |
+      conda config --add channels conda-forge
+      conda config --set channel_priority strict
+      conda create --yes --quiet --name build python=$PYTHON_VERSION conda conda-build
     displayName: Create Anaconda build environment
 
   - bash: |
+      eval "$(conda shell.bash hook)"
       conda activate build
       conda build -m "ci/python${PYTHON_VERSION}.yaml" "recipe"
     displayName: Build pyremap
 
   - bash: |
+      eval "$(conda shell.bash hook)"
       conda create --yes --quiet --name test --use-local python=$PYTHON_VERSION pyremap \
           pytest sphinx mock sphinx_rtd_theme m2r
     displayName: Create Anaconda test environment
 
   - bash: |
+      eval "$(conda shell.bash hook)"
       conda activate test
       pytest --pyargs pyremap
     displayName: pytest
 
 - job:
-  displayName: macOS-10.13
+  displayName: osx
   pool:
-    vmImage: 'macOS-10.13'
+    vmImage: 'macOS-10.14'
   strategy:
     matrix:
       Python36:
@@ -51,20 +57,26 @@ jobs:
   - bash: echo "##vso[task.prependpath]$CONDA/bin"
     displayName: Add conda to PATH
 
-  - bash: conda create --yes --quiet --name build python=$PYTHON_VERSION conda conda-build
+  - bash: |
+      conda config --add channels conda-forge
+      conda config --set channel_priority strict
+      conda create --yes --quiet --name build python=$PYTHON_VERSION conda conda-build
     displayName: Create Anaconda build environment
 
   - bash: |
+      eval "$(conda shell.bash hook)"
       conda activate build
       conda build -m "ci/python${PYTHON_VERSION}.yaml" "recipe"
     displayName: Build pyremap
 
   - bash: |
+      eval "$(conda shell.bash hook)"
       conda create --yes --quiet --name test --use-local python=$PYTHON_VERSION pyremap \
           pytest sphinx mock sphinx_rtd_theme m2r
     displayName: Create Anaconda test environment
 
   - bash: |
+      eval "$(conda shell.bash hook)"
       conda activate test
       pytest --pyargs pyremap
     displayName: pytest
