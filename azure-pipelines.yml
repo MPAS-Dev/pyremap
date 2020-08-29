@@ -30,8 +30,8 @@ jobs:
 
   - bash: |
       eval "$(conda shell.bash hook)"
-      conda create --yes --quiet --name test --use-local python=$PYTHON_VERSION pyremap \
-          pytest sphinx mock sphinx_rtd_theme m2r
+      conda create --yes --quiet --name test --use-local python=$PYTHON_VERSION \
+          pyremap pytest
     displayName: Create Anaconda test environment
 
   - bash: |
@@ -39,6 +39,41 @@ jobs:
       conda activate test
       pytest --pyargs pyremap
     displayName: pytest
+
+  - bash: |
+      eval "$(conda shell.bash hook)"
+      conda create --yes --quiet --name docs --use-local python=$PYTHON_VERSION \
+          pyremap sphinx mock sphinx_rtd_theme m2r
+    condition: eq(variables['python.version'], '3.8')
+    displayName: Create Anaconda docs environment
+
+  - bash: |
+      eval "$(conda shell.bash hook)"
+      conda activate docs
+
+      echo "source branch: $(Build.SourceBranch)"
+      echo "target branch: $(System.PullRequest.TargetBranch)"
+
+      tag=$(git describe --tags $(git rev-list --tags --max-count=1))
+      echo "tag: $tag"
+
+      version=`python -c "import pyremap; print(pyremap.__version__)"`
+      echo "version: $version"
+
+      if [[ "$(Build.SourceBranch)" == "refs/heads/master" ]]; then
+        export DOCS_VERSION="stable"
+      elif [[ "$(Build.SourceBranch)" == refs/tags/* ]]; then
+        # this is a tag build
+        export DOCS_VERSION="$tag"
+      else
+        DOCS_VERSION="$version"
+        export DOCS_VERSION
+      fi
+      echo "Docs version: $DOCS_VERSION"
+      cd docs || exit 1
+      make html
+    condition: eq(variables['python.version'], '3.8')
+    displayName: build and deploy docs
 
 - job:
   displayName: osx
