@@ -5,8 +5,8 @@ Quick Start
 ===========
 
 
-.. image:: https://travis-ci.org/MPAS-Dev/pyremap.svg?branch=master
-   :target: https://travis-ci.org/MPAS-Dev/pyremap
+.. image:: https://dev.azure.com/MPAS-Dev/pyremap%20testing/_apis/build/status/MPAS-Dev.pyremap?branchName=master
+   :target: https://dev.azure.com/MPAS-Dev/pyremap%20testing/_build/latest?definitionId=1&branchName=master
    :alt: Build Status
 
 
