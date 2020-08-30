@@ -1,6 +1,6 @@
 # pyremap
 
-[![Build Status](https://travis-ci.org/MPAS-Dev/pyremap.svg?branch=master)](https://travis-ci.org/MPAS-Dev/pyremap)
+[![Build Status](https://dev.azure.com/MPAS-Dev/pyremap%20testing/_apis/build/status/MPAS-Dev.pyremap?branchName=master)](https://dev.azure.com/MPAS-Dev/pyremap%20testing/_build/latest?definitionId=1&branchName=master)
 
 Python remapping tools for climate and earth system models.
 
