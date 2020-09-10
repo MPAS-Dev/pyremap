@@ -231,8 +231,8 @@ class Remapper(object):
 
             # throw out the standard output from ESMF_RegridWeightGen, as it's
             # rather verbose but keep stderr
-            DEVNULL = open(os.devnull, 'wb')
-            subprocess.check_call(args, stdout=DEVNULL)
+            with open(os.devnull, 'wb') as DEVNULL:
+                subprocess.check_call(args, stdout=DEVNULL)
 
         else:
             logger.info('running: {}'.format(' '.join(args)))
