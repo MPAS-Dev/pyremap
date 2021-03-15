@@ -269,6 +269,7 @@ class Remapper(object):
             # throw out the standard output from ESMF_RegridWeightGen, as it's
             # rather verbose but keep stderr
             if stderr:
+                stderr = stderr.decode('utf-8')
                 for line in stderr.split('\n'):
                     logger.error(line)
 
