@@ -8,7 +8,7 @@
 # Additional copyright and license information can be found in the LICENSE file
 # distributed with this code, or at
 # https://raw.githubusercontent.com/MPAS-Dev/MPAS-Analysis/master/LICENSE
-'''
+"""
 Functions for performing interpolation
 
 Functions
@@ -17,7 +17,7 @@ build_remap_weights - constructs a mapping file containing the indices and
     weights needed to perform horizontal interpolation
 
 remap - perform horizontal interpolation on a data sets, given a mapping file
-'''
+"""
 # Authors
 # -------
 # Xylar Asay-Davis
@@ -30,7 +30,7 @@ import numpy
 from scipy.sparse import csr_matrix
 import xarray as xr
 import sys
-from subprocess import check_output, CalledProcessError
+from subprocess import check_output
 import json
 import warnings
 
@@ -40,18 +40,18 @@ from pyremap.descriptor import MpasMeshDescriptor, \
 
 
 class Remapper(object):
-    '''
+    """
     A class for remapping fields using a given mapping file.  The weights and
     indices from the mapping file can be loaded once and reused multiple times
     to map several fields between the same source and destination grids.
-    '''
+    """
     # Authors
     # -------
     # Xylar Asay-Davis
 
     def __init__(self, sourceDescriptor, destinationDescriptor,
                  mappingFileName=None):  # {{{
-        '''
+        """
         Create the remapper and read weights and indices from the given file
         for later used in remapping fields.
 
@@ -72,7 +72,7 @@ class Remapper(object):
             This is useful if the source and destination grids are determined
             to be the same (though the Remapper does not attempt to determine
             if this is the case).
-        '''
+        """
         # Authors
         # -------
         # Xylar Asay-Davis
@@ -101,8 +101,9 @@ class Remapper(object):
         # }}}
 
     def build_mapping_file(self, method='bilinear', additionalArgs=None,
-                           logger=None, mpiTasks=1, tempdir=None):  # {{{
-        '''
+                           logger=None, mpiTasks=1, tempdir=None,
+                           esmf_path=None, esmf_parallel_exec=None):  # {{{
+        """
         Given a source file defining either an MPAS mesh or a lat-lon grid and
         a destination file or set of arrays defining a lat-lon grid, constructs
         a mapping file used for interpolation between the source and
@@ -124,11 +125,20 @@ class Remapper(object):
             The number of MPI tasks (a number > 1 implies that
             ESMF_RegridWeightGen will be called with ``mpirun``)
 
-        tempdir: str, optional
+        tempdir : str, optional
             A temporary directory.  By default, a temporary directory is
             created, typically in ``/tmp`` but on some systems such as compute
             nodes this may not be visible to all processors in the subsequent
             ``ESMF_RegridWeightGen`` call
+
+        esmf_path : str, optional
+            A path to a system build of ESMF (containing a 'bin' directory with
+            the ESMF tools).  By default, ESMF tools are found in the conda
+            environment
+
+        esmf_parallel_exec : {'srun', 'mpirun}, optional
+            The name of the parallel executable to use to launch ESMF tools.
+            But default, 'mpirun' from the conda environment is used
 
         Raises
         ------
@@ -137,7 +147,7 @@ class Remapper(object):
 
         ValueError
             If sourceDescriptor or destinationDescriptor is of an unknown type
-        '''
+        """
         # Authors
         # -------
         # Xylar Asay-Davis
@@ -154,15 +164,19 @@ class Remapper(object):
             # a valid weight file already exists, so nothing to do
             return
 
-        rwgPath = find_executable('ESMF_RegridWeightGen')
+        if esmf_path is not None:
+            # use the system build of ESMF
+            rwgPath = os.path.join(esmf_path, 'bin', 'ESMF_RegridWeightGen')
 
-        if rwgPath is None:
-            raise OSError('ESMF_RegridWeightGen not found. Make sure esmf '
-                          'package is installed via\n'
-                          'latest nco: \n'
-                          'conda install nco\n'
-                          'Note: this presumes use of the conda-forge '
-                          'channel.')
+        else:
+            rwgPath = find_executable('ESMF_RegridWeightGen')
+
+            if rwgPath is None:
+                raise OSError('ESMF_RegridWeightGen not found. Make sure esmf '
+                              'package is installed: \n'
+                              'conda install esmf\n'
+                              'Note: this presumes use of the conda-forge '
+                              'channel.')
 
         # Write source and destination SCRIP files in temporary locations
         if tempdir is None:
@@ -183,31 +197,40 @@ class Remapper(object):
                 '--netcdf4',
                 '--no_log']
 
-        if 'CONDA_PREFIX' in os.environ:
-            # this is a conda environment, so we need to find out if esmf
-            # needs mpirun or not
-            conda_args = ['conda', 'list', 'esmf', '--json']
-            output = check_output(conda_args).decode("utf-8")
-            output = json.loads(output)
-            build_string = output[0]['build_string']
+        parallel_args = []
 
-            if 'mpi_mpich' in build_string or 'mpi_openmpi' in build_string:
-                # esmf was installed with MPI, so we should use mpirun
-                mpirun_path = '{}/bin/mpirun'.format(os.environ['CONDA_PREFIX'])
-            else:
-                # esmf was installed without MPI, so we shouldn't try to use it
-                if mpiTasks > 1:
-                    warnings.warn('Requesting {} MPI tasks but the MPI version '
-                                  'of ESMF is not installed'.format(mpiTasks))
-                mpirun_path = None
+        if mpiTasks > 1:
+            if esmf_parallel_exec is not None:
+                # use the specified parallel executable
 
-        elif mpiTasks > 1:
-            mpirun_path = 'mpirun'
-        else:
-            mpirun_path = None
+                if 'srun' in esmf_parallel_exec:
+                    parallel_args = [esmf_parallel_exec, '-n',
+                                     '{}'.format(mpiTasks)]
+                else:
+                    # presume mpirun syntax
+                    parallel_args = [esmf_parallel_exec, '-np',
+                                     '{}'.format(mpiTasks)]
 
-        if mpirun_path is not None:
-            args = [mpirun_path, '-np', '{}'.format(mpiTasks)] + args
+            elif 'CONDA_PREFIX' in os.environ and mpiTasks > 1:
+                # this is a conda environment, so we need to find out if esmf
+                # needs mpirun or not
+                conda_args = ['conda', 'list', 'esmf', '--json']
+                output = check_output(conda_args).decode("utf-8")
+                output = json.loads(output)
+                build_string = output[0]['build_string']
+
+                if 'mpi_mpich' in build_string or 'mpi_openmpi' in build_string:
+                    # esmf was installed with MPI, so we should use mpirun
+                    mpirun_path = '{}/bin/mpirun'.format(
+                        os.environ['CONDA_PREFIX'])
+                    parallel_args = [mpirun_path, '-np', '{}'.format(mpiTasks)]
+                else:
+                    # esmf was installed without MPI, so we shouldn't try to
+                    # use it
+                    warnings.warn('Requesting {} MPI tasks but the MPI version'
+                                  ' of ESMF is not installed'.format(mpiTasks))
+
+        args = parallel_args + args
 
         if self.sourceDescriptor.regional:
             args.append('--src_regional')
@@ -246,6 +269,7 @@ class Remapper(object):
             # throw out the standard output from ESMF_RegridWeightGen, as it's
             # rather verbose but keep stderr
             if stderr:
+                stderr = stderr.decode('utf-8')
                 for line in stderr.split('\n'):
                     logger.error(line)
 
@@ -260,7 +284,7 @@ class Remapper(object):
 
     def remap_file(self, inFileName, outFileName, variableList=None,
                    overwrite=False, renormalize=None, logger=None):  # {{{
-        '''
+        """
         Given a source file defining either an MPAS mesh or a lat-lon grid and
         a destination file or set of arrays defining a lat-lon grid, constructs
         a mapping file used for interpolation between the source and
@@ -297,7 +321,7 @@ class Remapper(object):
         ValueError
             If ``mappingFileName`` is ``None`` (meaning no remapping is
             needed).
-        '''
+        """
         # Authors
         # -------
         # Xylar Asay-Davis
@@ -312,7 +336,7 @@ class Remapper(object):
             # a remapped file already exists, so nothing to do
             return
 
-        if isinstance(self.sourceDescriptor, (PointCollectionDescriptor)):
+        if isinstance(self.sourceDescriptor, PointCollectionDescriptor):
             raise TypeError('Source grid is a point collection, which is not'
                             'supported.')
 
@@ -408,7 +432,7 @@ class Remapper(object):
         # }}}
 
     def remap(self, ds, renormalizationThreshold=None):  # {{{
-        '''
+        """
         Given a source data set, returns a remapped version of the data set,
         possibly masked and renormalized.
 
@@ -439,7 +463,7 @@ class Remapper(object):
             (``self.src_grid_dims``).
         TypeError
             If ds is not an ``xarray.Dataset`` or ``xarray.DataArray`` object
-        '''
+        """
         # Authors
         # -------
         # Xylar Asay-Davis
@@ -484,10 +508,10 @@ class Remapper(object):
         return remappedDs  # }}}
 
     def _load_mapping(self):  # {{{
-        '''
+        """
         Load weights and indices from a mapping file, if this has not already
         been done
-        '''
+        """
         # Authors
         # -------
         # Xylar Asay-Davis
@@ -555,9 +579,9 @@ class Remapper(object):
                 numpy.all(sourceDimsInArray))  # }}}
 
     def _remap_data_array(self, dataArray, renormalizationThreshold):  # {{{
-        '''
+        """
         Remap a single xarray data array
-        '''
+        """
         # Authors
         # -------
         # Xylar Asay-Davis
@@ -625,9 +649,9 @@ class Remapper(object):
 
     def _remap_numpy_array(self, inField, remapAxes,
                            renormalizationThreshold):  # {{{
-        '''
+        """
         Remap a single numpy array
-        '''
+        """
         # Authors
         # -------
         # Xylar Asay-Davis
