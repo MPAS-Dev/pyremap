@@ -3,9 +3,9 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>pyremap.remapper &mdash; pyremap stable documentation</title>
   
@@ -16,7 +16,10 @@
 
   
   
+
   
+  
+
   
 
   
@@ -29,7 +32,6 @@
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
@@ -49,7 +51,7 @@
           
 
           
-            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> pyremap
+            <a href="../../index.html" class="icon icon-home"> pyremap
           
 
           
@@ -132,6 +134,8 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
@@ -166,7 +170,7 @@
 <span class="c1"># Additional copyright and license information can be found in the LICENSE file</span>
 <span class="c1"># distributed with this code, or at</span>
 <span class="c1"># https://raw.githubusercontent.com/MPAS-Dev/MPAS-Analysis/master/LICENSE</span>
-<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Functions for performing interpolation</span>
 
 <span class="sd">Functions</span>
@@ -175,7 +179,7 @@
 <span class="sd">    weights needed to perform horizontal interpolation</span>
 
 <span class="sd">remap - perform horizontal interpolation on a data sets, given a mapping file</span>
-<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">&quot;&quot;&quot;</span>
 <span class="c1"># Authors</span>
 <span class="c1"># -------</span>
 <span class="c1"># Xylar Asay-Davis</span>
@@ -188,7 +192,7 @@
 <span class="kn">from</span> <span class="nn">scipy.sparse</span> <span class="kn">import</span> <span class="n">csr_matrix</span>
 <span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
 <span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">from</span> <span class="nn">subprocess</span> <span class="kn">import</span> <span class="n">check_output</span><span class="p">,</span> <span class="n">CalledProcessError</span>
+<span class="kn">from</span> <span class="nn">subprocess</span> <span class="kn">import</span> <span class="n">check_output</span>
 <span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 
@@ -198,18 +202,18 @@
 
 
 <div class="viewcode-block" id="Remapper"><a class="viewcode-back" href="../../generated/pyremap.remapper.Remapper.html#pyremap.remapper.Remapper">[docs]</a><span class="k">class</span> <span class="nc">Remapper</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A class for remapping fields using a given mapping file.  The weights and</span>
 <span class="sd">    indices from the mapping file can be loaded once and reused multiple times</span>
 <span class="sd">    to map several fields between the same source and destination grids.</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Authors</span>
     <span class="c1"># -------</span>
     <span class="c1"># Xylar Asay-Davis</span>
 
 <div class="viewcode-block" id="Remapper.__init__"><a class="viewcode-back" href="../../generated/pyremap.remapper.Remapper.html#pyremap.remapper.Remapper.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sourceDescriptor</span><span class="p">,</span> <span class="n">destinationDescriptor</span><span class="p">,</span>
                  <span class="n">mappingFileName</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>  <span class="c1"># {{{</span>
-        <span class="sd">&#39;&#39;&#39;</span>
+        <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create the remapper and read weights and indices from the given file</span>
 <span class="sd">        for later used in remapping fields.</span>
 
@@ -230,7 +234,7 @@
 <span class="sd">            This is useful if the source and destination grids are determined</span>
 <span class="sd">            to be the same (though the Remapper does not attempt to determine</span>
 <span class="sd">            if this is the case).</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Authors</span>
         <span class="c1"># -------</span>
         <span class="c1"># Xylar Asay-Davis</span>
@@ -259,8 +263,9 @@
         <span class="c1"># }}}</span>
 
     <span class="k">def</span> <span class="nf">build_mapping_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;bilinear&#39;</span><span class="p">,</span> <span class="n">additionalArgs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                           <span class="n">logger</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mpiTasks</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">tempdir</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>  <span class="c1"># {{{</span>
-        <span class="sd">&#39;&#39;&#39;</span>
+                           <span class="n">logger</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mpiTasks</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">tempdir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                           <span class="n">esmf_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">esmf_parallel_exec</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>  <span class="c1"># {{{</span>
+        <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Given a source file defining either an MPAS mesh or a lat-lon grid and</span>
 <span class="sd">        a destination file or set of arrays defining a lat-lon grid, constructs</span>
 <span class="sd">        a mapping file used for interpolation between the source and</span>
@@ -282,11 +287,20 @@
 <span class="sd">            The number of MPI tasks (a number &gt; 1 implies that</span>
 <span class="sd">            ESMF_RegridWeightGen will be called with ``mpirun``)</span>
 
-<span class="sd">        tempdir: str, optional</span>
+<span class="sd">        tempdir : str, optional</span>
 <span class="sd">            A temporary directory.  By default, a temporary directory is</span>
 <span class="sd">            created, typically in ``/tmp`` but on some systems such as compute</span>
 <span class="sd">            nodes this may not be visible to all processors in the subsequent</span>
 <span class="sd">            ``ESMF_RegridWeightGen`` call</span>
+
+<span class="sd">        esmf_path : str, optional</span>
+<span class="sd">            A path to a system build of ESMF (containing a &#39;bin&#39; directory with</span>
+<span class="sd">            the ESMF tools).  By default, ESMF tools are found in the conda</span>
+<span class="sd">            environment</span>
+
+<span class="sd">        esmf_parallel_exec : {&#39;srun&#39;, &#39;mpirun}, optional</span>
+<span class="sd">            The name of the parallel executable to use to launch ESMF tools.</span>
+<span class="sd">            But default, &#39;mpirun&#39; from the conda environment is used</span>
 
 <span class="sd">        Raises</span>
 <span class="sd">        ------</span>
@@ -295,7 +309,7 @@
 
 <span class="sd">        ValueError</span>
 <span class="sd">            If sourceDescriptor or destinationDescriptor is of an unknown type</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Authors</span>
         <span class="c1"># -------</span>
         <span class="c1"># Xylar Asay-Davis</span>
@@ -312,15 +326,19 @@
             <span class="c1"># a valid weight file already exists, so nothing to do</span>
             <span class="k">return</span>
 
-        <span class="n">rwgPath</span> <span class="o">=</span> <span class="n">find_executable</span><span class="p">(</span><span class="s1">&#39;ESMF_RegridWeightGen&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">esmf_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># use the system build of ESMF</span>
+            <span class="n">rwgPath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">esmf_path</span><span class="p">,</span> <span class="s1">&#39;bin&#39;</span><span class="p">,</span> <span class="s1">&#39;ESMF_RegridWeightGen&#39;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">rwgPath</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="s1">&#39;ESMF_RegridWeightGen not found. Make sure esmf &#39;</span>
-                          <span class="s1">&#39;package is installed via</span><span class="se">\n</span><span class="s1">&#39;</span>
-                          <span class="s1">&#39;latest nco: </span><span class="se">\n</span><span class="s1">&#39;</span>
-                          <span class="s1">&#39;conda install nco</span><span class="se">\n</span><span class="s1">&#39;</span>
-                          <span class="s1">&#39;Note: this presumes use of the conda-forge &#39;</span>
-                          <span class="s1">&#39;channel.&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">rwgPath</span> <span class="o">=</span> <span class="n">find_executable</span><span class="p">(</span><span class="s1">&#39;ESMF_RegridWeightGen&#39;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">rwgPath</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="s1">&#39;ESMF_RegridWeightGen not found. Make sure esmf &#39;</span>
+                              <span class="s1">&#39;package is installed: </span><span class="se">\n</span><span class="s1">&#39;</span>
+                              <span class="s1">&#39;conda install esmf</span><span class="se">\n</span><span class="s1">&#39;</span>
+                              <span class="s1">&#39;Note: this presumes use of the conda-forge &#39;</span>
+                              <span class="s1">&#39;channel.&#39;</span><span class="p">)</span>
 
         <span class="c1"># Write source and destination SCRIP files in temporary locations</span>
         <span class="k">if</span> <span class="n">tempdir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -341,31 +359,40 @@
                 <span class="s1">&#39;--netcdf4&#39;</span><span class="p">,</span>
                 <span class="s1">&#39;--no_log&#39;</span><span class="p">]</span>
 
-        <span class="k">if</span> <span class="s1">&#39;CONDA_PREFIX&#39;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
-            <span class="c1"># this is a conda environment, so we need to find out if esmf</span>
-            <span class="c1"># needs mpirun or not</span>
-            <span class="n">conda_args</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;conda&#39;</span><span class="p">,</span> <span class="s1">&#39;list&#39;</span><span class="p">,</span> <span class="s1">&#39;esmf&#39;</span><span class="p">,</span> <span class="s1">&#39;--json&#39;</span><span class="p">]</span>
-            <span class="n">output</span> <span class="o">=</span> <span class="n">check_output</span><span class="p">(</span><span class="n">conda_args</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
-            <span class="n">output</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
-            <span class="n">build_string</span> <span class="o">=</span> <span class="n">output</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;build_string&#39;</span><span class="p">]</span>
+        <span class="n">parallel_args</span> <span class="o">=</span> <span class="p">[]</span>
 
-            <span class="k">if</span> <span class="s1">&#39;mpi_mpich&#39;</span> <span class="ow">in</span> <span class="n">build_string</span> <span class="ow">or</span> <span class="s1">&#39;mpi_openmpi&#39;</span> <span class="ow">in</span> <span class="n">build_string</span><span class="p">:</span>
-                <span class="c1"># esmf was installed with MPI, so we should use mpirun</span>
-                <span class="n">mpirun_path</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">/bin/mpirun&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;CONDA_PREFIX&#39;</span><span class="p">])</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="c1"># esmf was installed without MPI, so we shouldn&#39;t try to use it</span>
-                <span class="k">if</span> <span class="n">mpiTasks</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-                    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Requesting </span><span class="si">{}</span><span class="s1"> MPI tasks but the MPI version &#39;</span>
-                                  <span class="s1">&#39;of ESMF is not installed&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mpiTasks</span><span class="p">))</span>
-                <span class="n">mpirun_path</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">mpiTasks</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">esmf_parallel_exec</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># use the specified parallel executable</span>
 
-        <span class="k">elif</span> <span class="n">mpiTasks</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">mpirun_path</span> <span class="o">=</span> <span class="s1">&#39;mpirun&#39;</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">mpirun_path</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">if</span> <span class="s1">&#39;srun&#39;</span> <span class="ow">in</span> <span class="n">esmf_parallel_exec</span><span class="p">:</span>
+                    <span class="n">parallel_args</span> <span class="o">=</span> <span class="p">[</span><span class="n">esmf_parallel_exec</span><span class="p">,</span> <span class="s1">&#39;-n&#39;</span><span class="p">,</span>
+                                     <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mpiTasks</span><span class="p">)]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># presume mpirun syntax</span>
+                    <span class="n">parallel_args</span> <span class="o">=</span> <span class="p">[</span><span class="n">esmf_parallel_exec</span><span class="p">,</span> <span class="s1">&#39;-np&#39;</span><span class="p">,</span>
+                                     <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mpiTasks</span><span class="p">)]</span>
 
-        <span class="k">if</span> <span class="n">mpirun_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="n">mpirun_path</span><span class="p">,</span> <span class="s1">&#39;-np&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mpiTasks</span><span class="p">)]</span> <span class="o">+</span> <span class="n">args</span>
+            <span class="k">elif</span> <span class="s1">&#39;CONDA_PREFIX&#39;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span> <span class="ow">and</span> <span class="n">mpiTasks</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="c1"># this is a conda environment, so we need to find out if esmf</span>
+                <span class="c1"># needs mpirun or not</span>
+                <span class="n">conda_args</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;conda&#39;</span><span class="p">,</span> <span class="s1">&#39;list&#39;</span><span class="p">,</span> <span class="s1">&#39;esmf&#39;</span><span class="p">,</span> <span class="s1">&#39;--json&#39;</span><span class="p">]</span>
+                <span class="n">output</span> <span class="o">=</span> <span class="n">check_output</span><span class="p">(</span><span class="n">conda_args</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+                <span class="n">output</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+                <span class="n">build_string</span> <span class="o">=</span> <span class="n">output</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;build_string&#39;</span><span class="p">]</span>
+
+                <span class="k">if</span> <span class="s1">&#39;mpi_mpich&#39;</span> <span class="ow">in</span> <span class="n">build_string</span> <span class="ow">or</span> <span class="s1">&#39;mpi_openmpi&#39;</span> <span class="ow">in</span> <span class="n">build_string</span><span class="p">:</span>
+                    <span class="c1"># esmf was installed with MPI, so we should use mpirun</span>
+                    <span class="n">mpirun_path</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">/bin/mpirun&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;CONDA_PREFIX&#39;</span><span class="p">])</span>
+                    <span class="n">parallel_args</span> <span class="o">=</span> <span class="p">[</span><span class="n">mpirun_path</span><span class="p">,</span> <span class="s1">&#39;-np&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mpiTasks</span><span class="p">)]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># esmf was installed without MPI, so we shouldn&#39;t try to</span>
+                    <span class="c1"># use it</span>
+                    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Requesting </span><span class="si">{}</span><span class="s1"> MPI tasks but the MPI version&#39;</span>
+                                  <span class="s1">&#39; of ESMF is not installed&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mpiTasks</span><span class="p">))</span>
+
+        <span class="n">args</span> <span class="o">=</span> <span class="n">parallel_args</span> <span class="o">+</span> <span class="n">args</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sourceDescriptor</span><span class="o">.</span><span class="n">regional</span><span class="p">:</span>
             <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;--src_regional&#39;</span><span class="p">)</span>
@@ -404,6 +431,7 @@
             <span class="c1"># throw out the standard output from ESMF_RegridWeightGen, as it&#39;s</span>
             <span class="c1"># rather verbose but keep stderr</span>
             <span class="k">if</span> <span class="n">stderr</span><span class="p">:</span>
+                <span class="n">stderr</span> <span class="o">=</span> <span class="n">stderr</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
                 <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">stderr</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">):</span>
                     <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
 
@@ -418,7 +446,7 @@
 
     <span class="k">def</span> <span class="nf">remap_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inFileName</span><span class="p">,</span> <span class="n">outFileName</span><span class="p">,</span> <span class="n">variableList</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                    <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">renormalize</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>  <span class="c1"># {{{</span>
-        <span class="sd">&#39;&#39;&#39;</span>
+        <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Given a source file defining either an MPAS mesh or a lat-lon grid and</span>
 <span class="sd">        a destination file or set of arrays defining a lat-lon grid, constructs</span>
 <span class="sd">        a mapping file used for interpolation between the source and</span>
@@ -455,7 +483,7 @@
 <span class="sd">        ValueError</span>
 <span class="sd">            If ``mappingFileName`` is ``None`` (meaning no remapping is</span>
 <span class="sd">            needed).</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Authors</span>
         <span class="c1"># -------</span>
         <span class="c1"># Xylar Asay-Davis</span>
@@ -470,7 +498,7 @@
             <span class="c1"># a remapped file already exists, so nothing to do</span>
             <span class="k">return</span>
 
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sourceDescriptor</span><span class="p">,</span> <span class="p">(</span><span class="n">PointCollectionDescriptor</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sourceDescriptor</span><span class="p">,</span> <span class="n">PointCollectionDescriptor</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Source grid is a point collection, which is not&#39;</span>
                             <span class="s1">&#39;supported.&#39;</span><span class="p">)</span>
 
@@ -566,7 +594,7 @@
         <span class="c1"># }}}</span>
 
     <span class="k">def</span> <span class="nf">remap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ds</span><span class="p">,</span> <span class="n">renormalizationThreshold</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>  <span class="c1"># {{{</span>
-        <span class="sd">&#39;&#39;&#39;</span>
+        <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Given a source data set, returns a remapped version of the data set,</span>
 <span class="sd">        possibly masked and renormalized.</span>
 
@@ -597,7 +625,7 @@
 <span class="sd">            (``self.src_grid_dims``).</span>
 <span class="sd">        TypeError</span>
 <span class="sd">            If ds is not an ``xarray.Dataset`` or ``xarray.DataArray`` object</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Authors</span>
         <span class="c1"># -------</span>
         <span class="c1"># Xylar Asay-Davis</span>
@@ -642,10 +670,10 @@
         <span class="k">return</span> <span class="n">remappedDs</span>  <span class="c1"># }}}</span>
 
     <span class="k">def</span> <span class="nf">_load_mapping</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># {{{</span>
-        <span class="sd">&#39;&#39;&#39;</span>
+        <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Load weights and indices from a mapping file, if this has not already</span>
 <span class="sd">        been done</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Authors</span>
         <span class="c1"># -------</span>
         <span class="c1"># Xylar Asay-Davis</span>
@@ -713,9 +741,9 @@
                 <span class="n">numpy</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">sourceDimsInArray</span><span class="p">))</span>  <span class="c1"># }}}</span>
 
     <span class="k">def</span> <span class="nf">_remap_data_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataArray</span><span class="p">,</span> <span class="n">renormalizationThreshold</span><span class="p">):</span>  <span class="c1"># {{{</span>
-        <span class="sd">&#39;&#39;&#39;</span>
+        <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Remap a single xarray data array</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Authors</span>
         <span class="c1"># -------</span>
         <span class="c1"># Xylar Asay-Davis</span>
@@ -783,9 +811,9 @@
 
     <span class="k">def</span> <span class="nf">_remap_numpy_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inField</span><span class="p">,</span> <span class="n">remapAxes</span><span class="p">,</span>
                            <span class="n">renormalizationThreshold</span><span class="p">):</span>  <span class="c1"># {{{</span>
-        <span class="sd">&#39;&#39;&#39;</span>
+        <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Remap a single numpy array</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Authors</span>
         <span class="c1"># -------</span>
         <span class="c1"># Xylar Asay-Davis</span>
@@ -854,28 +882,25 @@
            
           </div>
           <footer>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        
-        &copy; Copyright This software is open source software available under the BSD-3license. Copyright (c) 2019 Xylar Asay-Davis
+        &#169; Copyright This software is open source software available under the BSD-3license. Copyright (c) 2019 Xylar Asay-Davis.
 
     </p>
   </div>
     
     
     
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 
