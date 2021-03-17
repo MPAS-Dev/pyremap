@@ -1,0 +1,25 @@
+﻿pyremap.remapper.Remapper
+=========================
+
+.. currentmodule:: pyremap.remapper
+
+.. autoclass:: Remapper
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Remapper.__init__
+      ~Remapper.build_mapping_file
+      ~Remapper.remap
+      ~Remapper.remap_file
+   
+   
+
+   
+   
+   
