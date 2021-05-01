@@ -86,3 +86,6 @@ ENV/
 .ropeproject
  
 .DS_Store
+
+# pycharm
+.idea
