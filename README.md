@@ -10,39 +10,25 @@ Python remapping tools for climate and earth system models.
 
 ## Installation
 
-To use the latest version for developers, you will need to set up a conda
-environment with the following packages:
+To use the latest version for developers, get the code from:
+[https://github.com/MPAS-Dev/pyremap](https://github.com/MPAS-Dev/pyremap)
 
- * python >= 3.6
- * numpy
- * scipy
- * netcdf4
- * xarray >= 0.10.0
- * dask
- * nco >= 4.8.1
- * pyproj
-
-These can be installed via the conda command:
+Then, you will need to set up a conda environment and install the package
+in a way that points to the repo (so changes you make are available in the
+conda environment):
 ```
 conda config --add channels conda-forge
 conda config --set channel_priority strict
-conda create -n pyremap python=3.7 numpy scipy netcdf4 "xarray>=0.10.0" dask \
-    "nco>=4.8.1" pyproj
+conda create -n pyremap
 conda activate pyremap
+conda env update -n pyremap -f dev_environment.yaml
+python -m pip install -e .
 ```
-
-Then, get the code from:
-[https://github.com/MPAS-Dev/pyremap](https://github.com/MPAS-Dev/pyremap)
-
 
 ## Examples
 
 ```
 cd examples
-```
-The simplest way to make pyremap available is:
-```
-ln -s ../pyremap
 ```
 First, make mapping files for a lat-lon grid, and test it out by remapping
 temperature from the example file:
