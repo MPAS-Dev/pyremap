@@ -19,9 +19,8 @@ conda environment):
 ```
 conda config --add channels conda-forge
 conda config --set channel_priority strict
-conda create -n pyremap
+conda create -y -n pyremap --file dev-spec.txt
 conda activate pyremap
-conda env update -n pyremap -f dev_environment.yaml
 python -m pip install -e .
 ```
 
