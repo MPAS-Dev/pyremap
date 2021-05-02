@@ -1,0 +1,23 @@
+# This file may be used to create an environment using:
+# $ conda create --name <env> --file <this file>
+
+# Base
+python >=3.6
+dask
+esmf
+nco >=4.8.1
+netcdf4
+numpy
+scipy
+pyproj
+xarray >=0.10.0
+
+# Development
+pip
+
+# Documentation
+mock
+pillow
+sphinx
+sphinx_rtd_theme
+m2r
