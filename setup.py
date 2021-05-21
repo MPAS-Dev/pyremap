@@ -28,4 +28,4 @@ setup(name='pyremap',
           'Topic :: Scientific/Engineering',
       ],
       packages=find_packages(),
-      package_data={'pyremap.test': ['test*/*', 'test*/*/*']})
+      package_data={'pyremap.test': ['test*/*', 'ncremap_files/*']})
