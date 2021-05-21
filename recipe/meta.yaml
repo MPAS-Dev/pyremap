@@ -24,7 +24,7 @@ requirements:
     - netcdf4
     - xarray >=0.10.0
     - dask
-    - nco >=4.8.1
+    - nco >=4.8.1,<4.9.9
     - esmf
     - pyproj
 
