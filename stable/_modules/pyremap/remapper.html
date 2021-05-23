@@ -267,7 +267,8 @@
 
     <span class="k">def</span> <span class="nf">build_mapping_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;bilinear&#39;</span><span class="p">,</span> <span class="n">additionalArgs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                            <span class="n">logger</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mpiTasks</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">tempdir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                           <span class="n">esmf_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">esmf_parallel_exec</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>  <span class="c1"># {{{</span>
+                           <span class="n">esmf_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">esmf_parallel_exec</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                           <span class="n">extrap_method</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>  <span class="c1"># {{{</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Given a source file defining either an MPAS mesh or a lat-lon grid and</span>
 <span class="sd">        a destination file or set of arrays defining a lat-lon grid, constructs</span>
@@ -304,6 +305,9 @@
 <span class="sd">        esmf_parallel_exec : {&#39;srun&#39;, &#39;mpirun}, optional</span>
 <span class="sd">            The name of the parallel executable to use to launch ESMF tools.</span>
 <span class="sd">            But default, &#39;mpirun&#39; from the conda environment is used</span>
+
+<span class="sd">        extrap_method : {&#39;neareststod&#39;, &#39;nearestidavg&#39;,&#39;creep&#39;}, optional</span>
+<span class="sd">            The method used to extrapolate unmapped destination locations</span>
 
 <span class="sd">        Raises</span>
 <span class="sd">        ------</span>
@@ -361,6 +365,9 @@
                 <span class="s1">&#39;--method&#39;</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span>
                 <span class="s1">&#39;--netcdf4&#39;</span><span class="p">,</span>
                 <span class="s1">&#39;--no_log&#39;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">extrap_method</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;--extrap_method&#39;</span><span class="p">,</span> <span class="n">extrap_method</span><span class="p">])</span>
 
         <span class="n">parallel_args</span> <span class="o">=</span> <span class="p">[]</span>
 
