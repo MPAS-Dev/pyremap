@@ -283,7 +283,8 @@ class Remapper(object):
         # }}}
 
     def remap_file(self, inFileName, outFileName, variableList=None,
-                   overwrite=False, renormalize=None, logger=None):  # {{{
+                   overwrite=False, renormalize=None, logger=None,
+                   replaceMpasFill=False):  # {{{
         """
         Given a source file defining either an MPAS mesh or a lat-lon grid and
         a destination file or set of arrays defining a lat-lon grid, constructs
@@ -312,6 +313,11 @@ class Remapper(object):
 
         logger : ``logging.Logger``, optional
             A logger to which ncclimo output should be redirected
+
+        replaceMpasFill : bool, optional
+            For MPAS meshes, whether add a ``_FillValue`` attribute (missing
+            from MPAS output).  If this has been handled before the call,
+            replacing the fill value again may cause errors.
 
         Raises
         ------
@@ -387,10 +393,12 @@ class Remapper(object):
             args.extend(['-R', ' '.join(regridArgs)])
 
         if isinstance(self.sourceDescriptor, MpasMeshDescriptor):
-            # Note: using the -C (climatology) flag for now because otherwise
-            #       ncremap tries to add a _FillValue attribute that might
-            #       already be present and quits with an error
-            args.extend(['-P', 'mpas', '-C'])
+            args.extend(['-P', 'mpas'])
+            if not replaceMpasFill:
+                # the -C (climatology) flag prevents ncremap from trying to
+                # add a _FillValue attribute that might already be present and
+                # quits with an error
+                args.append('-C')
 
         if variableList is not None:
             args.extend(['-v', ','.join(variableList)])

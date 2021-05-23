@@ -104,7 +104,8 @@ class TestInterp(TestCase):
         if remap_file:
             # first, test interpolation with ncremap
             remapper.remap_file(inFileName=inFileName,
-                                outFileName=outFileName)
+                                outFileName=outFileName,
+                                replaceMpasFill=True)
 
             assert os.path.exists(outFileName)
             dsRemapped = xarray.open_dataset(outFileName)
