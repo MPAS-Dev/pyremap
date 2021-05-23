@@ -102,7 +102,8 @@ class Remapper(object):
 
     def build_mapping_file(self, method='bilinear', additionalArgs=None,
                            logger=None, mpiTasks=1, tempdir=None,
-                           esmf_path=None, esmf_parallel_exec=None):  # {{{
+                           esmf_path=None, esmf_parallel_exec=None,
+                           extrap_method=None):  # {{{
         """
         Given a source file defining either an MPAS mesh or a lat-lon grid and
         a destination file or set of arrays defining a lat-lon grid, constructs
@@ -139,6 +140,9 @@ class Remapper(object):
         esmf_parallel_exec : {'srun', 'mpirun}, optional
             The name of the parallel executable to use to launch ESMF tools.
             But default, 'mpirun' from the conda environment is used
+
+        extrap_method : {'neareststod', 'nearestidavg','creep'}, optional
+            The method used to extrapolate unmapped destination locations
 
         Raises
         ------
@@ -196,6 +200,9 @@ class Remapper(object):
                 '--method', method,
                 '--netcdf4',
                 '--no_log']
+
+        if extrap_method is not None:
+            args.extend(['--extrap_method', extrap_method])
 
         parallel_args = []
 
