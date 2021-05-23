@@ -246,7 +246,7 @@ class Remapper(object):
             args.extend(additionalArgs)
 
         if logger is None:
-            print('running: {}'.format(' '.join(args)))
+            _print_running(args)
             # make sure any output is flushed before we add output from the
             # subprocess
             sys.stdout.flush()
@@ -258,6 +258,7 @@ class Remapper(object):
                 subprocess.check_call(args, stdout=DEVNULL)
 
         else:
+            _print_running(args)
             logger.info('running: {}'.format(' '.join(args)))
             for handler in logger.handlers:
                 handler.flush()
@@ -354,10 +355,8 @@ class Remapper(object):
                           'channel.')
 
         args = ['ncremap',
-                '-i', inFileName,
                 '-m', self.mappingFileName,
-                '--vrb=1',
-                '-o', outFileName]
+                '--vrb=1']
 
         regridArgs = []
 
@@ -408,8 +407,9 @@ class Remapper(object):
         env = os.environ.copy()
         env['NCO_PATH_OVERRIDE'] = 'No'
 
+        args.extend([inFileName, outFileName])
+
         if logger is None:
-            print('running: {}'.format(' '.join(args)))
             # make sure any output is flushed before we add output from the
             # subprocess
             sys.stdout.flush()
@@ -720,5 +720,13 @@ class Remapper(object):
 
         return outField  # }}}
 
+
+def _print_running(args):
+    print_args = []
+    for arg in args:
+        if ' ' in arg:
+            arg = '"{}"'.format(arg)
+        print_args.append(arg)
+    print('running: {}'.format(' '.join(print_args)))
 
 # vim: ai ts=4 sts=4 et sw=4 ft=python
