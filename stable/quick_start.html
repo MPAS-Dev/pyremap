@@ -13,6 +13,8 @@
   
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
 
   
   
@@ -29,6 +31,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
@@ -193,18 +196,18 @@ conda environment):</p>
 </div>
 <p>First, make mapping files for a lat-lon grid, and test it out by remapping
 temperature from the example file:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">wget</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">web</span><span class="o">.</span><span class="n">lcrc</span><span class="o">.</span><span class="n">anl</span><span class="o">.</span><span class="n">gov</span><span class="o">/</span><span class="n">public</span><span class="o">/</span><span class="n">e3sm</span><span class="o">/</span><span class="n">inputdata</span><span class="o">/</span><span class="n">ocn</span><span class="o">/</span><span class="n">mpas</span><span class="o">-</span><span class="n">o</span><span class="o">/</span><span class="n">oQU240</span><span class="o">/</span><span class="n">ocean</span><span class="o">.</span><span class="n">QU</span><span class="o">.</span><span class="mi">240</span><span class="n">km</span><span class="o">.</span><span class="mf">151209.</span><span class="n">nc</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">wget</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">web</span><span class="o">.</span><span class="n">lcrc</span><span class="o">.</span><span class="n">anl</span><span class="o">.</span><span class="n">gov</span><span class="o">/</span><span class="n">public</span><span class="o">/</span><span class="n">e3sm</span><span class="o">/</span><span class="n">inputdata</span><span class="o">/</span><span class="n">ocn</span><span class="o">/</span><span class="n">mpas</span><span class="o">-</span><span class="n">o</span><span class="o">/</span><span class="n">oQU240</span><span class="o">/</span><span class="n">ocean</span><span class="o">.</span><span class="n">QU</span><span class="mf">.240</span><span class="n">km</span><span class="mf">.151209</span><span class="o">.</span><span class="n">nc</span>
 <span class="o">./</span><span class="n">make_mpas_to_lat_lon_mapping</span><span class="o">.</span><span class="n">py</span>
 </pre></div>
 </div>
 <p>You should now see the mapping file:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">map_oQU240_to_0</span><span class="o">.</span><span class="mi">5</span><span class="n">x0</span><span class="o">.</span><span class="mi">5</span><span class="n">degree</span><span class="o">.</span><span class="n">nc</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">map_oQU240_to_0</span><span class="mf">.5</span><span class="n">x0</span><span class="mf">.5</span><span class="n">degree</span><span class="o">.</span><span class="n">nc</span>
 </pre></div>
 </div>
 <p>as well as the input file (an initial condition for the MPAS-Ocean model) and
 an example of temperature from the initial condition remapped to the new grid.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ocean</span><span class="o">.</span><span class="n">QU</span><span class="o">.</span><span class="mi">240</span><span class="n">km</span><span class="o">.</span><span class="mf">151209.</span><span class="n">nc</span>
-<span class="n">temp_0</span><span class="o">.</span><span class="mi">5</span><span class="n">x0</span><span class="o">.</span><span class="mi">5</span><span class="n">degree</span><span class="o">.</span><span class="n">nc</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ocean</span><span class="o">.</span><span class="n">QU</span><span class="mf">.240</span><span class="n">km</span><span class="mf">.151209</span><span class="o">.</span><span class="n">nc</span>
+<span class="n">temp_0</span><span class="mf">.5</span><span class="n">x0</span><span class="mf">.5</span><span class="n">degree</span><span class="o">.</span><span class="n">nc</span>
 </pre></div>
 </div>
 <p>Second, let’s try the same but to an Antarctic stereographic grid:</p>
@@ -212,19 +215,19 @@ an example of temperature from the initial condition remapped to the new grid.</
 </pre></div>
 </div>
 <p>Now, there’s a new mapping file and example output file:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">map_oQU240_to_6000</span><span class="o">.</span><span class="mh">0x6000</span><span class="o">.</span><span class="mi">0</span><span class="n">km_10</span><span class="o">.</span><span class="mi">0</span><span class="n">km_Antarctic_stereo</span><span class="o">.</span><span class="n">nc</span>
-<span class="n">temp_6000</span><span class="o">.</span><span class="mh">0x6000</span><span class="o">.</span><span class="mi">0</span><span class="n">km_10</span><span class="o">.</span><span class="mi">0</span><span class="n">km_Antarctic_stereo</span><span class="o">.</span><span class="n">nc</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">map_oQU240_to_6000</span><span class="mf">.0</span><span class="n">x6000</span><span class="mf">.0</span><span class="n">km_10</span><span class="mf">.0</span><span class="n">km_Antarctic_stereo</span><span class="o">.</span><span class="n">nc</span>
+<span class="n">temp_6000</span><span class="mf">.0</span><span class="n">x6000</span><span class="mf">.0</span><span class="n">km_10</span><span class="mf">.0</span><span class="n">km_Antarctic_stereo</span><span class="o">.</span><span class="n">nc</span>
 </pre></div>
 </div>
 <p>Finally, let’s remap the temperature on the Antarctic grid to a lower
 resolution Antarctic grid:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">./</span><span class="n">remap_stereographic</span><span class="o">.</span><span class="n">py</span> <span class="o">-</span><span class="n">i</span> <span class="n">temp_6000</span><span class="o">.</span><span class="mh">0x6000</span><span class="o">.</span><span class="mi">0</span><span class="n">km_10</span><span class="o">.</span><span class="mi">0</span><span class="n">km_Antarctic_stereo</span><span class="o">.</span><span class="n">nc</span> \
-    <span class="o">-</span><span class="n">o</span> <span class="n">temp_6000</span><span class="o">.</span><span class="mh">0x6000</span><span class="o">.</span><span class="mi">0</span><span class="n">km_20</span><span class="o">.</span><span class="mi">0</span><span class="n">km_Antarctic_stereo</span><span class="o">.</span><span class="n">nc</span> <span class="o">-</span><span class="n">r</span> <span class="mi">20</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">./</span><span class="n">remap_stereographic</span><span class="o">.</span><span class="n">py</span> <span class="o">-</span><span class="n">i</span> <span class="n">temp_6000</span><span class="mf">.0</span><span class="n">x6000</span><span class="mf">.0</span><span class="n">km_10</span><span class="mf">.0</span><span class="n">km_Antarctic_stereo</span><span class="o">.</span><span class="n">nc</span> \
+    <span class="o">-</span><span class="n">o</span> <span class="n">temp_6000</span><span class="mf">.0</span><span class="n">x6000</span><span class="mf">.0</span><span class="n">km_20</span><span class="mf">.0</span><span class="n">km_Antarctic_stereo</span><span class="o">.</span><span class="n">nc</span> <span class="o">-</span><span class="n">r</span> <span class="mi">20</span>
 </pre></div>
 </div>
 <p>This created another mapping file and an output file:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">map_6000x6000km_10km_Antarctic_stereo_to_6000x6000km_20</span><span class="o">.</span><span class="mi">0</span><span class="n">km_Antarctic_stereo</span><span class="o">.</span><span class="n">nc</span>
-<span class="n">temp_6000</span><span class="o">.</span><span class="mh">0x6000</span><span class="o">.</span><span class="mi">0</span><span class="n">km_20</span><span class="o">.</span><span class="mi">0</span><span class="n">km_Antarctic_stereo</span><span class="o">.</span><span class="n">nc</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">map_6000x6000km_10km_Antarctic_stereo_to_6000x6000km_20</span><span class="mf">.0</span><span class="n">km_Antarctic_stereo</span><span class="o">.</span><span class="n">nc</span>
+<span class="n">temp_6000</span><span class="mf">.0</span><span class="n">x6000</span><span class="mf">.0</span><span class="n">km_20</span><span class="mf">.0</span><span class="n">km_Antarctic_stereo</span><span class="o">.</span><span class="n">nc</span>
 </pre></div>
 </div>
 </div>

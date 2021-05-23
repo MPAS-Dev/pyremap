@@ -13,6 +13,8 @@
   
   <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
 
   
   
@@ -29,6 +31,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
@@ -445,7 +448,8 @@
         <span class="c1"># }}}</span>
 
     <span class="k">def</span> <span class="nf">remap_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inFileName</span><span class="p">,</span> <span class="n">outFileName</span><span class="p">,</span> <span class="n">variableList</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                   <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">renormalize</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>  <span class="c1"># {{{</span>
+                   <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">renormalize</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                   <span class="n">replaceMpasFill</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>  <span class="c1"># {{{</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Given a source file defining either an MPAS mesh or a lat-lon grid and</span>
 <span class="sd">        a destination file or set of arrays defining a lat-lon grid, constructs</span>
@@ -474,6 +478,11 @@
 
 <span class="sd">        logger : ``logging.Logger``, optional</span>
 <span class="sd">            A logger to which ncclimo output should be redirected</span>
+
+<span class="sd">        replaceMpasFill : bool, optional</span>
+<span class="sd">            For MPAS meshes, whether add a ``_FillValue`` attribute (missing</span>
+<span class="sd">            from MPAS output).  If this has been handled before the call,</span>
+<span class="sd">            replacing the fill value again may cause errors.</span>
 
 <span class="sd">        Raises</span>
 <span class="sd">        ------</span>
@@ -549,10 +558,12 @@
             <span class="n">args</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;-R&#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">regridArgs</span><span class="p">)])</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sourceDescriptor</span><span class="p">,</span> <span class="n">MpasMeshDescriptor</span><span class="p">):</span>
-            <span class="c1"># Note: using the -C (climatology) flag for now because otherwise</span>
-            <span class="c1">#       ncremap tries to add a _FillValue attribute that might</span>
-            <span class="c1">#       already be present and quits with an error</span>
-            <span class="n">args</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;-P&#39;</span><span class="p">,</span> <span class="s1">&#39;mpas&#39;</span><span class="p">,</span> <span class="s1">&#39;-C&#39;</span><span class="p">])</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;-P&#39;</span><span class="p">,</span> <span class="s1">&#39;mpas&#39;</span><span class="p">])</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">replaceMpasFill</span><span class="p">:</span>
+                <span class="c1"># the -C (climatology) flag prevents ncremap from trying to</span>
+                <span class="c1"># add a _FillValue attribute that might already be present and</span>
+                <span class="c1"># quits with an error</span>
+                <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;-C&#39;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">variableList</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">args</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;-v&#39;</span><span class="p">,</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">variableList</span><span class="p">)])</span>
