@@ -388,9 +388,9 @@ class Remapper(object):
                 self.destinationDescriptor.lonVarName)])
         elif isinstance(self.destinationDescriptor, ProjectionGridDescriptor):
             regridArgs.extend(['--rgr lat_dmn_nm={}'.format(
-                self.destinationDescriptor.xVarName),
-                '--rgr lon_dmn_nm={}'.format(
                 self.destinationDescriptor.yVarName),
+                '--rgr lon_dmn_nm={}'.format(
+                self.destinationDescriptor.xVarName),
                 '--rgr lat_nm_out=lat', '--rgr lon_nm_out=lon'])
         if isinstance(self.destinationDescriptor, PointCollectionDescriptor):
             regridArgs.extend(['--rgr lat_nm_out=lat', '--rgr lon_nm_out=lon'])
