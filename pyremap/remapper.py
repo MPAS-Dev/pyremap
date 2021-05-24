@@ -189,13 +189,48 @@ class Remapper(object):
         else:
             tempobj = None
 
-        self.sourceDescriptor.to_scrip('{}/src_mesh.nc'.format(tempdir))
-        self.destinationDescriptor.to_scrip(
-            '{}/dst_mesh.nc'.format(tempdir))
+        sourceFileName = '{}/src_mesh.nc'.format(tempdir)
+        destinationFileName = '{}/dst_mesh.nc'.format(tempdir)
+
+        src_loc = 'center'
+        src_file_format = 'scrip'
+        if isinstance(self.sourceDescriptor, MpasMeshDescriptor):
+            src_file_format = 'esmf'
+            if self.sourceDescriptor.vertices:
+                if 'conserve' in method:
+                    raise ValueError('Can\'t remap from MPAS vertices with '
+                                     'conservative methods')
+                src_loc = 'corner'
+
+        dst_loc = 'center'
+        dst_file_format = 'scrip'
+        if isinstance(self.destinationDescriptor, MpasMeshDescriptor):
+            dst_file_format = 'esmf'
+            if self.destinationDescriptor.vertices:
+                if 'conserve' in method:
+                    raise ValueError('Can\'t remap to MPAS vertices with '
+                                     'conservative methods')
+                dst_loc = 'corner'
+
+        if src_file_format == 'scrip':
+            self.sourceDescriptor.to_scrip(sourceFileName)
+        elif src_file_format == 'esmf':
+            self.sourceDescriptor.to_esmf(sourceFileName)
+        else:
+            raise ValueError('Unexpected file format {}'.format(
+                src_file_format))
+
+        if dst_file_format == 'scrip':
+            self.destinationDescriptor.to_scrip(destinationFileName)
+        elif dst_file_format == 'esmf':
+            self.destinationDescriptor.to_esmf(destinationFileName)
+        else:
+            raise ValueError('Unexpected file format {}'.format(
+                dst_file_format))
 
         args = [rwgPath,
-                '--source', self.sourceDescriptor.scripFileName,
-                '--destination', self.destinationDescriptor.scripFileName,
+                '--source', sourceFileName,
+                '--destination', destinationFileName,
                 '--weight', self.mappingFileName,
                 '--method', method,
                 '--netcdf4',
@@ -203,6 +238,11 @@ class Remapper(object):
 
         if extrap_method is not None:
             args.extend(['--extrap_method', extrap_method])
+
+        if src_file_format == 'esmf':
+            args.extend(['--src_loc', src_loc])
+        if dst_file_format == 'esmf':
+            args.extend(['--dst_loc', dst_loc])
 
         parallel_args = []
 
@@ -253,7 +293,7 @@ class Remapper(object):
             args.extend(additionalArgs)
 
         if logger is None:
-            _print_running(args)
+            _print_running(args, fn=print)
             # make sure any output is flushed before we add output from the
             # subprocess
             sys.stdout.flush()
@@ -265,8 +305,7 @@ class Remapper(object):
                 subprocess.check_call(args, stdout=DEVNULL)
 
         else:
-            _print_running(args)
-            logger.info('running: {}'.format(' '.join(args)))
+            _print_running(args, fn=logger.info)
             for handler in logger.handlers:
                 handler.flush()
 
@@ -367,6 +406,20 @@ class Remapper(object):
 
         regridArgs = []
 
+        if isinstance(self.sourceDescriptor, MpasMeshDescriptor):
+            if self.sourceDescriptor.vertices:
+                regridArgs.extend(['--rgr col_nm=nVertices'])
+            else:
+                args.extend(['-P', 'mpas'])
+                if not replaceMpasFill:
+                    # the -C (climatology) flag prevents ncremap from trying to
+                    # add a _FillValue attribute that might already be present
+                    # and quits with an error
+                    args.append('-C')
+
+        if variableList is not None:
+            args.extend(['-v', ','.join(variableList)])
+
         if renormalize is not None:
             regridArgs.append('--renormalize={}'.format(renormalize))
 
@@ -398,17 +451,6 @@ class Remapper(object):
         if len(regridArgs) > 0:
             args.extend(['-R', ' '.join(regridArgs)])
 
-        if isinstance(self.sourceDescriptor, MpasMeshDescriptor):
-            args.extend(['-P', 'mpas'])
-            if not replaceMpasFill:
-                # the -C (climatology) flag prevents ncremap from trying to
-                # add a _FillValue attribute that might already be present and
-                # quits with an error
-                args.append('-C')
-
-        if variableList is not None:
-            args.extend(['-v', ','.join(variableList)])
-
         # set an environment variable to make sure we're not using czender's
         # local version of NCO instead of one we have intentionally loaded
         env = os.environ.copy()
@@ -422,9 +464,10 @@ class Remapper(object):
             sys.stdout.flush()
             sys.stderr.flush()
 
+            _print_running(args, fn=print)
             subprocess.check_call(args, env=env)
         else:
-            logger.info('running: {}'.format(' '.join(args)))
+            _print_running(args, fn=logger.info)
             for handler in logger.handlers:
                 handler.flush()
 
@@ -728,12 +771,12 @@ class Remapper(object):
         return outField  # }}}
 
 
-def _print_running(args):
+def _print_running(args, fn):
     print_args = []
     for arg in args:
         if ' ' in arg:
             arg = '"{}"'.format(arg)
         print_args.append(arg)
-    print('running: {}'.format(' '.join(print_args)))
+    fn('running: {}'.format(' '.join(print_args)))
 
 # vim: ai ts=4 sts=4 et sw=4 ft=python
