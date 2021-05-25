@@ -100,19 +100,35 @@ class MeshDescriptor(object):  # {{{
 
         return  # }}}
 
+    def to_esmf(self, esmfFileName):  # {{{
+        """
+        Subclasses should overload this method to write an ESMF mesh file based
+        on the mesh.
+
+        Parameters
+        ----------
+        esmfFileName : str
+            The path to which the SCRIP file should be written
+        """
+        # Authors
+        # ------
+        # Xylar Asay-Davis
+
+        return  # }}}
+
     # }}}
 
 
 class MpasMeshDescriptor(MeshDescriptor):  # {{{
-    '''
+    """
     A class for describing an MPAS mesh
-    '''
+    """
     # Authors
     # -------
     # Xylar Asay-Davis
 
-    def __init__(self, fileName, meshName=None):  # {{{
-        '''
+    def __init__(self, fileName, meshName=None, vertices=False):  # {{{
+        """
         Constructor stores the file name
 
         Parameters
@@ -125,48 +141,66 @@ class MpasMeshDescriptor(MeshDescriptor):  # {{{
             ``'oRRS18to6'``).  If not provided, the data set in ``fileName``
             must have a global attribute ``meshName`` that will be used
             instead.
-        '''
+
+        vertices : bool, optional
+            Whether the mapping is to or from vertices instead of corners
+            (for non-conservative remapping)
+        """
         # Authors
         # -------
         # Xylar Asay-Davis
+        super().__init__()
 
-        ds = xarray.open_dataset(fileName)
+        self.vertices = vertices
 
-        if meshName is None:
-            if 'meshName' not in ds.attrs:
-                raise ValueError('No meshName provided or found in file.')
-            self.meshName = ds.attrs['meshName']
-        else:
-            self.meshName = meshName
+        with xarray.open_dataset(fileName) as ds:
 
-        self.fileName = fileName
-        self.regional = True
+            if meshName is None:
+                if 'meshName' not in ds.attrs:
+                    raise ValueError('No meshName provided or found in file.')
+                self.meshName = ds.attrs['meshName']
+            else:
+                self.meshName = meshName
 
-        # build coords
-        self.coords = {'latCell': {'dims': 'nCells',
-                                   'data': ds.latCell.values,
-                                   'attrs': {'units': 'radians'}},
-                       'lonCell': {'dims': 'nCells',
-                                   'data': ds.lonCell.values,
-                                   'attrs': {'units': 'radians'}}}
-        self.dims = ['nCells']
-        self.dimSize = [ds.dims[dim] for dim in self.dims]
-        ds.close()  # }}}
+            self.fileName = fileName
+            self.regional = True
+
+            if vertices:
+                # build coords
+                self.coords = {'latVertex': {'dims': 'nVertices',
+                                             'data': ds.latVertex.values,
+                                             'attrs': {'units': 'radians'}},
+                               'lonVertex': {'dims': 'nVertices',
+                                             'data': ds.lonVertex.values,
+                                             'attrs': {'units': 'radians'}}}
+                self.dims = ['nVertices']
+            else:
+                # build coords
+                self.coords = {'latCell': {'dims': 'nCells',
+                                           'data': ds.latCell.values,
+                                           'attrs': {'units': 'radians'}},
+                               'lonCell': {'dims': 'nCells',
+                                           'data': ds.lonCell.values,
+                                           'attrs': {'units': 'radians'}}}
+                self.dims = ['nCells']
+            self.dimSize = [ds.dims[dim] for dim in self.dims]
+        # }}}
 
     def to_scrip(self, scripFileName):  # {{{
-        '''
+        """
         Given an MPAS mesh file, create a SCRIP file based on the mesh.
 
         Parameters
         ----------
         scripFileName : str
             The path to which the SCRIP file should be written
-        '''
+        """
         # Authors
         # -------
         # Xylar Asay-Davis
 
-        self.scripFileName = scripFileName
+        if self.vertices:
+            raise ValueError('A SCRIP file won\'t work for remapping vertices')
 
         inFile = netCDF4.Dataset(self.fileName, 'r')
         outFile = netCDF4.Dataset(scripFileName, 'w')
@@ -220,6 +254,52 @@ class MpasMeshDescriptor(MeshDescriptor):  # {{{
 
         inFile.close()
         outFile.close()  # }}}
+
+    def to_esmf(self, esmfFileName):  # {{{
+        """
+        Create an ESMF mesh file for the mesh
+
+        Parameters
+        ----------
+        esmfFileName : str
+            The path to which the ESMF mesh file should be written
+        """
+        # Authors
+        # -------
+        # Xylar Asay-Davis
+
+        with xarray.open_dataset(self.fileName) as ds:
+
+            nodeCount = ds.sizes['nVertices']
+            elementCount = ds.sizes['nCells']
+            coordDim = 2
+
+            nodeCoords = numpy.zeros((nodeCount, coordDim))
+            nodeCoords[:, 0] = ds.lonVertex.values
+            nodeCoords[:, 1] = ds.latVertex.values
+            centerCoords = numpy.zeros((elementCount, coordDim))
+            centerCoords[:, 0] = ds.lonCell.values
+            centerCoords[:, 1] = ds.latCell.values
+
+            elementConn = ds.verticesOnCell.values
+            elementConn[elementConn == nodeCount + 1] = -1
+
+            ds_out = xarray.Dataset()
+            ds_out['nodeCoords'] = (('nodeCount', 'coordDim'), nodeCoords)
+            ds_out.nodeCoords.attrs['units'] = 'radians'
+            ds_out['centerCoords'] = \
+                (('elementCount', 'coordDim'), centerCoords)
+            ds_out.centerCoords.attrs['units'] = 'radians'
+            ds_out['elementConn'] = \
+                (('elementCount', 'maxNodePElement'), elementConn)
+            ds_out.elementConn.attrs['start_index'] = 1
+            ds_out.elementConn.attrs['_FillValue'] = -1
+            ds_out['numElementConn'] = \
+                (('elementCount',), ds.nEdgesOnCell.values)
+            ds_out.attrs['gridType'] = 'unstructured mesh'
+            ds_out.attrs['version'] = '0.9'
+
+            ds_out.to_netcdf(esmfFileName)  # }}}
     # }}}
 
 
@@ -342,8 +422,6 @@ class LatLonGridDescriptor(MeshDescriptor):  # {{{
         # -------
         # Xylar Asay-Davis
 
-        self.scripFileName = scripFileName
-
         outFile = netCDF4.Dataset(scripFileName, 'w')
 
         nLat = len(self.lat)
@@ -368,6 +446,71 @@ class LatLonGridDescriptor(MeshDescriptor):  # {{{
         setattr(outFile, 'history', self.history)
 
         outFile.close()  # }}}
+
+    def to_esmf(self, esmfFileName):  # {{{
+        """
+        Create an ESMF mesh file for the mesh
+
+        Parameters
+        ----------
+        esmfFileName : str
+            The path to which the ESMF mesh file should be written
+        """
+        # Authors
+        # -------
+        # Xylar Asay-Davis
+
+        nLat = len(self.lat)
+        nLon = len(self.lon)
+
+        (Lon, Lat) = numpy.meshgrid(self.lon, self.lat)
+        (LonCorner, LatCorner) = numpy.meshgrid(self.lonCorner, self.latCorner)
+        (XIndices, YIndices) = numpy.meshgrid(numpy.arange(nLon + 1),
+                                              numpy.arange(nLat + 1))
+
+        elementCount = nLon * nLat
+        nodeCount = (nLon + 1) * (nLat + 1)
+        coordDim = 2
+        maxNodePElement = 4
+
+        nodeCoords = numpy.zeros((nodeCount, coordDim))
+        nodeCoords[:, 0] = LonCorner.flat
+        nodeCoords[:, 1] = LatCorner.flat
+
+        centerCoords = numpy.zeros((elementCount, coordDim))
+        centerCoords[:, 0] = Lon.flat
+        centerCoords[:, 1] = Lat.flat
+
+        elementConn = numpy.zeros((elementCount, maxNodePElement), dtype=int)
+        elementConn[:, 0] = (XIndices[0:-1, 0:-1].ravel() +
+                             (nLon + 1) * YIndices[0:-1, 0:-1].ravel())
+        elementConn[:, 1] = (XIndices[0:-1, 1:].ravel() +
+                             (nLon + 1) * YIndices[0:-1, 1:].ravel())
+        elementConn[:, 2] = (XIndices[1:, 1:].ravel() +
+                             (nLon + 1) * YIndices[1:, 1:].ravel())
+        elementConn[:, 3] = (XIndices[1:, 0:-1].ravel() +
+                             (nLon + 1) * YIndices[1:, 0:-1].ravel())
+
+        ds_out = xarray.Dataset()
+        ds_out['nodeCoords'] = (('nodeCount', 'coordDim'), nodeCoords)
+        ds_out.nodeCoords.attrs['units'] = self.units
+        ds_out['centerCoords'] = \
+            (('elementCount', 'coordDim'), centerCoords)
+        ds_out.centerCoords.attrs['units'] = self.units
+        ds_out['elementConn'] = \
+            (('elementCount', 'maxNodePElement'), elementConn + 1)
+        ds_out.elementConn.attrs['start_index'] = 1
+        ds_out.elementConn.attrs['_FillValue'] = -1
+        ds_out['numElementConn'] = \
+            (('elementCount',), maxNodePElement * numpy.ones(elementCount,
+                                                             dtype=int))
+
+        ds_out['origGridDims'] = (('origGridRank',), [nLon, nLat])
+
+        ds_out.attrs['gridType'] = 'unstructured mesh'
+        ds_out.attrs['version'] = '0.9'
+
+        ds_out.to_netcdf(esmfFileName)  # }}}
 
     def _set_coords(self, latVarName, lonVarName, latDimName,
                     lonDimName):  # {{{
@@ -507,8 +650,6 @@ class LatLon2DGridDescriptor(MeshDescriptor):  # {{{
         # -------
         # Xylar Asay-Davis
 
-        self.scripFileName = scripFileName
-
         outFile = netCDF4.Dataset(scripFileName, 'w')
 
         nLat, nLon = self.lat.shape
@@ -590,9 +731,17 @@ class ProjectionGridDescriptor(MeshDescriptor):  # {{{
         # -------
         # Xylar Asay-Davis
 
+        super().__init__()
+
         self.projection = projection
         self.latLonProjection = pyproj.Proj(proj='latlong', datum='WGS84')
         self.regional = True
+
+        self.x = None
+        self.y = None
+        self.xCorner = None
+        self.yCorner = None
+        self.history = None
 
     @classmethod
     def read(cls, projection, fileName, meshName=None, xVarName='x',
@@ -701,8 +850,6 @@ class ProjectionGridDescriptor(MeshDescriptor):  # {{{
         # -------
         # Xylar Asay-Davis
 
-        self.scripFileName = scripFileName
-
         outFile = netCDF4.Dataset(scripFileName, 'w')
 
         nx = len(self.x)
@@ -730,6 +877,74 @@ class ProjectionGridDescriptor(MeshDescriptor):  # {{{
         setattr(outFile, 'history', self.history)
 
         outFile.close()  # }}}
+
+    def to_esmf(self, esmfFileName):  # {{{
+        """
+        Create an ESMF mesh file for the mesh
+
+        Parameters
+        ----------
+        esmfFileName : str
+            The path to which the ESMF mesh file should be written
+        """
+        # Authors
+        # -------
+        # Xylar Asay-Davis
+
+        nx = len(self.x)
+        ny = len(self.y)
+
+        (X, Y) = numpy.meshgrid(self.x, self.y)
+        (XCorner, YCorner) = numpy.meshgrid(self.xCorner, self.yCorner)
+        (XIndices, YIndices) = numpy.meshgrid(numpy.arange(nx + 1),
+                                              numpy.arange(ny + 1))
+
+        (Lat, Lon) = self.project_to_lat_lon(X, Y)
+        (LatCorner, LonCorner) = self.project_to_lat_lon(XCorner, YCorner)
+
+        elementCount = nx * ny
+        nodeCount = (nx + 1) * (ny + 1)
+        coordDim = 2
+        maxNodePElement = 4
+
+        nodeCoords = numpy.zeros((nodeCount, coordDim))
+        nodeCoords[:, 0] = LonCorner.flat
+        nodeCoords[:, 1] = LatCorner.flat
+
+        centerCoords = numpy.zeros((elementCount, coordDim))
+        centerCoords[:, 0] = Lon.flat
+        centerCoords[:, 1] = Lat.flat
+
+        elementConn = numpy.zeros((elementCount, maxNodePElement), dtype=int)
+        elementConn[:, 0] = (XIndices[0:-1, 0:-1].ravel() +
+                             (nx + 1) * YIndices[0:-1, 0:-1].ravel())
+        elementConn[:, 1] = (XIndices[0:-1, 1:].ravel() +
+                             (nx + 1) * YIndices[0:-1, 1:].ravel())
+        elementConn[:, 2] = (XIndices[1:, 1:].ravel() +
+                             (nx + 1) * YIndices[1:, 1:].ravel())
+        elementConn[:, 3] = (XIndices[1:, 0:-1].ravel() +
+                             (nx + 1) * YIndices[1:, 0:-1].ravel())
+
+        ds_out = xarray.Dataset()
+        ds_out['nodeCoords'] = (('nodeCount', 'coordDim'), nodeCoords)
+        ds_out.nodeCoords.attrs['units'] = 'degrees'
+        ds_out['centerCoords'] = \
+            (('elementCount', 'coordDim'), centerCoords)
+        ds_out.centerCoords.attrs['units'] = 'degrees'
+        ds_out['elementConn'] = \
+            (('elementCount', 'maxNodePElement'), elementConn + 1)
+        ds_out.elementConn.attrs['start_index'] = 1
+        ds_out.elementConn.attrs['_FillValue'] = -1
+        ds_out['numElementConn'] = \
+            (('elementCount',), maxNodePElement * numpy.ones(elementCount,
+                                                             dtype=int))
+
+        ds_out['origGridDims'] = (('origGridRank',), [ny, nx])
+
+        ds_out.attrs['gridType'] = 'unstructured mesh'
+        ds_out.attrs['version'] = '0.9'
+
+        ds_out.to_netcdf(esmfFileName)  # }}}
 
     def project_to_lat_lon(self, X, Y):  # {{{
         '''
@@ -864,8 +1079,6 @@ class PointCollectionDescriptor(MeshDescriptor):  # {{{
         # ------
         # Xylar Asay-Davis
 
-        self.scripFileName = scripFileName
-
         outFile = netCDF4.Dataset(scripFileName, 'w')
 
         nPoints = len(self.lat)
@@ -887,7 +1100,7 @@ class PointCollectionDescriptor(MeshDescriptor):  # {{{
         # grid corners:
         grid_corner_lon = numpy.zeros((nPoints, 4))
         grid_corner_lat = numpy.zeros((nPoints, 4))
-        # just repeate the center lat and lon
+        # just repeat the center lat and lon
         for iVertex in range(4):
             grid_corner_lat[:, iVertex] = self.lat
             grid_corner_lon[:, iVertex] = self.lon
@@ -899,6 +1112,62 @@ class PointCollectionDescriptor(MeshDescriptor):  # {{{
         setattr(outFile, 'history', ' '.join(sys.argv[:]))
 
         outFile.close()  # }}}
+
+    def to_esmf(self, esmfFileName):  # {{{
+        """
+        Create an ESMF mesh file for the mesh
+
+        Parameters
+        ----------
+        esmfFileName : str
+            The path to which the ESMF mesh file should be written
+        """
+        # Authors
+        # -------
+        # Xylar Asay-Davis
+
+        nPoints = len(self.lat)
+
+        (Lon, Lat) = numpy.meshgrid(self.lon, self.lat)
+
+        elementCount = nPoints
+        nodeCount = 3*nPoints
+        coordDim = 2
+        maxNodePElement = 3
+
+        nodeCoords = numpy.zeros((nodeCount, coordDim))
+        # just repeat the center lat and lon
+        for iVertex in range(maxNodePElement):
+            nodeCoords[iVertex::maxNodePElement, 0] = self.lon
+            nodeCoords[iVertex::maxNodePElement, 1] = self.lat
+
+        centerCoords = numpy.zeros((elementCount, coordDim))
+        centerCoords[:, 0] = self.lon
+        centerCoords[:, 1] = self.lat
+
+        elementConn = numpy.zeros((elementCount, maxNodePElement), dtype=int)
+        elementConn[:, 0] = maxNodePElement * numpy.arange(nPoints)
+        elementConn[:, 1] = maxNodePElement * numpy.arange(nPoints) + 1
+        elementConn[:, 2] = maxNodePElement * numpy.arange(nPoints) + 2
+
+        ds_out = xarray.Dataset()
+        ds_out['nodeCoords'] = (('nodeCount', 'coordDim'), nodeCoords)
+        ds_out.nodeCoords.attrs['units'] = self.units
+        ds_out['centerCoords'] = \
+            (('elementCount', 'coordDim'), centerCoords)
+        ds_out.centerCoords.attrs['units'] = self.units
+        ds_out['elementConn'] = \
+            (('elementCount', 'maxNodePElement'), elementConn + 1)
+        ds_out.elementConn.attrs['start_index'] = 1
+        ds_out.elementConn.attrs['_FillValue'] = -1
+        ds_out['numElementConn'] = \
+            (('elementCount',), maxNodePElement * numpy.ones(elementCount,
+                                                             dtype=int))
+
+        ds_out.attrs['gridType'] = 'unstructured mesh'
+        ds_out.attrs['version'] = '0.9'
+
+        ds_out.to_netcdf(esmfFileName)  # }}}
 # }}}
 
 
