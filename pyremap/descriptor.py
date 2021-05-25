@@ -774,15 +774,15 @@ class ProjectionGridDescriptor(MeshDescriptor):  # {{{
                        yVarName: {'dims': yDimName,
                                   'data': self.y,
                                   'attrs': {'units': 'meters'}},
-                       'lat': {'dims': (xDimName, yDimName),
+                       'lat': {'dims': (yDimName, xDimName),
                                'data': Lat,
                                'attrs': {'units': 'degrees'}},
-                       'lon': {'dims': (xDimName, yDimName),
+                       'lon': {'dims': (yDimName, xDimName),
                                'data': Lon,
                                'attrs': {'units': 'degrees'}}}
 
-        self.dims = [xDimName, yDimName]
-        self.dimSize = [len(self.x), len(self.y)]
+        self.dims = [yDimName, xDimName]
+        self.dimSize = [len(self.y), len(self.x)]
         # }}}
 
     # }}}

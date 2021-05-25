@@ -35,20 +35,29 @@ inGridFileName = 'ocean.QU.240km.151209.nc'
 inDescriptor = MpasMeshDescriptor(inGridFileName, inGridName)
 
 # modify the size and resolution of the Antarctic grid as desired
-outDescriptor = get_polar_descriptor(Lx=6000., Ly=6000., dx=10., dy=10.,
+outDescriptor = get_polar_descriptor(Lx=6000., Ly=5000., dx=10., dy=10.,
                                      projection='antarctic')
 outGridName = outDescriptor.meshName
 
-mappingFileName = 'map_{}_to_{}_conserve.nc'.format(inGridName, outGridName)
+mappingFileName = 'map_{}_to_{}_bilinear.nc'.format(inGridName, outGridName)
 
 remapper = Remapper(inDescriptor, outDescriptor, mappingFileName)
 
 # conservative remapping with 4 MPI tasks (using mpirun)
-remapper.build_mapping_file(method='conserve', mpiTasks=4)
+remapper.build_mapping_file(method='bilinear', mpiTasks=4)
 
-outFileName = 'temp_{}.nc'.format(outGridName)
+# select the SST at the initial time as an example data set
+srcFileName = 'temp_{}.nc'.format(inGridName)
 ds = xarray.open_dataset(inGridFileName)
 dsOut = xarray.Dataset()
-dsOut['temperature'] = ds['temperature']
+dsOut['temperature'] = ds['temperature'].isel(nVertLevels=0, Time=0)
+dsOut.to_netcdf(srcFileName)
+
+# do remapping with ncremap
+outFileName = 'temp_{}_file.nc'.format(outGridName)
+remapper.remap_file(srcFileName, outFileName)
+
+# do remapping again, this time with python remapping
+outFileName = 'temp_{}_array.nc'.format(outGridName)
 dsOut = remapper.remap(dsOut)
 dsOut.to_netcdf(outFileName)
