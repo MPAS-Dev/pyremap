@@ -14,6 +14,7 @@
    .. autosummary::
    
       ~MpasMeshDescriptor.__init__
+      ~MpasMeshDescriptor.to_esmf
       ~MpasMeshDescriptor.to_scrip
    
    

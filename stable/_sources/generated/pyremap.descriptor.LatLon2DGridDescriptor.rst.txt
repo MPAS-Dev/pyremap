@@ -15,6 +15,7 @@
    
       ~LatLon2DGridDescriptor.__init__
       ~LatLon2DGridDescriptor.read
+      ~LatLon2DGridDescriptor.to_esmf
       ~LatLon2DGridDescriptor.to_scrip
    
    

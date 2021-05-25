@@ -185,11 +185,11 @@
 <h1>pyremap.descriptor.MpasMeshDescriptor<a class="headerlink" href="#pyremap-descriptor-mpasmeshdescriptor" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyremap.descriptor.MpasMeshDescriptor">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">pyremap.descriptor.</span></span><span class="sig-name descname"><span class="pre">MpasMeshDescriptor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fileName</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">meshName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyremap/descriptor.html#MpasMeshDescriptor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyremap.descriptor.MpasMeshDescriptor" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">pyremap.descriptor.</span></span><span class="sig-name descname"><span class="pre">MpasMeshDescriptor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fileName</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">meshName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertices</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyremap/descriptor.html#MpasMeshDescriptor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyremap.descriptor.MpasMeshDescriptor" title="Permalink to this definition">¶</a></dt>
 <dd><p>A class for describing an MPAS mesh</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pyremap.descriptor.MpasMeshDescriptor.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fileName</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">meshName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyremap/descriptor.html#MpasMeshDescriptor.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyremap.descriptor.MpasMeshDescriptor.__init__" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fileName</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">meshName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertices</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyremap/descriptor.html#MpasMeshDescriptor.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyremap.descriptor.MpasMeshDescriptor.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Constructor stores the file name</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -199,6 +199,8 @@
 <code class="docutils literal notranslate"><span class="pre">'oRRS18to6'</span></code>).  If not provided, the data set in <code class="docutils literal notranslate"><span class="pre">fileName</span></code>
 must have a global attribute <code class="docutils literal notranslate"><span class="pre">meshName</span></code> that will be used
 instead.</p></li>
+<li><p><strong>vertices</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Whether the mapping is to or from vertices instead of corners
+(for non-conservative remapping)</p></li>
 </ul>
 </dd>
 </dl>
@@ -211,10 +213,13 @@ instead.</p></li>
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyremap.descriptor.MpasMeshDescriptor.__init__" title="pyremap.descriptor.MpasMeshDescriptor.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(fileName[, meshName])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyremap.descriptor.MpasMeshDescriptor.__init__" title="pyremap.descriptor.MpasMeshDescriptor.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(fileName[, meshName, vertices])</p></td>
 <td><p>Constructor stores the file name</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_scrip</span></code>(scripFileName)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_esmf</span></code>(esmfFileName)</p></td>
+<td><p>Create an ESMF mesh file for the mesh</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_scrip</span></code>(scripFileName)</p></td>
 <td><p>Given an MPAS mesh file, create a SCRIP file based on the mesh.</p></td>
 </tr>
 </tbody>
