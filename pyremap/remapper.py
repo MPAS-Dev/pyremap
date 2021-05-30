@@ -246,36 +246,35 @@ class Remapper(object):
 
         parallel_args = []
 
-        if mpiTasks > 1:
-            if esmf_parallel_exec is not None:
-                # use the specified parallel executable
+        if esmf_parallel_exec is not None:
+            # use the specified parallel executable
 
-                if 'srun' in esmf_parallel_exec:
-                    parallel_args = [esmf_parallel_exec, '-n',
-                                     '{}'.format(mpiTasks)]
-                else:
-                    # presume mpirun syntax
-                    parallel_args = [esmf_parallel_exec, '-np',
-                                     '{}'.format(mpiTasks)]
+            if 'srun' in esmf_parallel_exec:
+                parallel_args = [esmf_parallel_exec, '-n',
+                                 '{}'.format(mpiTasks)]
+            else:
+                # presume mpirun syntax
+                parallel_args = [esmf_parallel_exec, '-np',
+                                 '{}'.format(mpiTasks)]
 
-            elif 'CONDA_PREFIX' in os.environ and mpiTasks > 1:
-                # this is a conda environment, so we need to find out if esmf
-                # needs mpirun or not
-                conda_args = ['conda', 'list', 'esmf', '--json']
-                output = check_output(conda_args).decode("utf-8")
-                output = json.loads(output)
-                build_string = output[0]['build_string']
+        elif 'CONDA_PREFIX' in os.environ and mpiTasks > 1:
+            # this is a conda environment, so we need to find out if esmf
+            # needs mpirun or not
+            conda_args = ['conda', 'list', 'esmf', '--json']
+            output = check_output(conda_args).decode("utf-8")
+            output = json.loads(output)
+            build_string = output[0]['build_string']
 
-                if 'mpi_mpich' in build_string or 'mpi_openmpi' in build_string:
-                    # esmf was installed with MPI, so we should use mpirun
-                    mpirun_path = '{}/bin/mpirun'.format(
-                        os.environ['CONDA_PREFIX'])
-                    parallel_args = [mpirun_path, '-np', '{}'.format(mpiTasks)]
-                else:
-                    # esmf was installed without MPI, so we shouldn't try to
-                    # use it
-                    warnings.warn('Requesting {} MPI tasks but the MPI version'
-                                  ' of ESMF is not installed'.format(mpiTasks))
+            if 'mpi_mpich' in build_string or 'mpi_openmpi' in build_string:
+                # esmf was installed with MPI, so we should use mpirun
+                mpirun_path = '{}/bin/mpirun'.format(
+                    os.environ['CONDA_PREFIX'])
+                parallel_args = [mpirun_path, '-np', '{}'.format(mpiTasks)]
+            else:
+                # esmf was installed without MPI, so we shouldn't try to
+                # use it
+                warnings.warn('Requesting {} MPI tasks but the MPI version'
+                              ' of ESMF is not installed'.format(mpiTasks))
 
         args = parallel_args + args
 
