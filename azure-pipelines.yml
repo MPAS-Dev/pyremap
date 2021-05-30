@@ -142,6 +142,9 @@ jobs:
   - bash: echo "##vso[task.prependpath]$CONDA/bin"
     displayName: Add conda to PATH
 
+  - bash: sudo chown -R 501:20 /usr/local/miniconda/pkgs
+    displayName: Fix permissions
+
   - bash: |
       conda config --add channels conda-forge
       conda config --set channel_priority strict
