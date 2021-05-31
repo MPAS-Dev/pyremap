@@ -304,7 +304,7 @@
 
 <span class="sd">        esmf_parallel_exec : {&#39;srun&#39;, &#39;mpirun}, optional</span>
 <span class="sd">            The name of the parallel executable to use to launch ESMF tools.</span>
-<span class="sd">            But default, &#39;mpirun&#39; from the conda environment is used</span>
+<span class="sd">            By default, &#39;mpirun&#39; from the conda environment is used</span>
 
 <span class="sd">        extrap_method : {&#39;neareststod&#39;, &#39;nearestidavg&#39;,&#39;creep&#39;}, optional</span>
 <span class="sd">            The method used to extrapolate unmapped destination locations</span>
@@ -413,14 +413,13 @@
 
         <span class="k">if</span> <span class="n">esmf_parallel_exec</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="c1"># use the specified parallel executable</span>
+            <span class="n">parallel_args</span> <span class="o">=</span> <span class="n">esmf_parallel_exec</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="s1">&#39;srun&#39;</span> <span class="ow">in</span> <span class="n">esmf_parallel_exec</span><span class="p">:</span>
-                <span class="n">parallel_args</span> <span class="o">=</span> <span class="p">[</span><span class="n">esmf_parallel_exec</span><span class="p">,</span> <span class="s1">&#39;-n&#39;</span><span class="p">,</span>
-                                 <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mpiTasks</span><span class="p">)]</span>
+                <span class="n">parallel_args</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;-n&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mpiTasks</span><span class="p">)])</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="c1"># presume mpirun syntax</span>
-                <span class="n">parallel_args</span> <span class="o">=</span> <span class="p">[</span><span class="n">esmf_parallel_exec</span><span class="p">,</span> <span class="s1">&#39;-np&#39;</span><span class="p">,</span>
-                                 <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mpiTasks</span><span class="p">)]</span>
+                <span class="n">parallel_args</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;-np&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mpiTasks</span><span class="p">)])</span>
 
         <span class="k">elif</span> <span class="s1">&#39;CONDA_PREFIX&#39;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span> <span class="ow">and</span> <span class="n">mpiTasks</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="c1"># this is a conda environment, so we need to find out if esmf</span>
@@ -495,7 +494,7 @@
 
     <span class="k">def</span> <span class="nf">remap_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inFileName</span><span class="p">,</span> <span class="n">outFileName</span><span class="p">,</span> <span class="n">variableList</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                    <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">renormalize</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                   <span class="n">replaceMpasFill</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>  <span class="c1"># {{{</span>
+                   <span class="n">replaceMpasFill</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">parallel_exec</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>  <span class="c1"># {{{</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Given a source file defining either an MPAS mesh or a lat-lon grid and</span>
 <span class="sd">        a destination file or set of arrays defining a lat-lon grid, constructs</span>
@@ -529,6 +528,10 @@
 <span class="sd">            For MPAS meshes, whether add a ``_FillValue`` attribute (missing</span>
 <span class="sd">            from MPAS output).  If this has been handled before the call,</span>
 <span class="sd">            replacing the fill value again may cause errors.</span>
+
+<span class="sd">        parallel_exec : {&#39;srun&#39;}, optional</span>
+<span class="sd">            The name of the parallel executable to use to launch ncremap.</span>
+<span class="sd">            By default, none is used.</span>
 
 <span class="sd">        Raises</span>
 <span class="sd">        ------</span>
@@ -564,9 +567,15 @@
                           <span class="s1">&#39;Note: this presumes use of the conda-forge &#39;</span>
                           <span class="s1">&#39;channel.&#39;</span><span class="p">)</span>
 
-        <span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ncremap&#39;</span><span class="p">,</span>
-                <span class="s1">&#39;-m&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mappingFileName</span><span class="p">,</span>
-                <span class="s1">&#39;--vrb=1&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">parallel_exec</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># use the specified parallel executable</span>
+            <span class="n">args</span> <span class="o">=</span> <span class="n">parallel_exec</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">args</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
+        <span class="n">args</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;ncremap&#39;</span><span class="p">,</span>
+                     <span class="s1">&#39;-m&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mappingFileName</span><span class="p">,</span>
+                     <span class="s1">&#39;--vrb=1&#39;</span><span class="p">])</span>
 
         <span class="n">regridArgs</span> <span class="o">=</span> <span class="p">[]</span>
 
