@@ -139,7 +139,7 @@ class Remapper(object):
 
         esmf_parallel_exec : {'srun', 'mpirun}, optional
             The name of the parallel executable to use to launch ESMF tools.
-            But default, 'mpirun' from the conda environment is used
+            By default, 'mpirun' from the conda environment is used
 
         extrap_method : {'neareststod', 'nearestidavg','creep'}, optional
             The method used to extrapolate unmapped destination locations
@@ -248,14 +248,13 @@ class Remapper(object):
 
         if esmf_parallel_exec is not None:
             # use the specified parallel executable
+            parallel_args = esmf_parallel_exec.split(' ')
 
             if 'srun' in esmf_parallel_exec:
-                parallel_args = [esmf_parallel_exec, '-n',
-                                 '{}'.format(mpiTasks)]
+                parallel_args.extend(['-n', '{}'.format(mpiTasks)])
             else:
                 # presume mpirun syntax
-                parallel_args = [esmf_parallel_exec, '-np',
-                                 '{}'.format(mpiTasks)]
+                parallel_args.extend(['-np', '{}'.format(mpiTasks)])
 
         elif 'CONDA_PREFIX' in os.environ and mpiTasks > 1:
             # this is a conda environment, so we need to find out if esmf
@@ -330,7 +329,7 @@ class Remapper(object):
 
     def remap_file(self, inFileName, outFileName, variableList=None,
                    overwrite=False, renormalize=None, logger=None,
-                   replaceMpasFill=False):  # {{{
+                   replaceMpasFill=False, parallel_exec=None):  # {{{
         """
         Given a source file defining either an MPAS mesh or a lat-lon grid and
         a destination file or set of arrays defining a lat-lon grid, constructs
@@ -364,6 +363,10 @@ class Remapper(object):
             For MPAS meshes, whether add a ``_FillValue`` attribute (missing
             from MPAS output).  If this has been handled before the call,
             replacing the fill value again may cause errors.
+
+        parallel_exec : {'srun'}, optional
+            The name of the parallel executable to use to launch ncremap.
+            By default, none is used.
 
         Raises
         ------
@@ -399,9 +402,15 @@ class Remapper(object):
                           'Note: this presumes use of the conda-forge '
                           'channel.')
 
-        args = ['ncremap',
-                '-m', self.mappingFileName,
-                '--vrb=1']
+        if parallel_exec is not None:
+            # use the specified parallel executable
+            args = parallel_exec.split(' ')
+        else:
+            args = list()
+
+        args.extend(['ncremap',
+                     '-m', self.mappingFileName,
+                     '--vrb=1'])
 
         regridArgs = []
 
