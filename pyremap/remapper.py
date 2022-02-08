@@ -425,6 +425,12 @@ class Remapper(object):
                     # and quits with an error
                     args.append('-C')
 
+            if renormalize is not None:
+                # we also want to make sure cells that receive no data are
+                # marked with fill values, even if the source MPAS data
+                # doesn't have a fill value
+                args.append('--add_fill_value')
+
         if variableList is not None:
             args.extend(['-v', ','.join(variableList)])
 
