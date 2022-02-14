@@ -1,0 +1,24 @@
+﻿pyremap.descriptor.MpasMeshDescriptor
+=====================================
+
+.. currentmodule:: pyremap.descriptor
+
+.. autoclass:: MpasMeshDescriptor
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~MpasMeshDescriptor.__init__
+      ~MpasMeshDescriptor.to_esmf
+      ~MpasMeshDescriptor.to_scrip
+   
+   
+
+   
+   
+   
