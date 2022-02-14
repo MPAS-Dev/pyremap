@@ -6,5 +6,5 @@ from pyremap.remapper import Remapper
 
 from pyremap.polar import get_polar_descriptor_from_file, get_polar_descriptor
 
-__version_info__ = (0, 0, 14)
+__version_info__ = (0, 0, 15)
 __version__ = '.'.join(str(vi) for vi in __version_info__)
