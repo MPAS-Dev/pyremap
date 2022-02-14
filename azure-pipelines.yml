@@ -30,18 +30,21 @@ jobs:
     displayName: Add conda to PATH
 
   - bash: |
+      set -e
       conda config --add channels conda-forge
       conda config --set channel_priority strict
       conda create --yes --quiet --name build python=$PYTHON_VERSION conda conda-build
     displayName: Create Anaconda build environment
 
   - bash: |
+      set -e
       eval "$(conda shell.bash hook)"
       conda activate build
       conda build -m "ci/python${PYTHON_VERSION}.yaml" "recipe"
     displayName: Build pyremap
 
   - bash: |
+      set -e
       eval "$(conda shell.bash hook)"
       conda activate build
       conda create --yes --quiet --name test -c ${CONDA_PREFIX}/conda-bld/ \
@@ -49,20 +52,23 @@ jobs:
     displayName: Create Anaconda test environment
 
   - bash: |
+      set -e
       eval "$(conda shell.bash hook)"
       conda activate test
       pytest --pyargs pyremap
     displayName: pytest
 
   - bash: |
+      set -e
       eval "$(conda shell.bash hook)"
       conda activate build
       conda create --yes --quiet --name docs -c ${CONDA_PREFIX}/conda-bld/ \
-          python=$PYTHON_VERSION pyremap sphinx mock sphinx_rtd_theme m2r
+          python=$PYTHON_VERSION pyremap sphinx mock sphinx_rtd_theme m2r2
     condition: eq(variables['python.version'], '3.8')
     displayName: Create Anaconda docs environment
 
   - bash: |
+      set -e
       eval "$(conda shell.bash hook)"
       conda activate docs
 
@@ -146,25 +152,29 @@ jobs:
     displayName: Fix permissions
 
   - bash: |
+      set -e
       conda config --add channels conda-forge
       conda config --set channel_priority strict
       conda create --yes --quiet --name build python=$PYTHON_VERSION conda conda-build
     displayName: Create Anaconda build environment
 
   - bash: |
+      set -e
       eval "$(conda shell.bash hook)"
       conda activate build
       conda build -m "ci/python${PYTHON_VERSION}.yaml" "recipe"
     displayName: Build pyremap
 
   - bash: |
+      set -e
       eval "$(conda shell.bash hook)"
       conda activate build
       conda create --yes --quiet --name test -c ${CONDA_PREFIX}/conda-bld/ \
-          python=$PYTHON_VERSION pyremap pytest sphinx mock sphinx_rtd_theme m2r
+          python=$PYTHON_VERSION pyremap pytest sphinx mock sphinx_rtd_theme m2r2
     displayName: Create Anaconda test environment
 
   - bash: |
+      set -e
       eval "$(conda shell.bash hook)"
       conda activate test
       pytest --pyargs pyremap
