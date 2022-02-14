@@ -21,4 +21,4 @@ mock
 pillow
 sphinx
 sphinx_rtd_theme
-m2r
+m2r2
