@@ -80,7 +80,7 @@ class LatLonGridDescriptor(MeshDescriptor):
     history : str
         The history attribute written to SCRIP files
     """
-    def __init__(self, meshName=None, regional=False):
+    def __init__(self, meshName=None, regional=None):
         """
         Construct a mesh descriptor
 
@@ -89,7 +89,9 @@ class LatLonGridDescriptor(MeshDescriptor):
             names
 
         regional : bool or None, optional
-            Whether this is a regional or global grid
+            Whether this is a regional or global grid.  If ``None``, this will
+            be determined automatically by checking the limits of the corner
+            latitude and longitude to see if they cover the globe.
         """
         super().__init__(meshName=meshName, regional=regional)
         self.lat = None
@@ -101,7 +103,7 @@ class LatLonGridDescriptor(MeshDescriptor):
 
     @classmethod
     def read(cls, fileName=None, ds=None, latVarName='lat',
-             lonVarName='lon', meshName=None, regional=False):
+             lonVarName='lon', meshName=None, regional=None):
         """
         Read the lat-lon grid from a file with the given lat/lon var names.
 
@@ -123,7 +125,9 @@ class LatLonGridDescriptor(MeshDescriptor):
             names
 
         regional : bool or None, optional
-            Whether this is a regional or global grid
+            Whether this is a regional or global grid.  If ``None``, this will
+            be determined automatically by checking the limits of the corner
+            latitude and longitude to see if they cover the globe.
         """
         if ds is None:
             ds = xarray.open_dataset(fileName)
@@ -156,7 +160,8 @@ class LatLonGridDescriptor(MeshDescriptor):
         return descriptor
 
     @classmethod
-    def create(cls, latCorner, lonCorner, units='degrees'):
+    def create(cls, latCorner, lonCorner, units='degrees', meshName=None,
+               regional=None):
         """
         Create the lat-lon grid with the given arrays and units.
 
@@ -172,8 +177,17 @@ class LatLonGridDescriptor(MeshDescriptor):
 
         units : {'degrees', 'radians'}, optional
             The units of `latCorner` and `lonCorner`
+
+        meshName : str or None, optional
+            The name of the mesh or grid, used to give mapping files unique
+            names
+
+        regional : bool or None, optional
+            Whether this is a regional or global grid.  If ``None``, this will
+            be determined automatically by checking the limits of the corner
+            latitude and longitude to see if they cover the globe.
         """
-        descriptor = cls()
+        descriptor = cls(meshName=meshName, regional=regional)
 
         descriptor.latCorner = latCorner
         descriptor.lonCorner = lonCorner
@@ -303,19 +317,24 @@ class LatLonGridDescriptor(MeshDescriptor):
         latRange = self.latCorner[-1] - self.latCorner[0]
         if 'degree' in self.units:
             units = 'degree'
-            if numpy.abs(lonRange - 360.) > 1e-10:
-                self.regional = True
-            if numpy.abs(latRange - 180.) > 1e-10:
-                self.regional = True
         elif 'rad' in self.units:
-            if numpy.abs(lonRange - 2. * numpy.pi) > 1e-10:
-                self.regional = True
-            if numpy.abs(latRange - numpy.pi) > 1e-10:
-                self.regional = True
             units = 'radian'
         else:
             raise ValueError('Could not figure out units {}'.format(
                 self.units))
+
+        if self.regional is None:
+            self.regional = False
+            if units == 'degree':
+                if numpy.abs(lonRange - 360.) > 1e-10:
+                    self.regional = True
+                if numpy.abs(latRange - 180.) > 1e-10:
+                    self.regional = True
+            else:
+                if numpy.abs(lonRange - 2. * numpy.pi) > 1e-10:
+                    self.regional = True
+                if numpy.abs(latRange - numpy.pi) > 1e-10:
+                    self.regional = True
         if self.meshName is None:
             self.meshName = '{}x{}{}'.format(round_res(abs(dLat)),
                                              round_res(abs(dLon)), units)

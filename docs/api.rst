@@ -2,7 +2,7 @@
 API reference
 #############
 
-This page provides an auto-generated summary of the pyremap API. 
+This page provides an auto-generated summary of the pyremap API.
 
 Mesh Descriptors
 ================
@@ -12,12 +12,33 @@ Mesh Descriptors
 .. autosummary::
    :toctree: generated/
 
-   get_lat_lon_descriptor
+   interp_extrap_corner
+   interp_extrap_corners_2d
+
    MpasMeshDescriptor
+   MpasMeshDescriptor.to_scrip
+   MpasMeshDescriptor.to_esmf
+
+   get_lat_lon_descriptor
    LatLonGridDescriptor
+   LatLonGridDescriptor.read
+   LatLonGridDescriptor.create
+   LatLonGridDescriptor.to_scrip
+   LatLonGridDescriptor.to_esmf
+
    LatLon2DGridDescriptor
+   LatLon2DGridDescriptor.read
+   LatLon2DGridDescriptor.to_scrip
+
    ProjectionGridDescriptor
+   ProjectionGridDescriptor.read
+   ProjectionGridDescriptor.create
+   ProjectionGridDescriptor.to_scrip
+   ProjectionGridDescriptor.to_esmf
+
    PointCollectionDescriptor
+   PointCollectionDescriptor.to_scrip
+   PointCollectionDescriptor.to_esmf
 
 Remapping
 =========
