@@ -2,6 +2,14 @@ import os
 import re
 from setuptools import setup, find_packages
 
+install_requires = \
+    ['dask',
+     'netcdf4',
+     'numpy',
+     'pyproj',
+     'scipy',
+     'xarray>=0.10.0']
+
 here = os.path.abspath(os.path.dirname(__file__))
 with open(os.path.join(here, 'pyremap', '__init__.py')) as f:
     init_file = f.read()
@@ -25,7 +33,11 @@ setup(name='pyremap',
           'Programming Language :: Python :: 3',
           'Programming Language :: Python :: 3.6',
           'Programming Language :: Python :: 3.7',
+          'Programming Language :: Python :: 3.8',
+          'Programming Language :: Python :: 3.9',
+          'Programming Language :: Python :: 3.10',
           'Topic :: Scientific/Engineering',
       ],
       packages=find_packages(),
-      package_data={'pyremap.test': ['test*/*', 'test*/*/*']})
+      package_data={'pyremap.test': ['test*/*', 'test*/*/*']},
+      install_requires=install_requires)
