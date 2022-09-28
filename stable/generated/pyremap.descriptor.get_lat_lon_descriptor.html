@@ -13,12 +13,14 @@
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="pyremap.descriptor.MpasMeshDescriptor" href="pyremap.descriptor.MpasMeshDescriptor.html" />
-    <link rel="prev" title="API reference" href="../api.html" /> 
+    <link rel="next" title="pyremap.descriptor.LatLonGridDescriptor" href="pyremap.descriptor.LatLonGridDescriptor.html" />
+    <link rel="prev" title="pyremap.descriptor.MpasMeshDescriptor.to_esmf" href="pyremap.descriptor.MpasMeshDescriptor.to_esmf.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -45,12 +47,31 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="../api.html">API reference</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="../api.html#mesh-descriptors">Mesh Descriptors</a><ul class="current">
-<li class="toctree-l3 current"><a class="current reference internal" href="#">pyremap.descriptor.get_lat_lon_descriptor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.interp_extrap_corner.html">pyremap.descriptor.interp_extrap_corner</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.interp_extrap_corners_2d.html">pyremap.descriptor.interp_extrap_corners_2d</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.MpasMeshDescriptor.html">pyremap.descriptor.MpasMeshDescriptor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.MpasMeshDescriptor.to_scrip.html">pyremap.descriptor.MpasMeshDescriptor.to_scrip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.MpasMeshDescriptor.to_esmf.html">pyremap.descriptor.MpasMeshDescriptor.to_esmf</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">pyremap.descriptor.get_lat_lon_descriptor</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pyremap.descriptor.get_lat_lon_descriptor"><code class="docutils literal notranslate"><span class="pre">get_lat_lon_descriptor()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.LatLonGridDescriptor.html">pyremap.descriptor.LatLonGridDescriptor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.LatLonGridDescriptor.read.html">pyremap.descriptor.LatLonGridDescriptor.read</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.LatLonGridDescriptor.create.html">pyremap.descriptor.LatLonGridDescriptor.create</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.LatLonGridDescriptor.to_scrip.html">pyremap.descriptor.LatLonGridDescriptor.to_scrip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.LatLonGridDescriptor.to_esmf.html">pyremap.descriptor.LatLonGridDescriptor.to_esmf</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.LatLon2DGridDescriptor.html">pyremap.descriptor.LatLon2DGridDescriptor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.LatLon2DGridDescriptor.read.html">pyremap.descriptor.LatLon2DGridDescriptor.read</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.LatLon2DGridDescriptor.to_scrip.html">pyremap.descriptor.LatLon2DGridDescriptor.to_scrip</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.ProjectionGridDescriptor.html">pyremap.descriptor.ProjectionGridDescriptor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.ProjectionGridDescriptor.read.html">pyremap.descriptor.ProjectionGridDescriptor.read</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.ProjectionGridDescriptor.create.html">pyremap.descriptor.ProjectionGridDescriptor.create</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.ProjectionGridDescriptor.to_scrip.html">pyremap.descriptor.ProjectionGridDescriptor.to_scrip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.ProjectionGridDescriptor.to_esmf.html">pyremap.descriptor.ProjectionGridDescriptor.to_esmf</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.PointCollectionDescriptor.html">pyremap.descriptor.PointCollectionDescriptor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.PointCollectionDescriptor.to_scrip.html">pyremap.descriptor.PointCollectionDescriptor.to_scrip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.PointCollectionDescriptor.to_esmf.html">pyremap.descriptor.PointCollectionDescriptor.to_esmf</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../api.html#remapping">Remapping</a></li>
@@ -88,20 +109,24 @@
            <div itemprop="articleBody">
              
   <div class="section" id="pyremap-descriptor-get-lat-lon-descriptor">
-<h1>pyremap.descriptor.get_lat_lon_descriptor<a class="headerlink" href="#pyremap-descriptor-get-lat-lon-descriptor" title="Permalink to this headline">¶</a></h1>
+<h1>pyremap.descriptor.get_lat_lon_descriptor<a class="headerlink" href="#pyremap-descriptor-get-lat-lon-descriptor" title="Permalink to this heading">¶</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="pyremap.descriptor.get_lat_lon_descriptor">
-<span class="sig-prename descclassname"><span class="pre">pyremap.descriptor.</span></span><span class="sig-name descname"><span class="pre">get_lat_lon_descriptor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dLon</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dLat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lonMin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">180.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lonMax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">180.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latMin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">90.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latMax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">90.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyremap/descriptor.html#get_lat_lon_descriptor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyremap.descriptor.get_lat_lon_descriptor" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get a descriptor of a lat/lon grid, used for remapping</p>
+<span class="sig-prename descclassname"><span class="pre">pyremap.descriptor.</span></span><span class="sig-name descname"><span class="pre">get_lat_lon_descriptor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dLon</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dLat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lonMin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-180.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lonMax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">180.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latMin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-90.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latMax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">90.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyremap/descriptor/lat_lon_grid_descriptor.html#get_lat_lon_descriptor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyremap.descriptor.get_lat_lon_descriptor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a descriptor of a lat-lon grid, used for remapping</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>dLon</strong> (<em>float`</em>) – Resolution of the lon-lat grid in degrees</p></li>
-<li><p><strong>dLat</strong> (<em>float`</em>) – Resolution of the lon-lat grid in degrees</p></li>
+<li><p><strong>dLon</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – Longitude resolution in degrees</p></li>
+<li><p><strong>dLat</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – Latitude resolution in degrees</p></li>
+<li><p><strong>lonMin</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – Lower bound on longitude in degrees</p></li>
+<li><p><strong>lonMax</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – Upper bound on longitude in degrees</p></li>
+<li><p><strong>latMin</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – Lower bound on latitude in degrees</p></li>
+<li><p><strong>latMax</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>optional</em>) – Upper bound on latitude in degrees</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><strong>descriptor</strong> (<code class="docutils literal notranslate"><span class="pre">LatLonGridDescriptor</span></code> object) – A descriptor of the lat/lon grid</p>
+<dd class="field-even"><p><strong>descriptor</strong> (<em>xarray.LatLonGridDescriptor object</em>) – A descriptor of the lat/lon grid</p>
 </dd>
 </dl>
 </dd></dl>
@@ -112,8 +137,8 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="../api.html" class="btn btn-neutral float-left" title="API reference" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="pyremap.descriptor.MpasMeshDescriptor.html" class="btn btn-neutral float-right" title="pyremap.descriptor.MpasMeshDescriptor" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="pyremap.descriptor.MpasMeshDescriptor.to_esmf.html" class="btn btn-neutral float-left" title="pyremap.descriptor.MpasMeshDescriptor.to_esmf" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="pyremap.descriptor.LatLonGridDescriptor.html" class="btn btn-neutral float-right" title="pyremap.descriptor.LatLonGridDescriptor" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

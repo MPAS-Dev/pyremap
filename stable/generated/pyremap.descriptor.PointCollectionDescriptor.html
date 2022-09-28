@@ -13,12 +13,14 @@
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="pyremap.remapper.Remapper" href="pyremap.remapper.Remapper.html" />
-    <link rel="prev" title="pyremap.descriptor.ProjectionGridDescriptor" href="pyremap.descriptor.ProjectionGridDescriptor.html" /> 
+    <link rel="next" title="pyremap.descriptor.PointCollectionDescriptor.to_scrip" href="pyremap.descriptor.PointCollectionDescriptor.to_scrip.html" />
+    <link rel="prev" title="pyremap.descriptor.ProjectionGridDescriptor.to_esmf" href="pyremap.descriptor.ProjectionGridDescriptor.to_esmf.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -45,12 +47,31 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="../api.html">API reference</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="../api.html#mesh-descriptors">Mesh Descriptors</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.get_lat_lon_descriptor.html">pyremap.descriptor.get_lat_lon_descriptor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.interp_extrap_corner.html">pyremap.descriptor.interp_extrap_corner</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.interp_extrap_corners_2d.html">pyremap.descriptor.interp_extrap_corners_2d</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.MpasMeshDescriptor.html">pyremap.descriptor.MpasMeshDescriptor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.MpasMeshDescriptor.to_scrip.html">pyremap.descriptor.MpasMeshDescriptor.to_scrip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.MpasMeshDescriptor.to_esmf.html">pyremap.descriptor.MpasMeshDescriptor.to_esmf</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.get_lat_lon_descriptor.html">pyremap.descriptor.get_lat_lon_descriptor</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.LatLonGridDescriptor.html">pyremap.descriptor.LatLonGridDescriptor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.LatLonGridDescriptor.read.html">pyremap.descriptor.LatLonGridDescriptor.read</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.LatLonGridDescriptor.create.html">pyremap.descriptor.LatLonGridDescriptor.create</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.LatLonGridDescriptor.to_scrip.html">pyremap.descriptor.LatLonGridDescriptor.to_scrip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.LatLonGridDescriptor.to_esmf.html">pyremap.descriptor.LatLonGridDescriptor.to_esmf</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.LatLon2DGridDescriptor.html">pyremap.descriptor.LatLon2DGridDescriptor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.LatLon2DGridDescriptor.read.html">pyremap.descriptor.LatLon2DGridDescriptor.read</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.LatLon2DGridDescriptor.to_scrip.html">pyremap.descriptor.LatLon2DGridDescriptor.to_scrip</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.ProjectionGridDescriptor.html">pyremap.descriptor.ProjectionGridDescriptor</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">pyremap.descriptor.PointCollectionDescriptor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.ProjectionGridDescriptor.read.html">pyremap.descriptor.ProjectionGridDescriptor.read</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.ProjectionGridDescriptor.create.html">pyremap.descriptor.ProjectionGridDescriptor.create</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.ProjectionGridDescriptor.to_scrip.html">pyremap.descriptor.ProjectionGridDescriptor.to_scrip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.ProjectionGridDescriptor.to_esmf.html">pyremap.descriptor.ProjectionGridDescriptor.to_esmf</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">pyremap.descriptor.PointCollectionDescriptor</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pyremap.descriptor.PointCollectionDescriptor"><code class="docutils literal notranslate"><span class="pre">PointCollectionDescriptor</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.PointCollectionDescriptor.to_scrip.html">pyremap.descriptor.PointCollectionDescriptor.to_scrip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.PointCollectionDescriptor.to_esmf.html">pyremap.descriptor.PointCollectionDescriptor.to_esmf</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../api.html#remapping">Remapping</a></li>
@@ -88,40 +109,41 @@
            <div itemprop="articleBody">
              
   <div class="section" id="pyremap-descriptor-pointcollectiondescriptor">
-<h1>pyremap.descriptor.PointCollectionDescriptor<a class="headerlink" href="#pyremap-descriptor-pointcollectiondescriptor" title="Permalink to this headline">¶</a></h1>
+<h1>pyremap.descriptor.PointCollectionDescriptor<a class="headerlink" href="#pyremap-descriptor-pointcollectiondescriptor" title="Permalink to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyremap.descriptor.PointCollectionDescriptor">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyremap.descriptor.</span></span><span class="sig-name descname"><span class="pre">PointCollectionDescriptor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lats</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lons</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">collectionName</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'degrees'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outDimension</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'nPoints'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyremap/descriptor.html#PointCollectionDescriptor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyremap.descriptor.PointCollectionDescriptor" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyremap.descriptor.</span></span><span class="sig-name descname"><span class="pre">PointCollectionDescriptor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lats</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lons</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">collectionName</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'degrees'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outDimension</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'nPoints'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyremap/descriptor/point_collection_descriptor.html#PointCollectionDescriptor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyremap.descriptor.PointCollectionDescriptor" title="Permalink to this definition">¶</a></dt>
 <dd><p>A class for describing a collection of points</p>
-<p>Xylar Asay-Davis</p>
-<p>04/19/2017</p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lat</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.23)"><em>numpy.ndarray</em></a>) – The latitude of each point</p></li>
+<li><p><strong>lon</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.23)"><em>numpy.ndarray</em></a>) – The longitude of each point</p></li>
+<li><p><strong>units</strong> (<em>{'degrees'</em><em>, </em><em>'radians'}</em>) – The units of <code class="docutils literal notranslate"><span class="pre">lats</span></code> and <code class="docutils literal notranslate"><span class="pre">lons</span></code></p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="pyremap.descriptor.PointCollectionDescriptor.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lats</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lons</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">collectionName</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'degrees'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outDimension</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'nPoints'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyremap/descriptor.html#PointCollectionDescriptor.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyremap.descriptor.PointCollectionDescriptor.__init__" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lats</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lons</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">collectionName</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'degrees'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outDimension</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'nPoints'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyremap/descriptor/point_collection_descriptor.html#PointCollectionDescriptor.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyremap.descriptor.PointCollectionDescriptor.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Constructor stores</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>lats</strong> (<em>1D numpy arrays</em>) – The latitude and longitude of each point</p></li>
-<li><p><strong>lons</strong> (<em>1D numpy arrays</em>) – The latitude and longitude of each point</p></li>
+<li><p><strong>lats</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.23)"><em>numpy.ndarray</em></a>) – The latitude of each point</p></li>
+<li><p><strong>lons</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.23)"><em>numpy.ndarray</em></a>) – The longitude of each point</p></li>
 <li><p><strong>collectionName</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – A unique name for the collection of transects, used in the names
 of files containing data mapped to these points.</p></li>
 <li><p><strong>units</strong> (<em>{'degrees'</em><em>, </em><em>'radians'}</em><em>, </em><em>optional</em>) – The units of <code class="docutils literal notranslate"><span class="pre">lats</span></code> and <code class="docutils literal notranslate"><span class="pre">lons</span></code></p></li>
 <li><p><strong>outDimension</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – The name of the dimension corresponding to the points (i.e. the
 “horizontal” dimension of the point collection)</p></li>
-<li><p><strong>Author</strong> – </p></li>
-<li><p><strong>------</strong> – </p></li>
-<li><p><strong>Asay-Davis</strong> (<em>Xylar</em>) – </p></li>
-<li><p><strong>Modified</strong> (<em>Last</em>) – </p></li>
-<li><p><strong>-------------</strong> – </p></li>
-<li><p><strong>04/19/2017</strong> – </p></li>
 </ul>
 </dd>
 </dl>
 </dd></dl>
 
 <p class="rubric">Methods</p>
-<table class="longtable docutils align-default">
+<table class="autosummary longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -130,10 +152,10 @@ of files containing data mapped to these points.</p></li>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyremap.descriptor.PointCollectionDescriptor.__init__" title="pyremap.descriptor.PointCollectionDescriptor.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(lats, lons, collectionName[, ...])</p></td>
 <td><p>Constructor stores</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_esmf</span></code>(esmfFileName)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="pyremap.descriptor.PointCollectionDescriptor.to_esmf.html#pyremap.descriptor.PointCollectionDescriptor.to_esmf" title="pyremap.descriptor.PointCollectionDescriptor.to_esmf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_esmf</span></code></a>(esmfFileName)</p></td>
 <td><p>Create an ESMF mesh file for the mesh</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_scrip</span></code>(scripFileName)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="pyremap.descriptor.PointCollectionDescriptor.to_scrip.html#pyremap.descriptor.PointCollectionDescriptor.to_scrip" title="pyremap.descriptor.PointCollectionDescriptor.to_scrip"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_scrip</span></code></a>(scripFileName)</p></td>
 <td><p>Given an MPAS mesh file, create a SCRIP file based on the mesh.</p></td>
 </tr>
 </tbody>
@@ -146,8 +168,8 @@ of files containing data mapped to these points.</p></li>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="pyremap.descriptor.ProjectionGridDescriptor.html" class="btn btn-neutral float-left" title="pyremap.descriptor.ProjectionGridDescriptor" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="pyremap.remapper.Remapper.html" class="btn btn-neutral float-right" title="pyremap.remapper.Remapper" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="pyremap.descriptor.ProjectionGridDescriptor.to_esmf.html" class="btn btn-neutral float-left" title="pyremap.descriptor.ProjectionGridDescriptor.to_esmf" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="pyremap.descriptor.PointCollectionDescriptor.to_scrip.html" class="btn btn-neutral float-right" title="pyremap.descriptor.PointCollectionDescriptor.to_scrip" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
