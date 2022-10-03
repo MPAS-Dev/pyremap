@@ -449,10 +449,11 @@ class Remapper(object):
                 self.sourceDescriptor.xVarName)])
 
         if isinstance(self.destinationDescriptor, LatLonGridDescriptor):
-            regridArgs.extend(['--rgr lat_nm_out={}'.format(
-                self.destinationDescriptor.latVarName),
-                '--rgr lon_nm_out={}'.format(
-                self.destinationDescriptor.lonVarName)])
+            regridArgs.extend([
+                f'--rgr lat_nm_out={self.destinationDescriptor.latVarName}',
+                f'--rgr lon_nm_out={self.destinationDescriptor.lonVarName}',
+                f'--rgr lat_dmn_nm={self.destinationDescriptor.latVarName}',
+                f'--rgr lon_dmn_nm={self.destinationDescriptor.lonVarName}'])
         elif isinstance(self.destinationDescriptor, ProjectionGridDescriptor):
             regridArgs.extend(['--rgr lat_dmn_nm={}'.format(
                 self.destinationDescriptor.yVarName),
