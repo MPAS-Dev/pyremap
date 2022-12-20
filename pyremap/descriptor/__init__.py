@@ -7,7 +7,7 @@
 #
 # Additional copyright and license information can be found in the LICENSE file
 # distributed with this code, or at
-# https://raw.githubusercontent.com/MPAS-Dev/MPAS-Analysis/master/LICENSE
+# https://raw.githubusercontent.com/MPAS-Dev/pyremap/main/LICENSE
 
 from pyremap.descriptor.mesh_descriptor import MeshDescriptor
 from pyremap.descriptor.mpas_mesh_descriptor import MpasMeshDescriptor
