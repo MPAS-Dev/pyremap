@@ -4,7 +4,7 @@ Versions
 ================ ===============
 Documentation    On GitHub
 ================ ===============
-`stable`_        `master`_
+`stable`_        `main`_
 `v0.0.6`_        `0.0.6`_
 `v0.0.7`_        `0.0.7`_
 `v0.0.8`_        `0.0.8`_
@@ -28,7 +28,7 @@ Documentation    On GitHub
 .. _`v0.0.13`: ../0.0.13/index.html
 .. _`v0.0.14`: ../0.0.14/index.html
 .. _`v0.0.15`: ../0.0.15/index.html
-.. _`master`: https://github.com/MPAS-Dev/pyremap/tree/master
+.. _`main`: https://github.com/MPAS-Dev/pyremap/tree/main
 .. _`0.0.6`: https://github.com/MPAS-Dev/pyremap/tree/0.0.6
 .. _`0.0.7`: https://github.com/MPAS-Dev/pyremap/tree/0.0.7
 .. _`0.0.8`: https://github.com/MPAS-Dev/pyremap/tree/0.0.8
