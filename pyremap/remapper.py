@@ -8,20 +8,6 @@
 # Additional copyright and license information can be found in the LICENSE file
 # distributed with this code, or at
 # https://raw.githubusercontent.com/MPAS-Dev/pyremap/main/LICENSE
-"""
-Functions for performing interpolation
-
-Functions
----------
-build_remap_weights - constructs a mapping file containing the indices and
-    weights needed to perform horizontal interpolation
-
-remap - perform horizontal interpolation on a data sets, given a mapping file
-"""
-# Authors
-# -------
-# Xylar Asay-Davis
-
 import subprocess
 from tempfile import TemporaryDirectory
 import os
@@ -37,7 +23,6 @@ import warnings
 from pyremap.descriptor import MpasMeshDescriptor, \
     LatLonGridDescriptor, LatLon2DGridDescriptor, ProjectionGridDescriptor, \
     PointCollectionDescriptor
-
 
 class Remapper(object):
     """

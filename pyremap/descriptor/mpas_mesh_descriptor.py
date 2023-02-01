@@ -17,7 +17,6 @@ import xarray
 from pyremap.descriptor.mesh_descriptor import MeshDescriptor
 from pyremap.descriptor.utility import create_scrip
 
-
 class MpasMeshDescriptor(MeshDescriptor):
     """
     A class for describing an MPAS mesh
