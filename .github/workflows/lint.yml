@@ -7,13 +7,13 @@ on:
       - '**.py'
 
 jobs:
-  flake8:
+  lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: ricardochaves/python-lint@v1.4.0
         with:
-          python-root-list: "python_alelo tests"
+          python-root-list: "pyremap"
           use-pylint: false
           use-pycodestyle: false
           use-flake8: true
