@@ -96,7 +96,7 @@
 
 
 <div class="viewcode-block" id="LatLon2DGridDescriptor"><a class="viewcode-back" href="../../../generated/pyremap.descriptor.LatLon2DGridDescriptor.html#pyremap.descriptor.LatLon2DGridDescriptor">[docs]</a><span class="k">class</span> <span class="nc">LatLon2DGridDescriptor</span><span class="p">(</span><span class="n">MeshDescriptor</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A class for describing a lat-lon grid that may not be a tensor grid</span>
 <span class="sd">    (lat/lon are 2D arrays).  The grid is assumed to be regional, since this</span>
 <span class="sd">    is difficult to determine just from the lat/lon values.  The calling code</span>
@@ -121,7 +121,7 @@
 <span class="sd">        The history attribute written to SCRIP files</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 <div class="viewcode-block" id="LatLon2DGridDescriptor.__init__"><a class="viewcode-back" href="../../../generated/pyremap.descriptor.LatLon2DGridDescriptor.html#pyremap.descriptor.LatLon2DGridDescriptor.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">meshName</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">regional</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Construct a mesh descriptor</span>
 
 <span class="sd">        meshName : str or None, optional</span>
@@ -142,7 +142,7 @@
 <div class="viewcode-block" id="LatLon2DGridDescriptor.read"><a class="viewcode-back" href="../../../generated/pyremap.descriptor.LatLon2DGridDescriptor.read.html#pyremap.descriptor.LatLon2DGridDescriptor.read">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">fileName</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ds</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">latVarName</span><span class="o">=</span><span class="s1">&#39;lat&#39;</span><span class="p">,</span>
              <span class="n">lonVarName</span><span class="o">=</span><span class="s1">&#39;lon&#39;</span><span class="p">,</span> <span class="n">meshName</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">regional</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Read the lat-lon grid from a file with the given lat/lon var names.</span>
 
 <span class="sd">        Parameters</span>
@@ -199,7 +199,7 @@
         <span class="k">return</span> <span class="n">descriptor</span></div>
 
 <div class="viewcode-block" id="LatLon2DGridDescriptor.to_scrip"><a class="viewcode-back" href="../../../generated/pyremap.descriptor.LatLon2DGridDescriptor.to_scrip.html#pyremap.descriptor.LatLon2DGridDescriptor.to_scrip">[docs]</a>    <span class="k">def</span> <span class="nf">to_scrip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scripFileName</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create a SCRIP file based on the grid.</span>
 
 <span class="sd">        Parameters</span>
@@ -232,7 +232,7 @@
 
     <span class="k">def</span> <span class="nf">_set_coords</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">latVarName</span><span class="p">,</span> <span class="n">lonVarName</span><span class="p">,</span> <span class="n">latDimName</span><span class="p">,</span>
                     <span class="n">lonDimName</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Set up a coords dict with lat and lon</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">latVarName</span> <span class="o">=</span> <span class="n">latVarName</span>

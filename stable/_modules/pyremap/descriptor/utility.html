@@ -89,7 +89,7 @@
 
 
 <div class="viewcode-block" id="interp_extrap_corner"><a class="viewcode-back" href="../../../generated/pyremap.descriptor.interp_extrap_corner.html#pyremap.descriptor.interp_extrap_corner">[docs]</a><span class="k">def</span> <span class="nf">interp_extrap_corner</span><span class="p">(</span><span class="n">inField</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Interpolate/extrapolate a 1D field from grid centers to grid corners&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Interpolate/extrapolate a 1D field from grid centers to grid corners&quot;&quot;&quot;</span>
 
     <span class="n">outField</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">inField</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
     <span class="n">outField</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">inField</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">inField</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
@@ -100,7 +100,7 @@
 
 
 <div class="viewcode-block" id="interp_extrap_corners_2d"><a class="viewcode-back" href="../../../generated/pyremap.descriptor.interp_extrap_corners_2d.html#pyremap.descriptor.interp_extrap_corners_2d">[docs]</a><span class="k">def</span> <span class="nf">interp_extrap_corners_2d</span><span class="p">(</span><span class="n">inField</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Interpolate/extrapolate a 1D field from grid centers to grid corners&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Interpolate/extrapolate a 1D field from grid centers to grid corners&quot;&quot;&quot;</span>
 
     <span class="n">temp</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">inField</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">inField</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
     <span class="n">temp</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">inField</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">inField</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:])</span>
@@ -119,7 +119,7 @@
 
 <span class="k">def</span> <span class="nf">create_scrip</span><span class="p">(</span><span class="n">outFile</span><span class="p">,</span> <span class="n">grid_size</span><span class="p">,</span> <span class="n">grid_corners</span><span class="p">,</span> <span class="n">grid_rank</span><span class="p">,</span> <span class="n">units</span><span class="p">,</span>
                  <span class="n">meshName</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Given a SCRIP files, creates common variables and writes common values used</span>
 <span class="sd">    in various types of SCRIP files.</span>
 
@@ -170,7 +170,7 @@
 
 
 <span class="k">def</span> <span class="nf">unwrap_corners</span><span class="p">(</span><span class="n">inField</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Turn a 2D array of corners into an array of rectangular mesh elements&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Turn a 2D array of corners into an array of rectangular mesh elements&quot;&quot;&quot;</span>
     <span class="n">outField</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(((</span><span class="n">inField</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">inField</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span>
                             <span class="mi">4</span><span class="p">))</span>
     <span class="c1"># corners are counterclockwise</span>
@@ -183,7 +183,7 @@
 
 
 <span class="k">def</span> <span class="nf">round_res</span><span class="p">(</span><span class="n">res</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Round the resoltuion to a reasonable number for grid names&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Round the resoltuion to a reasonable number for grid names&quot;&quot;&quot;</span>
     <span class="n">rounded</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">res</span><span class="o">*</span><span class="mf">1000.</span><span class="p">)</span><span class="o">/</span><span class="mf">1000.</span>
     <span class="k">return</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">rounded</span><span class="p">)</span>
 </pre></div>

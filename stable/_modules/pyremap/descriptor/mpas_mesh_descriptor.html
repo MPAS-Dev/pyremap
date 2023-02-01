@@ -95,7 +95,7 @@
 
 
 <div class="viewcode-block" id="MpasMeshDescriptor"><a class="viewcode-back" href="../../../generated/pyremap.descriptor.MpasMeshDescriptor.html#pyremap.descriptor.MpasMeshDescriptor">[docs]</a><span class="k">class</span> <span class="nc">MpasMeshDescriptor</span><span class="p">(</span><span class="n">MeshDescriptor</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A class for describing an MPAS mesh</span>
 
 <span class="sd">    Attributes</span>
@@ -108,7 +108,7 @@
 <span class="sd">        The path of the file containing the MPAS mesh</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 <div class="viewcode-block" id="MpasMeshDescriptor.__init__"><a class="viewcode-back" href="../../../generated/pyremap.descriptor.MpasMeshDescriptor.html#pyremap.descriptor.MpasMeshDescriptor.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fileName</span><span class="p">,</span> <span class="n">meshName</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vertices</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Constructor stores the file name</span>
 
 <span class="sd">        Parameters</span>
@@ -163,7 +163,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">dimSize</span> <span class="o">=</span> <span class="p">[</span><span class="n">ds</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span> <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dims</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="MpasMeshDescriptor.to_scrip"><a class="viewcode-back" href="../../../generated/pyremap.descriptor.MpasMeshDescriptor.to_scrip.html#pyremap.descriptor.MpasMeshDescriptor.to_scrip">[docs]</a>    <span class="k">def</span> <span class="nf">to_scrip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scripFileName</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Given an MPAS mesh file, create a SCRIP file based on the mesh.</span>
 
 <span class="sd">        Parameters</span>
@@ -228,7 +228,7 @@
         <span class="n">outFile</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="MpasMeshDescriptor.to_esmf"><a class="viewcode-back" href="../../../generated/pyremap.descriptor.MpasMeshDescriptor.to_esmf.html#pyremap.descriptor.MpasMeshDescriptor.to_esmf">[docs]</a>    <span class="k">def</span> <span class="nf">to_esmf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">esmfFileName</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create an ESMF mesh file for the mesh</span>
 
 <span class="sd">        Parameters</span>

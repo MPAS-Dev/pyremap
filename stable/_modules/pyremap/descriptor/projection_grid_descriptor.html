@@ -97,7 +97,7 @@
 
 
 <div class="viewcode-block" id="ProjectionGridDescriptor"><a class="viewcode-back" href="../../../generated/pyremap.descriptor.ProjectionGridDescriptor.html#pyremap.descriptor.ProjectionGridDescriptor">[docs]</a><span class="k">class</span> <span class="nc">ProjectionGridDescriptor</span><span class="p">(</span><span class="n">MeshDescriptor</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A class for describing a general logically rectangular grid that can be</span>
 <span class="sd">    defined by a ``pyproj`` projection.</span>
 
@@ -132,7 +132,7 @@
 <span class="sd">        The name of the y variable</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 <div class="viewcode-block" id="ProjectionGridDescriptor.__init__"><a class="viewcode-back" href="../../../generated/pyremap.descriptor.ProjectionGridDescriptor.html#pyremap.descriptor.ProjectionGridDescriptor.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">projection</span><span class="p">,</span> <span class="n">meshName</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Constructor stores the projection</span>
 
 <span class="sd">        Parameters</span>
@@ -160,7 +160,7 @@
 <div class="viewcode-block" id="ProjectionGridDescriptor.read"><a class="viewcode-back" href="../../../generated/pyremap.descriptor.ProjectionGridDescriptor.read.html#pyremap.descriptor.ProjectionGridDescriptor.read">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">projection</span><span class="p">,</span> <span class="n">fileName</span><span class="p">,</span> <span class="n">meshName</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">xVarName</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span>
              <span class="n">yVarName</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Given a grid file with x and y coordinates defining the axes of the</span>
 <span class="sd">        logically rectangular grid, read in the x and y coordinates and</span>
 <span class="sd">        interpolate/extrapolate to locate corners.</span>
@@ -212,7 +212,7 @@
 
 <div class="viewcode-block" id="ProjectionGridDescriptor.create"><a class="viewcode-back" href="../../../generated/pyremap.descriptor.ProjectionGridDescriptor.create.html#pyremap.descriptor.ProjectionGridDescriptor.create">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">projection</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">meshName</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Given x and y coordinates defining the axes of the logically</span>
 <span class="sd">        rectangular grid, save the coordinates interpolate/extrapolate to</span>
 <span class="sd">        locate corners.</span>
@@ -248,7 +248,7 @@
         <span class="k">return</span> <span class="n">descriptor</span></div>
 
 <div class="viewcode-block" id="ProjectionGridDescriptor.to_scrip"><a class="viewcode-back" href="../../../generated/pyremap.descriptor.ProjectionGridDescriptor.to_scrip.html#pyremap.descriptor.ProjectionGridDescriptor.to_scrip">[docs]</a>    <span class="k">def</span> <span class="nf">to_scrip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scripFileName</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create a SCRIP file based on the grid and projection.</span>
 
 <span class="sd">        Parameters</span>
@@ -285,7 +285,7 @@
         <span class="n">outFile</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="ProjectionGridDescriptor.to_esmf"><a class="viewcode-back" href="../../../generated/pyremap.descriptor.ProjectionGridDescriptor.to_esmf.html#pyremap.descriptor.ProjectionGridDescriptor.to_esmf">[docs]</a>    <span class="k">def</span> <span class="nf">to_esmf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">esmfFileName</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create an ESMF mesh file for the mesh</span>
 
 <span class="sd">        Parameters</span>
@@ -349,7 +349,7 @@
         <span class="n">ds_out</span><span class="o">.</span><span class="n">to_netcdf</span><span class="p">(</span><span class="n">esmfFileName</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">project_to_lat_lon</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Given X and Y locations of points in a projection, returns the</span>
 <span class="sd">        corresponding latitude and longitude of each point.</span>
 
@@ -376,7 +376,7 @@
         <span class="k">return</span> <span class="n">Lat</span><span class="p">,</span> <span class="n">Lon</span>
 
     <span class="k">def</span> <span class="nf">_set_coords</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xVarName</span><span class="p">,</span> <span class="n">yVarName</span><span class="p">,</span> <span class="n">xDimName</span><span class="p">,</span> <span class="n">yDimName</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Set up a coords dict with x, y, lat and lon</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">xVarName</span> <span class="o">=</span> <span class="n">xVarName</span>
