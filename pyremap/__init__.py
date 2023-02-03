@@ -1,5 +1,5 @@
-from pyremap.descriptor import MpasMeshDescriptor, LatLonGridDescriptor, \
-    LatLon2DGridDescriptor, ProjectionGridDescriptor, \
+from pyremap.descriptor import MpasMeshDescriptor, MpasEdgeMeshDescriptor,\
+    LatLonGridDescriptor, LatLon2DGridDescriptor, ProjectionGridDescriptor, \
     PointCollectionDescriptor, get_lat_lon_descriptor
 
 from pyremap.remapper import Remapper
