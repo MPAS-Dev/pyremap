@@ -19,6 +19,10 @@ Mesh Descriptors
    MpasMeshDescriptor.to_scrip
    MpasMeshDescriptor.to_esmf
 
+   MpasEdgeMeshDescriptor
+   MpasEdgeMeshDescriptor.to_scrip
+   MpasEdgeMeshDescriptor.to_esmf
+
    get_lat_lon_descriptor
    LatLonGridDescriptor
    LatLonGridDescriptor.read

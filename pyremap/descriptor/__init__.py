@@ -11,6 +11,8 @@
 
 from pyremap.descriptor.mesh_descriptor import MeshDescriptor
 from pyremap.descriptor.mpas_mesh_descriptor import MpasMeshDescriptor
+from pyremap.descriptor.mpas_edge_mesh_descriptor import \
+    MpasEdgeMeshDescriptor
 from pyremap.descriptor.lat_lon_grid_descriptor import LatLonGridDescriptor, \
     get_lat_lon_descriptor
 from pyremap.descriptor.lat_lon_2d_grid_descriptor import \

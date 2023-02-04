@@ -20,7 +20,8 @@ from pyremap.descriptor.utility import create_scrip
 
 class MpasMeshDescriptor(MeshDescriptor):
     """
-    A class for describing an MPAS mesh
+    A class for describing an MPAS cell mesh (which also supports
+    non-conservative remapping from vertices)
 
     Attributes
     ----------

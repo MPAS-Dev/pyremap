@@ -34,7 +34,7 @@ from subprocess import check_output
 import json
 import warnings
 
-from pyremap.descriptor import MpasMeshDescriptor, \
+from pyremap.descriptor import MpasMeshDescriptor, MpasEdgeMeshDescriptor, \
     LatLonGridDescriptor, LatLon2DGridDescriptor, ProjectionGridDescriptor, \
     PointCollectionDescriptor
 
@@ -81,12 +81,14 @@ class Remapper(object):
             raise TypeError("sourceDescriptor of type "
                             "PointCollectionDescriptor is not supported.")
         if not isinstance(sourceDescriptor,
-                          (MpasMeshDescriptor,  LatLonGridDescriptor,
+                          (MpasMeshDescriptor, MpasEdgeMeshDescriptor,
+                           LatLonGridDescriptor,
                            LatLon2DGridDescriptor, ProjectionGridDescriptor)):
             raise TypeError("sourceDescriptor is not of a recognized type.")
 
         if not isinstance(destinationDescriptor,
-                          (MpasMeshDescriptor,  LatLonGridDescriptor,
+                          (MpasMeshDescriptor, MpasEdgeMeshDescriptor,
+                           LatLonGridDescriptor,
                            LatLon2DGridDescriptor, ProjectionGridDescriptor,
                            PointCollectionDescriptor)):
             raise TypeError(
@@ -194,23 +196,29 @@ class Remapper(object):
 
         src_loc = 'center'
         src_file_format = 'scrip'
-        if isinstance(self.sourceDescriptor, MpasMeshDescriptor):
+        if isinstance(self.sourceDescriptor,
+                      (MpasMeshDescriptor, MpasEdgeMeshDescriptor)):
             src_file_format = 'esmf'
-            if self.sourceDescriptor.vertices:
-                if 'conserve' in method:
-                    raise ValueError('Can\'t remap from MPAS vertices with '
-                                     'conservative methods')
-                src_loc = 'corner'
+
+        if isinstance(self.sourceDescriptor, MpasMeshDescriptor) and \
+                self.sourceDescriptor.vertices:
+            if 'conserve' in method:
+                raise ValueError('Can\'t remap from MPAS vertices with '
+                                 'conservative methods')
+            src_loc = 'corner'
 
         dst_loc = 'center'
         dst_file_format = 'scrip'
-        if isinstance(self.destinationDescriptor, MpasMeshDescriptor):
+        if isinstance(self.destinationDescriptor,
+                      (MpasMeshDescriptor, MpasEdgeMeshDescriptor)):
             dst_file_format = 'esmf'
-            if self.destinationDescriptor.vertices:
-                if 'conserve' in method:
-                    raise ValueError('Can\'t remap to MPAS vertices with '
-                                     'conservative methods')
-                dst_loc = 'corner'
+
+        if isinstance(self.destinationDescriptor, MpasMeshDescriptor) and \
+                self.destinationDescriptor.vertices:
+            if 'conserve' in method:
+                raise ValueError('Can\'t remap to MPAS vertices with '
+                                 'conservative methods')
+            dst_loc = 'corner'
 
         if src_file_format == 'scrip':
             self.sourceDescriptor.to_scrip(sourceFileName)
@@ -425,11 +433,16 @@ class Remapper(object):
                     # and quits with an error
                     args.append('-C')
 
-            if renormalize is not None:
-                # we also want to make sure cells that receive no data are
-                # marked with fill values, even if the source MPAS data
-                # doesn't have a fill value
-                args.append('--add_fill_value')
+        if isinstance(self.sourceDescriptor, MpasEdgeMeshDescriptor):
+            regridArgs.extend(['--rgr col_nm=nEdges'])
+
+        if isinstance(self.sourceDescriptor,
+                      (MpasMeshDescriptor, MpasEdgeMeshDescriptor)) and \
+                renormalize is not None:
+            # we also want to make sure cells that receive no data are
+            # marked with fill values, even if the source MPAS data
+            # doesn't have a fill value
+            args.append('--add_fill_value')
 
         if variableList is not None:
             args.extend(['-v', ','.join(variableList)])
