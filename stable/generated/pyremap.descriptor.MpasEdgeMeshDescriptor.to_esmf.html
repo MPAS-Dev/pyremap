@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pyremap.descriptor.LatLonGridDescriptor.create &mdash; pyremap stable documentation</title>
+  <title>pyremap.descriptor.MpasEdgeMeshDescriptor.to_esmf &mdash; pyremap stable documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -20,8 +20,8 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="pyremap.descriptor.LatLonGridDescriptor.to_scrip" href="pyremap.descriptor.LatLonGridDescriptor.to_scrip.html" />
-    <link rel="prev" title="pyremap.descriptor.LatLonGridDescriptor.read" href="pyremap.descriptor.LatLonGridDescriptor.read.html" /> 
+    <link rel="next" title="pyremap.descriptor.get_lat_lon_descriptor" href="pyremap.descriptor.get_lat_lon_descriptor.html" />
+    <link rel="prev" title="pyremap.descriptor.MpasEdgeMeshDescriptor.to_scrip" href="pyremap.descriptor.MpasEdgeMeshDescriptor.to_scrip.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -55,14 +55,14 @@
 <li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.MpasMeshDescriptor.to_esmf.html">pyremap.descriptor.MpasMeshDescriptor.to_esmf</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.MpasEdgeMeshDescriptor.html">pyremap.descriptor.MpasEdgeMeshDescriptor</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.MpasEdgeMeshDescriptor.to_scrip.html">pyremap.descriptor.MpasEdgeMeshDescriptor.to_scrip</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.MpasEdgeMeshDescriptor.to_esmf.html">pyremap.descriptor.MpasEdgeMeshDescriptor.to_esmf</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">pyremap.descriptor.MpasEdgeMeshDescriptor.to_esmf</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pyremap.descriptor.MpasEdgeMeshDescriptor.to_esmf"><code class="docutils literal notranslate"><span class="pre">MpasEdgeMeshDescriptor.to_esmf()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.get_lat_lon_descriptor.html">pyremap.descriptor.get_lat_lon_descriptor</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.LatLonGridDescriptor.html">pyremap.descriptor.LatLonGridDescriptor</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.LatLonGridDescriptor.read.html">pyremap.descriptor.LatLonGridDescriptor.read</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">pyremap.descriptor.LatLonGridDescriptor.create</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#pyremap.descriptor.LatLonGridDescriptor.create"><code class="docutils literal notranslate"><span class="pre">LatLonGridDescriptor.create()</span></code></a></li>
-</ul>
-</li>
+<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.LatLonGridDescriptor.create.html">pyremap.descriptor.LatLonGridDescriptor.create</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.LatLonGridDescriptor.to_scrip.html">pyremap.descriptor.LatLonGridDescriptor.to_scrip</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.LatLonGridDescriptor.to_esmf.html">pyremap.descriptor.LatLonGridDescriptor.to_esmf</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.LatLon2DGridDescriptor.html">pyremap.descriptor.LatLon2DGridDescriptor</a></li>
@@ -102,9 +102,9 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home"></a></li>
           <li class="breadcrumb-item"><a href="../api.html">API reference</a></li>
-      <li class="breadcrumb-item active">pyremap.descriptor.LatLonGridDescriptor.create</li>
+      <li class="breadcrumb-item active">pyremap.descriptor.MpasEdgeMeshDescriptor.to_esmf</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../_sources/generated/pyremap.descriptor.LatLonGridDescriptor.create.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/generated/pyremap.descriptor.MpasEdgeMeshDescriptor.to_esmf.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -112,26 +112,15 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="pyremap-descriptor-latlongriddescriptor-create">
-<h1>pyremap.descriptor.LatLonGridDescriptor.create<a class="headerlink" href="#pyremap-descriptor-latlongriddescriptor-create" title="Permalink to this heading">¶</a></h1>
+  <section id="pyremap-descriptor-mpasedgemeshdescriptor-to-esmf">
+<h1>pyremap.descriptor.MpasEdgeMeshDescriptor.to_esmf<a class="headerlink" href="#pyremap-descriptor-mpasedgemeshdescriptor-to-esmf" title="Permalink to this heading">¶</a></h1>
 <dl class="py method">
-<dt class="sig sig-object py" id="pyremap.descriptor.LatLonGridDescriptor.create">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">LatLonGridDescriptor.</span></span><span class="sig-name descname"><span class="pre">create</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">latCorner</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lonCorner</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'degrees'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">meshName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regional</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyremap/descriptor/lat_lon_grid_descriptor.html#LatLonGridDescriptor.create"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyremap.descriptor.LatLonGridDescriptor.create" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create the lat-lon grid with the given arrays and units.</p>
+<dt class="sig sig-object py" id="pyremap.descriptor.MpasEdgeMeshDescriptor.to_esmf">
+<span class="sig-prename descclassname"><span class="pre">MpasEdgeMeshDescriptor.</span></span><span class="sig-name descname"><span class="pre">to_esmf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">esmfFileName</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyremap/descriptor/mpas_edge_mesh_descriptor.html#MpasEdgeMeshDescriptor.to_esmf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyremap.descriptor.MpasEdgeMeshDescriptor.to_esmf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create an ESMF mesh file for the mesh</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>latCorner</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>numpy.ndarray</em></a>) – One dimensional array defining the latitude coordinates of grid
-corners.</p></li>
-<li><p><strong>lonCorner</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>numpy.ndarray</em></a>) – One dimensional array defining the longitude coordinates of grid
-corners.</p></li>
-<li><p><strong>units</strong> (<em>{'degrees'</em><em>, </em><em>'radians'}</em><em>, </em><em>optional</em>) – The units of <cite>latCorner</cite> and <cite>lonCorner</cite></p></li>
-<li><p><strong>meshName</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – The name of the mesh or grid, used to give mapping files unique
-names</p></li>
-<li><p><strong>regional</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – Whether this is a regional or global grid.  If <code class="docutils literal notranslate"><span class="pre">None</span></code>, this will
-be determined automatically by checking the limits of the corner
-latitude and longitude to see if they cover the globe.</p></li>
-</ul>
+<dd class="field-odd"><p><strong>esmfFileName</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – The path to which the ESMF mesh file should be written</p>
 </dd>
 </dl>
 </dd></dl>
@@ -142,8 +131,8 @@ latitude and longitude to see if they cover the globe.</p></li>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="pyremap.descriptor.LatLonGridDescriptor.read.html" class="btn btn-neutral float-left" title="pyremap.descriptor.LatLonGridDescriptor.read" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="pyremap.descriptor.LatLonGridDescriptor.to_scrip.html" class="btn btn-neutral float-right" title="pyremap.descriptor.LatLonGridDescriptor.to_scrip" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="pyremap.descriptor.MpasEdgeMeshDescriptor.to_scrip.html" class="btn btn-neutral float-left" title="pyremap.descriptor.MpasEdgeMeshDescriptor.to_scrip" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="pyremap.descriptor.get_lat_lon_descriptor.html" class="btn btn-neutral float-right" title="pyremap.descriptor.get_lat_lon_descriptor" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

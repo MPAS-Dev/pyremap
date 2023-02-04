@@ -56,6 +56,9 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.MpasMeshDescriptor.to_scrip.html">pyremap.descriptor.MpasMeshDescriptor.to_scrip</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.MpasMeshDescriptor.to_esmf.html">pyremap.descriptor.MpasMeshDescriptor.to_esmf</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.MpasEdgeMeshDescriptor.html">pyremap.descriptor.MpasEdgeMeshDescriptor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.MpasEdgeMeshDescriptor.to_scrip.html">pyremap.descriptor.MpasEdgeMeshDescriptor.to_scrip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.MpasEdgeMeshDescriptor.to_esmf.html">pyremap.descriptor.MpasEdgeMeshDescriptor.to_esmf</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.get_lat_lon_descriptor.html">pyremap.descriptor.get_lat_lon_descriptor</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.LatLonGridDescriptor.html">pyremap.descriptor.LatLonGridDescriptor</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.LatLonGridDescriptor.read.html">pyremap.descriptor.LatLonGridDescriptor.read</a></li>
@@ -114,7 +117,8 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="pyremap.descriptor.MpasMeshDescriptor">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyremap.descriptor.</span></span><span class="sig-name descname"><span class="pre">MpasMeshDescriptor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fileName</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">meshName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertices</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyremap/descriptor/mpas_mesh_descriptor.html#MpasMeshDescriptor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyremap.descriptor.MpasMeshDescriptor" title="Permalink to this definition">¶</a></dt>
-<dd><p>A class for describing an MPAS mesh</p>
+<dd><p>A class for describing an MPAS cell mesh (which also supports
+non-conservative remapping from vertices)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Variables</dt>
 <dd class="field-odd"><ul class="simple">

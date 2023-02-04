@@ -53,6 +53,9 @@
 <li class="toctree-l3"><a class="reference internal" href="generated/pyremap.descriptor.MpasMeshDescriptor.html">pyremap.descriptor.MpasMeshDescriptor</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/pyremap.descriptor.MpasMeshDescriptor.to_scrip.html">pyremap.descriptor.MpasMeshDescriptor.to_scrip</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/pyremap.descriptor.MpasMeshDescriptor.to_esmf.html">pyremap.descriptor.MpasMeshDescriptor.to_esmf</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pyremap.descriptor.MpasEdgeMeshDescriptor.html">pyremap.descriptor.MpasEdgeMeshDescriptor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pyremap.descriptor.MpasEdgeMeshDescriptor.to_scrip.html">pyremap.descriptor.MpasEdgeMeshDescriptor.to_scrip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pyremap.descriptor.MpasEdgeMeshDescriptor.to_esmf.html">pyremap.descriptor.MpasEdgeMeshDescriptor.to_esmf</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/pyremap.descriptor.get_lat_lon_descriptor.html">pyremap.descriptor.get_lat_lon_descriptor</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/pyremap.descriptor.LatLonGridDescriptor.html">pyremap.descriptor.LatLonGridDescriptor</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/pyremap.descriptor.LatLonGridDescriptor.read.html">pyremap.descriptor.LatLonGridDescriptor.read</a></li>
@@ -134,7 +137,7 @@
 <td><p>Interpolate/extrapolate a 1D field from grid centers to grid corners</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/pyremap.descriptor.MpasMeshDescriptor.html#pyremap.descriptor.MpasMeshDescriptor" title="pyremap.descriptor.MpasMeshDescriptor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MpasMeshDescriptor</span></code></a>(fileName[, meshName, ...])</p></td>
-<td><p>A class for describing an MPAS mesh</p></td>
+<td><p>A class for describing an MPAS cell mesh (which also supports non-conservative remapping from vertices)</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/pyremap.descriptor.MpasMeshDescriptor.to_scrip.html#pyremap.descriptor.MpasMeshDescriptor.to_scrip" title="pyremap.descriptor.MpasMeshDescriptor.to_scrip"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MpasMeshDescriptor.to_scrip</span></code></a>(scripFileName)</p></td>
 <td><p>Given an MPAS mesh file, create a SCRIP file based on the mesh.</p></td>
@@ -142,55 +145,64 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/pyremap.descriptor.MpasMeshDescriptor.to_esmf.html#pyremap.descriptor.MpasMeshDescriptor.to_esmf" title="pyremap.descriptor.MpasMeshDescriptor.to_esmf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MpasMeshDescriptor.to_esmf</span></code></a>(esmfFileName)</p></td>
 <td><p>Create an ESMF mesh file for the mesh</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/pyremap.descriptor.get_lat_lon_descriptor.html#pyremap.descriptor.get_lat_lon_descriptor" title="pyremap.descriptor.get_lat_lon_descriptor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_lat_lon_descriptor</span></code></a>(dLon, dLat[, lonMin, ...])</p></td>
-<td><p>Get a descriptor of a lat-lon grid, used for remapping</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pyremap.descriptor.MpasEdgeMeshDescriptor.html#pyremap.descriptor.MpasEdgeMeshDescriptor" title="pyremap.descriptor.MpasEdgeMeshDescriptor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MpasEdgeMeshDescriptor</span></code></a>(fileName[, meshName])</p></td>
+<td><p>A class for describing an MPAS edge mesh</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/pyremap.descriptor.LatLonGridDescriptor.html#pyremap.descriptor.LatLonGridDescriptor" title="pyremap.descriptor.LatLonGridDescriptor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LatLonGridDescriptor</span></code></a>([meshName, regional])</p></td>
-<td><p>A class for describing a lat-lon grid</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/pyremap.descriptor.LatLonGridDescriptor.read.html#pyremap.descriptor.LatLonGridDescriptor.read" title="pyremap.descriptor.LatLonGridDescriptor.read"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LatLonGridDescriptor.read</span></code></a>([fileName, ds, ...])</p></td>
-<td><p>Read the lat-lon grid from a file with the given lat/lon var names.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/pyremap.descriptor.LatLonGridDescriptor.create.html#pyremap.descriptor.LatLonGridDescriptor.create" title="pyremap.descriptor.LatLonGridDescriptor.create"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LatLonGridDescriptor.create</span></code></a>(latCorner, lonCorner)</p></td>
-<td><p>Create the lat-lon grid with the given arrays and units.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/pyremap.descriptor.LatLonGridDescriptor.to_scrip.html#pyremap.descriptor.LatLonGridDescriptor.to_scrip" title="pyremap.descriptor.LatLonGridDescriptor.to_scrip"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LatLonGridDescriptor.to_scrip</span></code></a>(scripFileName)</p></td>
-<td><p>Given a lat-lon grid file, create a SCRIP file based on the grid.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/pyremap.descriptor.LatLonGridDescriptor.to_esmf.html#pyremap.descriptor.LatLonGridDescriptor.to_esmf" title="pyremap.descriptor.LatLonGridDescriptor.to_esmf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LatLonGridDescriptor.to_esmf</span></code></a>(esmfFileName)</p></td>
-<td><p>Create an ESMF mesh file for the mesh</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/pyremap.descriptor.LatLon2DGridDescriptor.html#pyremap.descriptor.LatLon2DGridDescriptor" title="pyremap.descriptor.LatLon2DGridDescriptor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LatLon2DGridDescriptor</span></code></a>([meshName, regional])</p></td>
-<td><p>A class for describing a lat-lon grid that may not be a tensor grid (lat/lon are 2D arrays).</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/pyremap.descriptor.LatLon2DGridDescriptor.read.html#pyremap.descriptor.LatLon2DGridDescriptor.read" title="pyremap.descriptor.LatLon2DGridDescriptor.read"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LatLon2DGridDescriptor.read</span></code></a>([fileName, ds, ...])</p></td>
-<td><p>Read the lat-lon grid from a file with the given lat/lon var names.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/pyremap.descriptor.LatLon2DGridDescriptor.to_scrip.html#pyremap.descriptor.LatLon2DGridDescriptor.to_scrip" title="pyremap.descriptor.LatLon2DGridDescriptor.to_scrip"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LatLon2DGridDescriptor.to_scrip</span></code></a>(scripFileName)</p></td>
-<td><p>Create a SCRIP file based on the grid.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/pyremap.descriptor.ProjectionGridDescriptor.html#pyremap.descriptor.ProjectionGridDescriptor" title="pyremap.descriptor.ProjectionGridDescriptor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProjectionGridDescriptor</span></code></a>(projection[, meshName])</p></td>
-<td><p>A class for describing a general logically rectangular grid that can be defined by a <code class="docutils literal notranslate"><span class="pre">pyproj</span></code> projection.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/pyremap.descriptor.ProjectionGridDescriptor.read.html#pyremap.descriptor.ProjectionGridDescriptor.read" title="pyremap.descriptor.ProjectionGridDescriptor.read"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProjectionGridDescriptor.read</span></code></a>(projection, ...)</p></td>
-<td><p>Given a grid file with x and y coordinates defining the axes of the logically rectangular grid, read in the x and y coordinates and interpolate/extrapolate to locate corners.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/pyremap.descriptor.ProjectionGridDescriptor.create.html#pyremap.descriptor.ProjectionGridDescriptor.create" title="pyremap.descriptor.ProjectionGridDescriptor.create"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProjectionGridDescriptor.create</span></code></a>(projection, ...)</p></td>
-<td><p>Given x and y coordinates defining the axes of the logically rectangular grid, save the coordinates interpolate/extrapolate to locate corners.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/pyremap.descriptor.ProjectionGridDescriptor.to_scrip.html#pyremap.descriptor.ProjectionGridDescriptor.to_scrip" title="pyremap.descriptor.ProjectionGridDescriptor.to_scrip"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProjectionGridDescriptor.to_scrip</span></code></a>(scripFileName)</p></td>
-<td><p>Create a SCRIP file based on the grid and projection.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/pyremap.descriptor.ProjectionGridDescriptor.to_esmf.html#pyremap.descriptor.ProjectionGridDescriptor.to_esmf" title="pyremap.descriptor.ProjectionGridDescriptor.to_esmf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProjectionGridDescriptor.to_esmf</span></code></a>(esmfFileName)</p></td>
-<td><p>Create an ESMF mesh file for the mesh</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/pyremap.descriptor.PointCollectionDescriptor.html#pyremap.descriptor.PointCollectionDescriptor" title="pyremap.descriptor.PointCollectionDescriptor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PointCollectionDescriptor</span></code></a>(lats, lons, ...[, ...])</p></td>
-<td><p>A class for describing a collection of points</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/pyremap.descriptor.PointCollectionDescriptor.to_scrip.html#pyremap.descriptor.PointCollectionDescriptor.to_scrip" title="pyremap.descriptor.PointCollectionDescriptor.to_scrip"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PointCollectionDescriptor.to_scrip</span></code></a>(scripFileName)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pyremap.descriptor.MpasEdgeMeshDescriptor.to_scrip.html#pyremap.descriptor.MpasEdgeMeshDescriptor.to_scrip" title="pyremap.descriptor.MpasEdgeMeshDescriptor.to_scrip"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MpasEdgeMeshDescriptor.to_scrip</span></code></a>(scripFileName)</p></td>
 <td><p>Given an MPAS mesh file, create a SCRIP file based on the mesh.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/pyremap.descriptor.PointCollectionDescriptor.to_esmf.html#pyremap.descriptor.PointCollectionDescriptor.to_esmf" title="pyremap.descriptor.PointCollectionDescriptor.to_esmf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PointCollectionDescriptor.to_esmf</span></code></a>(esmfFileName)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pyremap.descriptor.MpasEdgeMeshDescriptor.to_esmf.html#pyremap.descriptor.MpasEdgeMeshDescriptor.to_esmf" title="pyremap.descriptor.MpasEdgeMeshDescriptor.to_esmf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MpasEdgeMeshDescriptor.to_esmf</span></code></a>(esmfFileName)</p></td>
+<td><p>Create an ESMF mesh file for the mesh</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pyremap.descriptor.get_lat_lon_descriptor.html#pyremap.descriptor.get_lat_lon_descriptor" title="pyremap.descriptor.get_lat_lon_descriptor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_lat_lon_descriptor</span></code></a>(dLon, dLat[, lonMin, ...])</p></td>
+<td><p>Get a descriptor of a lat-lon grid, used for remapping</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pyremap.descriptor.LatLonGridDescriptor.html#pyremap.descriptor.LatLonGridDescriptor" title="pyremap.descriptor.LatLonGridDescriptor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LatLonGridDescriptor</span></code></a>([meshName, regional])</p></td>
+<td><p>A class for describing a lat-lon grid</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pyremap.descriptor.LatLonGridDescriptor.read.html#pyremap.descriptor.LatLonGridDescriptor.read" title="pyremap.descriptor.LatLonGridDescriptor.read"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LatLonGridDescriptor.read</span></code></a>([fileName, ds, ...])</p></td>
+<td><p>Read the lat-lon grid from a file with the given lat/lon var names.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pyremap.descriptor.LatLonGridDescriptor.create.html#pyremap.descriptor.LatLonGridDescriptor.create" title="pyremap.descriptor.LatLonGridDescriptor.create"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LatLonGridDescriptor.create</span></code></a>(latCorner, lonCorner)</p></td>
+<td><p>Create the lat-lon grid with the given arrays and units.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pyremap.descriptor.LatLonGridDescriptor.to_scrip.html#pyremap.descriptor.LatLonGridDescriptor.to_scrip" title="pyremap.descriptor.LatLonGridDescriptor.to_scrip"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LatLonGridDescriptor.to_scrip</span></code></a>(scripFileName)</p></td>
+<td><p>Given a lat-lon grid file, create a SCRIP file based on the grid.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pyremap.descriptor.LatLonGridDescriptor.to_esmf.html#pyremap.descriptor.LatLonGridDescriptor.to_esmf" title="pyremap.descriptor.LatLonGridDescriptor.to_esmf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LatLonGridDescriptor.to_esmf</span></code></a>(esmfFileName)</p></td>
+<td><p>Create an ESMF mesh file for the mesh</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pyremap.descriptor.LatLon2DGridDescriptor.html#pyremap.descriptor.LatLon2DGridDescriptor" title="pyremap.descriptor.LatLon2DGridDescriptor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LatLon2DGridDescriptor</span></code></a>([meshName, regional])</p></td>
+<td><p>A class for describing a lat-lon grid that may not be a tensor grid (lat/lon are 2D arrays).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pyremap.descriptor.LatLon2DGridDescriptor.read.html#pyremap.descriptor.LatLon2DGridDescriptor.read" title="pyremap.descriptor.LatLon2DGridDescriptor.read"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LatLon2DGridDescriptor.read</span></code></a>([fileName, ds, ...])</p></td>
+<td><p>Read the lat-lon grid from a file with the given lat/lon var names.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pyremap.descriptor.LatLon2DGridDescriptor.to_scrip.html#pyremap.descriptor.LatLon2DGridDescriptor.to_scrip" title="pyremap.descriptor.LatLon2DGridDescriptor.to_scrip"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LatLon2DGridDescriptor.to_scrip</span></code></a>(scripFileName)</p></td>
+<td><p>Create a SCRIP file based on the grid.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pyremap.descriptor.ProjectionGridDescriptor.html#pyremap.descriptor.ProjectionGridDescriptor" title="pyremap.descriptor.ProjectionGridDescriptor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProjectionGridDescriptor</span></code></a>(projection[, meshName])</p></td>
+<td><p>A class for describing a general logically rectangular grid that can be defined by a <code class="docutils literal notranslate"><span class="pre">pyproj</span></code> projection.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pyremap.descriptor.ProjectionGridDescriptor.read.html#pyremap.descriptor.ProjectionGridDescriptor.read" title="pyremap.descriptor.ProjectionGridDescriptor.read"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProjectionGridDescriptor.read</span></code></a>(projection, ...)</p></td>
+<td><p>Given a grid file with x and y coordinates defining the axes of the logically rectangular grid, read in the x and y coordinates and interpolate/extrapolate to locate corners.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pyremap.descriptor.ProjectionGridDescriptor.create.html#pyremap.descriptor.ProjectionGridDescriptor.create" title="pyremap.descriptor.ProjectionGridDescriptor.create"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProjectionGridDescriptor.create</span></code></a>(projection, ...)</p></td>
+<td><p>Given x and y coordinates defining the axes of the logically rectangular grid, save the coordinates interpolate/extrapolate to locate corners.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pyremap.descriptor.ProjectionGridDescriptor.to_scrip.html#pyremap.descriptor.ProjectionGridDescriptor.to_scrip" title="pyremap.descriptor.ProjectionGridDescriptor.to_scrip"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProjectionGridDescriptor.to_scrip</span></code></a>(scripFileName)</p></td>
+<td><p>Create a SCRIP file based on the grid and projection.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pyremap.descriptor.ProjectionGridDescriptor.to_esmf.html#pyremap.descriptor.ProjectionGridDescriptor.to_esmf" title="pyremap.descriptor.ProjectionGridDescriptor.to_esmf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProjectionGridDescriptor.to_esmf</span></code></a>(esmfFileName)</p></td>
+<td><p>Create an ESMF mesh file for the mesh</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pyremap.descriptor.PointCollectionDescriptor.html#pyremap.descriptor.PointCollectionDescriptor" title="pyremap.descriptor.PointCollectionDescriptor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PointCollectionDescriptor</span></code></a>(lats, lons, ...[, ...])</p></td>
+<td><p>A class for describing a collection of points</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pyremap.descriptor.PointCollectionDescriptor.to_scrip.html#pyremap.descriptor.PointCollectionDescriptor.to_scrip" title="pyremap.descriptor.PointCollectionDescriptor.to_scrip"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PointCollectionDescriptor.to_scrip</span></code></a>(scripFileName)</p></td>
+<td><p>Given an MPAS mesh file, create a SCRIP file based on the mesh.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pyremap.descriptor.PointCollectionDescriptor.to_esmf.html#pyremap.descriptor.PointCollectionDescriptor.to_esmf" title="pyremap.descriptor.PointCollectionDescriptor.to_esmf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PointCollectionDescriptor.to_esmf</span></code></a>(esmfFileName)</p></td>
 <td><p>Create an ESMF mesh file for the mesh</p></td>
 </tr>
 </tbody>
