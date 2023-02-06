@@ -15,6 +15,9 @@ xarray >=0.10.0
 # Development
 pip
 pytest
+isort
+flake8
+pre-commit
 
 # Documentation
 mock
