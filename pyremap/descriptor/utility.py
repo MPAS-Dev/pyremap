@@ -108,5 +108,5 @@ def unwrap_corners(inField):
 
 def round_res(res):
     """Round the resoltuion to a reasonable number for grid names"""
-    rounded = numpy.round(res*1000.)/1000.
+    rounded = numpy.round(res * 1000.) / 1000.
     return '{}'.format(rounded)

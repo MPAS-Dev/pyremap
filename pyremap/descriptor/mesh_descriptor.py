@@ -61,7 +61,8 @@ class MeshDescriptor:
         scripFileName : str
             The path to which the SCRIP file should be written
         """
-        raise NotImplemented('to_scrip is not implemented for this descriptor')
+        raise NotImplementedError(
+            'to_scrip is not implemented for this descriptor')
 
     def to_esmf(self, esmfFileName):
         """
@@ -73,4 +74,5 @@ class MeshDescriptor:
         esmfFileName : str
             The path to which the ESMF mesh file should be written
         """
-        raise NotImplemented('to_esmf is not implemented for this descriptor')
+        raise NotImplementedError(
+            'to_esmf is not implemented for this descriptor')

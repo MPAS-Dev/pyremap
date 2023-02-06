@@ -9,9 +9,10 @@
 # distributed with this code, or at
 # https://raw.githubusercontent.com/MPAS-Dev/pyremap/main/LICENSE
 
+import sys
+
 import netCDF4
 import numpy
-import sys
 import xarray
 
 from pyremap.descriptor.mesh_descriptor import MeshDescriptor

@@ -9,9 +9,10 @@
 # distributed with this code, or at
 # https://raw.githubusercontent.com/MPAS-Dev/pyremap/main/LICENSE
 
+import sys
+
 import netCDF4
 import numpy as np
-import sys
 import xarray as xr
 
 from pyremap.descriptor.mesh_descriptor import MeshDescriptor
@@ -104,7 +105,7 @@ class MpasEdgeMeshDescriptor(MeshDescriptor):
         grid_area = outFile.createVariable('grid_area', 'f8', ('grid_size',))
         grid_area.units = 'radian^2'
         # a triangle if there is 1 valid cell and a diamond if there are 2
-        areaEdge = 0.5*validCellsOnEdge*dcEdge*dvEdge
+        areaEdge = 0.5 * validCellsOnEdge * dcEdge * dvEdge
         # SCRIP uses square radians
         grid_area[:] = areaEdge[:] / (sphereRadius**2)
 
@@ -118,12 +119,12 @@ class MpasEdgeMeshDescriptor(MeshDescriptor):
         grid_corner_lat = np.zeros((nEdges, 4))
 
         # start by repeating vertices, since these always exist
-        vertices = verticesOnEdge[:, 0]-1
+        vertices = verticesOnEdge[:, 0] - 1
         grid_corner_lon[:, 0] = lonVertex[vertices]
         grid_corner_lat[:, 0] = latVertex[vertices]
         grid_corner_lon[:, 1] = lonVertex[vertices]
         grid_corner_lat[:, 1] = latVertex[vertices]
-        vertices = verticesOnEdge[:, 1]-1
+        vertices = verticesOnEdge[:, 1] - 1
         grid_corner_lon[:, 2] = lonVertex[vertices]
         grid_corner_lat[:, 2] = latVertex[vertices]
         grid_corner_lon[:, 3] = lonVertex[vertices]
@@ -165,7 +166,7 @@ class MpasEdgeMeshDescriptor(MeshDescriptor):
         with xr.open_dataset(self.fileName) as ds:
 
             nCells = ds.sizes['nCells']
-            nodeCount = nCells+ds.sizes['nVertices']
+            nodeCount = nCells + ds.sizes['nVertices']
             elementCount = ds.sizes['nEdges']
             coordDim = 2
 
@@ -193,7 +194,7 @@ class MpasEdgeMeshDescriptor(MeshDescriptor):
         for vertex in range(3):
             # swap -1 value until they're at the end
             mask = elementConn[:, vertex] == -1
-            elementConn[mask, vertex] = elementConn[mask, vertex+1]
+            elementConn[mask, vertex] = elementConn[mask, vertex + 1]
             elementConn[mask, vertex + 1] = -1
 
         numElementConn = np.sum((elementConn != -1), axis=1).astype(np.byte)

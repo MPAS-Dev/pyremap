@@ -8,35 +8,28 @@
 # Additional copyright and license information can be found in the LICENSE file
 # distributed with this code, or at
 # https://raw.githubusercontent.com/MPAS-Dev/pyremap/main/LICENSE
-"""
-Functions for performing interpolation
 
-Functions
----------
-build_remap_weights - constructs a mapping file containing the indices and
-    weights needed to perform horizontal interpolation
-
-remap - perform horizontal interpolation on a data sets, given a mapping file
-"""
-# Authors
-# -------
-# Xylar Asay-Davis
-
-import subprocess
-from tempfile import TemporaryDirectory
-import os
-from distutils.spawn import find_executable
-import numpy
-from scipy.sparse import csr_matrix
-import xarray as xr
-import sys
-from subprocess import check_output
 import json
+import os
+import subprocess
+import sys
 import warnings
+from distutils.spawn import find_executable
+from subprocess import check_output
+from tempfile import TemporaryDirectory
 
-from pyremap.descriptor import MpasMeshDescriptor, MpasEdgeMeshDescriptor, \
-    LatLonGridDescriptor, LatLon2DGridDescriptor, ProjectionGridDescriptor, \
-    PointCollectionDescriptor
+import numpy
+import xarray as xr
+from scipy.sparse import csr_matrix
+
+from pyremap.descriptor import (
+    LatLon2DGridDescriptor,
+    LatLonGridDescriptor,
+    MpasEdgeMeshDescriptor,
+    MpasMeshDescriptor,
+    PointCollectionDescriptor,
+    ProjectionGridDescriptor,
+)
 
 
 class Remapper(object):
@@ -50,7 +43,7 @@ class Remapper(object):
     # Xylar Asay-Davis
 
     def __init__(self, sourceDescriptor, destinationDescriptor,
-                 mappingFileName=None):  # {{{
+                 mappingFileName=None):
         """
         Create the remapper and read weights and indices from the given file
         for later used in remapping fields.
@@ -100,12 +93,10 @@ class Remapper(object):
 
         self.mappingLoaded = False
 
-        # }}}
-
-    def build_mapping_file(self, method='bilinear', additionalArgs=None,
-                           logger=None, mpiTasks=1, tempdir=None,
-                           esmf_path=None, esmf_parallel_exec=None,
-                           extrap_method=None):  # {{{
+    def build_mapping_file(self, method='bilinear',  # noqa: C901
+                           additionalArgs=None, logger=None, mpiTasks=1,
+                           tempdir=None, esmf_path=None,
+                           esmf_parallel_exec=None, extrap_method=None):
         """
         Given a source file defining either an MPAS mesh or a lat-lon grid and
         a destination file or set of arrays defining a lat-lon grid, constructs
@@ -333,11 +324,9 @@ class Remapper(object):
         if tempobj is not None:
             tempobj.cleanup()
 
-        # }}}
-
-    def remap_file(self, inFileName, outFileName, variableList=None,
-                   overwrite=False, renormalize=None, logger=None,
-                   replaceMpasFill=False, parallel_exec=None):  # {{{
+    def remap_file(self, inFileName, outFileName,  # noqa: C901
+                   variableList=None, overwrite=False, renormalize=None,
+                   logger=None, replaceMpasFill=False, parallel_exec=None):
         """
         Given a source file defining either an MPAS mesh or a lat-lon grid and
         a destination file or set of arrays defining a lat-lon grid, constructs
@@ -515,9 +504,8 @@ class Remapper(object):
             if process.returncode != 0:
                 raise subprocess.CalledProcessError(process.returncode,
                                                     ' '.join(args))
-        # }}}
 
-    def remap(self, ds, renormalizationThreshold=None):  # {{{
+    def remap(self, ds, renormalizationThreshold=None):
         """
         Given a source data set, returns a remapped version of the data set,
         possibly masked and renormalized.
@@ -591,9 +579,9 @@ class Remapper(object):
 
         remappedDs.attrs['meshName'] = self.destinationDescriptor.meshName
 
-        return remappedDs  # }}}
+        return remappedDs
 
-    def _load_mapping(self):  # {{{
+    def _load_mapping(self):
         """
         Load weights and indices from a mapping file, if this has not already
         been done
@@ -654,17 +642,17 @@ class Remapper(object):
         S = dsMapping['S'].values
         self.matrix = csr_matrix((S, (row, col)), shape=(n_b, n_a))
 
-        self.mappingLoaded = True  # }}}
+        self.mappingLoaded = True
 
-    def _check_drop(self, dataArray):  # {{{
+    def _check_drop(self, dataArray):
         sourceDims = self.sourceDescriptor.dims
 
         sourceDimsInArray = [dim in dataArray.dims for dim in sourceDims]
 
         return (numpy.any(sourceDimsInArray) and not
-                numpy.all(sourceDimsInArray))  # }}}
+                numpy.all(sourceDimsInArray))
 
-    def _remap_data_array(self, dataArray, renormalizationThreshold):  # {{{
+    def _remap_data_array(self, dataArray, renormalizationThreshold):
         """
         Remap a single xarray data array
         """
@@ -731,10 +719,10 @@ class Remapper(object):
         # make a new data array
         remappedArray = xr.DataArray.from_dict(arrayDict)
 
-        return remappedArray  # }}}
+        return remappedArray
 
     def _remap_numpy_array(self, inField, remapAxes,
-                           renormalizationThreshold):  # {{{
+                           renormalizationThreshold):
         """
         Remap a single numpy array
         """
@@ -796,7 +784,7 @@ class Remapper(object):
                          unpermuteAxes[index:])
         outField = numpy.transpose(outField, axes=unpermuteAxes)
 
-        return outField  # }}}
+        return outField
 
 
 def _print_running(args, fn):
@@ -806,5 +794,3 @@ def _print_running(args, fn):
             arg = '"{}"'.format(arg)
         print_args.append(arg)
     fn('running: {}'.format(' '.join(print_args)))
-
-# vim: ai ts=4 sts=4 et sw=4 ft=python
