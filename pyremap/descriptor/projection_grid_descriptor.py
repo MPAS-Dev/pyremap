@@ -9,15 +9,19 @@
 # distributed with this code, or at
 # https://raw.githubusercontent.com/MPAS-Dev/pyremap/main/LICENSE
 
+import sys
+
 import netCDF4
 import numpy
-import sys
 import pyproj
 import xarray
 
 from pyremap.descriptor.mesh_descriptor import MeshDescriptor
-from pyremap.descriptor.utility import interp_extrap_corner, \
-    create_scrip, unwrap_corners
+from pyremap.descriptor.utility import (
+    create_scrip,
+    interp_extrap_corner,
+    unwrap_corners,
+)
 
 
 class ProjectionGridDescriptor(MeshDescriptor):

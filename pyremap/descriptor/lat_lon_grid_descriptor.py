@@ -9,14 +9,19 @@
 # distributed with this code, or at
 # https://raw.githubusercontent.com/MPAS-Dev/pyremap/main/LICENSE
 
+import sys
+
 import netCDF4
 import numpy
-import sys
 import xarray
 
 from pyremap.descriptor.mesh_descriptor import MeshDescriptor
-from pyremap.descriptor.utility import interp_extrap_corner, \
-    create_scrip, unwrap_corners, round_res
+from pyremap.descriptor.utility import (
+    create_scrip,
+    interp_extrap_corner,
+    round_res,
+    unwrap_corners,
+)
 
 
 def get_lat_lon_descriptor(dLon, dLat, lonMin=-180., lonMax=180., latMin=-90.,

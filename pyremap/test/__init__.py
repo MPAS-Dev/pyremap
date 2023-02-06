@@ -15,14 +15,13 @@ Phillip J. Wolfram, Xylar Asay-Davis
 04/06/2017
 """
 
+import os
 import warnings
 from contextlib import contextmanager
-
-import os
 from distutils import dir_util
-from pytest import fixture
 
 import xarray
+from pytest import fixture
 
 try:
     import unittest2 as unittest

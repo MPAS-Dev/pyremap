@@ -9,14 +9,19 @@
 # distributed with this code, or at
 # https://raw.githubusercontent.com/MPAS-Dev/pyremap/main/LICENSE
 
+import sys
+
 import netCDF4
 import numpy
-import sys
 import xarray
 
 from pyremap.descriptor.mesh_descriptor import MeshDescriptor
-from pyremap.descriptor.utility import interp_extrap_corners_2d, \
-    create_scrip, unwrap_corners, round_res
+from pyremap.descriptor.utility import (
+    create_scrip,
+    interp_extrap_corners_2d,
+    round_res,
+    unwrap_corners,
+)
 
 
 class LatLon2DGridDescriptor(MeshDescriptor):

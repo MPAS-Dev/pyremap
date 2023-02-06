@@ -15,17 +15,22 @@ Xylar Asay-Davis
 04/06/2017
 '''
 
-import pytest
-import shutil
 import os
+import shutil
 import tempfile
-import numpy
-import xarray
-import pyproj
 
-from pyremap import Remapper, MpasMeshDescriptor, \
-    LatLonGridDescriptor, ProjectionGridDescriptor
-from pyremap.test import TestCase, loaddatadir
+import numpy
+import pyproj
+import pytest
+import xarray
+
+from pyremap import (
+    LatLonGridDescriptor,
+    MpasMeshDescriptor,
+    ProjectionGridDescriptor,
+    Remapper,
+)
+from pyremap.test import TestCase, loaddatadir  # noqa: F401
 
 
 @pytest.mark.usefixtures('loaddatadir')

@@ -8,9 +8,9 @@
 # Additional copyright and license information can be found in the LICENSE file
 # distributed with this code, or at
 # https://raw.githubusercontent.com/MPAS-Dev/pyremap/main/LICENSE
+import numpy
 import pyproj
 import xarray
-import numpy
 
 from pyremap.descriptor import ProjectionGridDescriptor
 
@@ -66,9 +66,9 @@ def get_polar_descriptor_from_file(fileName, projection='antarctic'):
     dsIn = xarray.open_dataset(fileName)
     x = dsIn.x.values
     y = dsIn.y.values
-    dx = int((x[1]-x[0])/1000.)
-    Lx = int((x[-1] - x[0])/1000.)
-    Ly = int((y[-1] - y[0])/1000.)
+    dx = int((x[1] - x[0]) / 1000.)
+    Lx = int((x[-1] - x[0]) / 1000.)
+    Ly = int((y[-1] - y[0]) / 1000.)
 
     meshName = '{}x{}km_{}km_Antarctic_stereo'.format(Lx, Ly, dx)
 
