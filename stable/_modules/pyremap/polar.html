@@ -84,9 +84,9 @@
 <span class="c1"># Additional copyright and license information can be found in the LICENSE file</span>
 <span class="c1"># distributed with this code, or at</span>
 <span class="c1"># https://raw.githubusercontent.com/MPAS-Dev/pyremap/main/LICENSE</span>
+<span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">import</span> <span class="nn">pyproj</span>
 <span class="kn">import</span> <span class="nn">xarray</span>
-<span class="kn">import</span> <span class="nn">numpy</span>
 
 <span class="kn">from</span> <span class="nn">pyremap.descriptor</span> <span class="kn">import</span> <span class="n">ProjectionGridDescriptor</span>
 
@@ -142,9 +142,9 @@
     <span class="n">dsIn</span> <span class="o">=</span> <span class="n">xarray</span><span class="o">.</span><span class="n">open_dataset</span><span class="p">(</span><span class="n">fileName</span><span class="p">)</span>
     <span class="n">x</span> <span class="o">=</span> <span class="n">dsIn</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">values</span>
     <span class="n">y</span> <span class="o">=</span> <span class="n">dsIn</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">values</span>
-    <span class="n">dx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">/</span><span class="mf">1000.</span><span class="p">)</span>
-    <span class="n">Lx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">x</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">/</span><span class="mf">1000.</span><span class="p">)</span>
-    <span class="n">Ly</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">y</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">/</span><span class="mf">1000.</span><span class="p">)</span>
+    <span class="n">dx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="mf">1000.</span><span class="p">)</span>
+    <span class="n">Lx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">x</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="mf">1000.</span><span class="p">)</span>
+    <span class="n">Ly</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">y</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="mf">1000.</span><span class="p">)</span>
 
     <span class="n">meshName</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">x</span><span class="si">{}</span><span class="s1">km_</span><span class="si">{}</span><span class="s1">km_Antarctic_stereo&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">Lx</span><span class="p">,</span> <span class="n">Ly</span><span class="p">,</span> <span class="n">dx</span><span class="p">)</span>
 

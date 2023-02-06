@@ -84,35 +84,28 @@
 <span class="c1"># Additional copyright and license information can be found in the LICENSE file</span>
 <span class="c1"># distributed with this code, or at</span>
 <span class="c1"># https://raw.githubusercontent.com/MPAS-Dev/pyremap/main/LICENSE</span>
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Functions for performing interpolation</span>
 
-<span class="sd">Functions</span>
-<span class="sd">---------</span>
-<span class="sd">build_remap_weights - constructs a mapping file containing the indices and</span>
-<span class="sd">    weights needed to perform horizontal interpolation</span>
-
-<span class="sd">remap - perform horizontal interpolation on a data sets, given a mapping file</span>
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="c1"># Authors</span>
-<span class="c1"># -------</span>
-<span class="c1"># Xylar Asay-Davis</span>
-
-<span class="kn">import</span> <span class="nn">subprocess</span>
-<span class="kn">from</span> <span class="nn">tempfile</span> <span class="kn">import</span> <span class="n">TemporaryDirectory</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">distutils.spawn</span> <span class="kn">import</span> <span class="n">find_executable</span>
-<span class="kn">import</span> <span class="nn">numpy</span>
-<span class="kn">from</span> <span class="nn">scipy.sparse</span> <span class="kn">import</span> <span class="n">csr_matrix</span>
-<span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
-<span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">from</span> <span class="nn">subprocess</span> <span class="kn">import</span> <span class="n">check_output</span>
 <span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">distutils.spawn</span> <span class="kn">import</span> <span class="n">find_executable</span>
+<span class="kn">from</span> <span class="nn">subprocess</span> <span class="kn">import</span> <span class="n">check_output</span>
+<span class="kn">from</span> <span class="nn">tempfile</span> <span class="kn">import</span> <span class="n">TemporaryDirectory</span>
 
-<span class="kn">from</span> <span class="nn">pyremap.descriptor</span> <span class="kn">import</span> <span class="n">MpasMeshDescriptor</span><span class="p">,</span> <span class="n">MpasEdgeMeshDescriptor</span><span class="p">,</span> \
-    <span class="n">LatLonGridDescriptor</span><span class="p">,</span> <span class="n">LatLon2DGridDescriptor</span><span class="p">,</span> <span class="n">ProjectionGridDescriptor</span><span class="p">,</span> \
-    <span class="n">PointCollectionDescriptor</span>
+<span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
+<span class="kn">from</span> <span class="nn">scipy.sparse</span> <span class="kn">import</span> <span class="n">csr_matrix</span>
+
+<span class="kn">from</span> <span class="nn">pyremap.descriptor</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">LatLon2DGridDescriptor</span><span class="p">,</span>
+    <span class="n">LatLonGridDescriptor</span><span class="p">,</span>
+    <span class="n">MpasEdgeMeshDescriptor</span><span class="p">,</span>
+    <span class="n">MpasMeshDescriptor</span><span class="p">,</span>
+    <span class="n">PointCollectionDescriptor</span><span class="p">,</span>
+    <span class="n">ProjectionGridDescriptor</span><span class="p">,</span>
+<span class="p">)</span>
 
 
 <div class="viewcode-block" id="Remapper"><a class="viewcode-back" href="../../generated/pyremap.remapper.Remapper.html#pyremap.remapper.Remapper">[docs]</a><span class="k">class</span> <span class="nc">Remapper</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -126,7 +119,7 @@
     <span class="c1"># Xylar Asay-Davis</span>
 
 <div class="viewcode-block" id="Remapper.__init__"><a class="viewcode-back" href="../../generated/pyremap.remapper.Remapper.html#pyremap.remapper.Remapper.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sourceDescriptor</span><span class="p">,</span> <span class="n">destinationDescriptor</span><span class="p">,</span>
-                 <span class="n">mappingFileName</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>  <span class="c1"># {{{</span>
+                 <span class="n">mappingFileName</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create the remapper and read weights and indices from the given file</span>
 <span class="sd">        for later used in remapping fields.</span>
@@ -176,12 +169,10 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">mappingLoaded</span> <span class="o">=</span> <span class="kc">False</span></div>
 
-        <span class="c1"># }}}</span>
-
-    <span class="k">def</span> <span class="nf">build_mapping_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;bilinear&#39;</span><span class="p">,</span> <span class="n">additionalArgs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                           <span class="n">logger</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mpiTasks</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">tempdir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                           <span class="n">esmf_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">esmf_parallel_exec</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                           <span class="n">extrap_method</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>  <span class="c1"># {{{</span>
+    <span class="k">def</span> <span class="nf">build_mapping_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;bilinear&#39;</span><span class="p">,</span>  <span class="c1"># noqa: C901</span>
+                           <span class="n">additionalArgs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mpiTasks</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                           <span class="n">tempdir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">esmf_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                           <span class="n">esmf_parallel_exec</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">extrap_method</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Given a source file defining either an MPAS mesh or a lat-lon grid and</span>
 <span class="sd">        a destination file or set of arrays defining a lat-lon grid, constructs</span>
@@ -409,11 +400,9 @@
         <span class="k">if</span> <span class="n">tempobj</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">tempobj</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span>
 
-        <span class="c1"># }}}</span>
-
-    <span class="k">def</span> <span class="nf">remap_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inFileName</span><span class="p">,</span> <span class="n">outFileName</span><span class="p">,</span> <span class="n">variableList</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                   <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">renormalize</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                   <span class="n">replaceMpasFill</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">parallel_exec</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>  <span class="c1"># {{{</span>
+    <span class="k">def</span> <span class="nf">remap_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inFileName</span><span class="p">,</span> <span class="n">outFileName</span><span class="p">,</span>  <span class="c1"># noqa: C901</span>
+                   <span class="n">variableList</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">renormalize</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                   <span class="n">logger</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">replaceMpasFill</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">parallel_exec</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Given a source file defining either an MPAS mesh or a lat-lon grid and</span>
 <span class="sd">        a destination file or set of arrays defining a lat-lon grid, constructs</span>
@@ -591,9 +580,8 @@
             <span class="k">if</span> <span class="n">process</span><span class="o">.</span><span class="n">returncode</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">CalledProcessError</span><span class="p">(</span><span class="n">process</span><span class="o">.</span><span class="n">returncode</span><span class="p">,</span>
                                                     <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">args</span><span class="p">))</span>
-        <span class="c1"># }}}</span>
 
-    <span class="k">def</span> <span class="nf">remap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ds</span><span class="p">,</span> <span class="n">renormalizationThreshold</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>  <span class="c1"># {{{</span>
+    <span class="k">def</span> <span class="nf">remap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ds</span><span class="p">,</span> <span class="n">renormalizationThreshold</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Given a source data set, returns a remapped version of the data set,</span>
 <span class="sd">        possibly masked and renormalized.</span>
@@ -667,9 +655,9 @@
 
         <span class="n">remappedDs</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;meshName&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">destinationDescriptor</span><span class="o">.</span><span class="n">meshName</span>
 
-        <span class="k">return</span> <span class="n">remappedDs</span>  <span class="c1"># }}}</span>
+        <span class="k">return</span> <span class="n">remappedDs</span>
 
-    <span class="k">def</span> <span class="nf">_load_mapping</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># {{{</span>
+    <span class="k">def</span> <span class="nf">_load_mapping</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Load weights and indices from a mapping file, if this has not already</span>
 <span class="sd">        been done</span>
@@ -730,17 +718,17 @@
         <span class="n">S</span> <span class="o">=</span> <span class="n">dsMapping</span><span class="p">[</span><span class="s1">&#39;S&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">matrix</span> <span class="o">=</span> <span class="n">csr_matrix</span><span class="p">((</span><span class="n">S</span><span class="p">,</span> <span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">)),</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">n_b</span><span class="p">,</span> <span class="n">n_a</span><span class="p">))</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">mappingLoaded</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># }}}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mappingLoaded</span> <span class="o">=</span> <span class="kc">True</span>
 
-    <span class="k">def</span> <span class="nf">_check_drop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataArray</span><span class="p">):</span>  <span class="c1"># {{{</span>
+    <span class="k">def</span> <span class="nf">_check_drop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataArray</span><span class="p">):</span>
         <span class="n">sourceDims</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sourceDescriptor</span><span class="o">.</span><span class="n">dims</span>
 
         <span class="n">sourceDimsInArray</span> <span class="o">=</span> <span class="p">[</span><span class="n">dim</span> <span class="ow">in</span> <span class="n">dataArray</span><span class="o">.</span><span class="n">dims</span> <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">sourceDims</span><span class="p">]</span>
 
         <span class="k">return</span> <span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">sourceDimsInArray</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span>
-                <span class="n">numpy</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">sourceDimsInArray</span><span class="p">))</span>  <span class="c1"># }}}</span>
+                <span class="n">numpy</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">sourceDimsInArray</span><span class="p">))</span>
 
-    <span class="k">def</span> <span class="nf">_remap_data_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataArray</span><span class="p">,</span> <span class="n">renormalizationThreshold</span><span class="p">):</span>  <span class="c1"># {{{</span>
+    <span class="k">def</span> <span class="nf">_remap_data_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataArray</span><span class="p">,</span> <span class="n">renormalizationThreshold</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Remap a single xarray data array</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -807,10 +795,10 @@
         <span class="c1"># make a new data array</span>
         <span class="n">remappedArray</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">arrayDict</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">remappedArray</span>  <span class="c1"># }}}</span>
+        <span class="k">return</span> <span class="n">remappedArray</span>
 
     <span class="k">def</span> <span class="nf">_remap_numpy_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inField</span><span class="p">,</span> <span class="n">remapAxes</span><span class="p">,</span>
-                           <span class="n">renormalizationThreshold</span><span class="p">):</span>  <span class="c1"># {{{</span>
+                           <span class="n">renormalizationThreshold</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Remap a single numpy array</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -872,7 +860,7 @@
                          <span class="n">unpermuteAxes</span><span class="p">[</span><span class="n">index</span><span class="p">:])</span>
         <span class="n">outField</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">outField</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="n">unpermuteAxes</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">outField</span>  <span class="c1"># }}}</span></div>
+        <span class="k">return</span> <span class="n">outField</span></div>
 
 
 <span class="k">def</span> <span class="nf">_print_running</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">fn</span><span class="p">):</span>
@@ -882,8 +870,6 @@
             <span class="n">arg</span> <span class="o">=</span> <span class="s1">&#39;&quot;</span><span class="si">{}</span><span class="s1">&quot;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
         <span class="n">print_args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
     <span class="n">fn</span><span class="p">(</span><span class="s1">&#39;running: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">print_args</span><span class="p">)))</span>
-
-<span class="c1"># vim: ai ts=4 sts=4 et sw=4 ft=python</span>
 </pre></div>
 
            </div>

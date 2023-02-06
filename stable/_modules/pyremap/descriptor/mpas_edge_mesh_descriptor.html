@@ -85,9 +85,10 @@
 <span class="c1"># distributed with this code, or at</span>
 <span class="c1"># https://raw.githubusercontent.com/MPAS-Dev/pyremap/main/LICENSE</span>
 
+<span class="kn">import</span> <span class="nn">sys</span>
+
 <span class="kn">import</span> <span class="nn">netCDF4</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
 
 <span class="kn">from</span> <span class="nn">pyremap.descriptor.mesh_descriptor</span> <span class="kn">import</span> <span class="n">MeshDescriptor</span>
@@ -180,7 +181,7 @@
         <span class="n">grid_area</span> <span class="o">=</span> <span class="n">outFile</span><span class="o">.</span><span class="n">createVariable</span><span class="p">(</span><span class="s1">&#39;grid_area&#39;</span><span class="p">,</span> <span class="s1">&#39;f8&#39;</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;grid_size&#39;</span><span class="p">,))</span>
         <span class="n">grid_area</span><span class="o">.</span><span class="n">units</span> <span class="o">=</span> <span class="s1">&#39;radian^2&#39;</span>
         <span class="c1"># a triangle if there is 1 valid cell and a diamond if there are 2</span>
-        <span class="n">areaEdge</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">validCellsOnEdge</span><span class="o">*</span><span class="n">dcEdge</span><span class="o">*</span><span class="n">dvEdge</span>
+        <span class="n">areaEdge</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">validCellsOnEdge</span> <span class="o">*</span> <span class="n">dcEdge</span> <span class="o">*</span> <span class="n">dvEdge</span>
         <span class="c1"># SCRIP uses square radians</span>
         <span class="n">grid_area</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">areaEdge</span><span class="p">[:]</span> <span class="o">/</span> <span class="p">(</span><span class="n">sphereRadius</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
 
@@ -194,12 +195,12 @@
         <span class="n">grid_corner_lat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">nEdges</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
 
         <span class="c1"># start by repeating vertices, since these always exist</span>
-        <span class="n">vertices</span> <span class="o">=</span> <span class="n">verticesOnEdge</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span>
+        <span class="n">vertices</span> <span class="o">=</span> <span class="n">verticesOnEdge</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span>
         <span class="n">grid_corner_lon</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">lonVertex</span><span class="p">[</span><span class="n">vertices</span><span class="p">]</span>
         <span class="n">grid_corner_lat</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">latVertex</span><span class="p">[</span><span class="n">vertices</span><span class="p">]</span>
         <span class="n">grid_corner_lon</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">lonVertex</span><span class="p">[</span><span class="n">vertices</span><span class="p">]</span>
         <span class="n">grid_corner_lat</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">latVertex</span><span class="p">[</span><span class="n">vertices</span><span class="p">]</span>
-        <span class="n">vertices</span> <span class="o">=</span> <span class="n">verticesOnEdge</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span>
+        <span class="n">vertices</span> <span class="o">=</span> <span class="n">verticesOnEdge</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span>
         <span class="n">grid_corner_lon</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">lonVertex</span><span class="p">[</span><span class="n">vertices</span><span class="p">]</span>
         <span class="n">grid_corner_lat</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">latVertex</span><span class="p">[</span><span class="n">vertices</span><span class="p">]</span>
         <span class="n">grid_corner_lon</span><span class="p">[:,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">lonVertex</span><span class="p">[</span><span class="n">vertices</span><span class="p">]</span>
@@ -241,7 +242,7 @@
         <span class="k">with</span> <span class="n">xr</span><span class="o">.</span><span class="n">open_dataset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fileName</span><span class="p">)</span> <span class="k">as</span> <span class="n">ds</span><span class="p">:</span>
 
             <span class="n">nCells</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">sizes</span><span class="p">[</span><span class="s1">&#39;nCells&#39;</span><span class="p">]</span>
-            <span class="n">nodeCount</span> <span class="o">=</span> <span class="n">nCells</span><span class="o">+</span><span class="n">ds</span><span class="o">.</span><span class="n">sizes</span><span class="p">[</span><span class="s1">&#39;nVertices&#39;</span><span class="p">]</span>
+            <span class="n">nodeCount</span> <span class="o">=</span> <span class="n">nCells</span> <span class="o">+</span> <span class="n">ds</span><span class="o">.</span><span class="n">sizes</span><span class="p">[</span><span class="s1">&#39;nVertices&#39;</span><span class="p">]</span>
             <span class="n">elementCount</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">sizes</span><span class="p">[</span><span class="s1">&#39;nEdges&#39;</span><span class="p">]</span>
             <span class="n">coordDim</span> <span class="o">=</span> <span class="mi">2</span>
 
@@ -269,7 +270,7 @@
         <span class="k">for</span> <span class="n">vertex</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
             <span class="c1"># swap -1 value until they&#39;re at the end</span>
             <span class="n">mask</span> <span class="o">=</span> <span class="n">elementConn</span><span class="p">[:,</span> <span class="n">vertex</span><span class="p">]</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span>
-            <span class="n">elementConn</span><span class="p">[</span><span class="n">mask</span><span class="p">,</span> <span class="n">vertex</span><span class="p">]</span> <span class="o">=</span> <span class="n">elementConn</span><span class="p">[</span><span class="n">mask</span><span class="p">,</span> <span class="n">vertex</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">elementConn</span><span class="p">[</span><span class="n">mask</span><span class="p">,</span> <span class="n">vertex</span><span class="p">]</span> <span class="o">=</span> <span class="n">elementConn</span><span class="p">[</span><span class="n">mask</span><span class="p">,</span> <span class="n">vertex</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
             <span class="n">elementConn</span><span class="p">[</span><span class="n">mask</span><span class="p">,</span> <span class="n">vertex</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
 
         <span class="n">numElementConn</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">elementConn</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">byte</span><span class="p">)</span>

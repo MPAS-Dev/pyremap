@@ -85,14 +85,19 @@
 <span class="c1"># distributed with this code, or at</span>
 <span class="c1"># https://raw.githubusercontent.com/MPAS-Dev/pyremap/main/LICENSE</span>
 
+<span class="kn">import</span> <span class="nn">sys</span>
+
 <span class="kn">import</span> <span class="nn">netCDF4</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
-<span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">xarray</span>
 
 <span class="kn">from</span> <span class="nn">pyremap.descriptor.mesh_descriptor</span> <span class="kn">import</span> <span class="n">MeshDescriptor</span>
-<span class="kn">from</span> <span class="nn">pyremap.descriptor.utility</span> <span class="kn">import</span> <span class="n">interp_extrap_corners_2d</span><span class="p">,</span> \
-    <span class="n">create_scrip</span><span class="p">,</span> <span class="n">unwrap_corners</span><span class="p">,</span> <span class="n">round_res</span>
+<span class="kn">from</span> <span class="nn">pyremap.descriptor.utility</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">create_scrip</span><span class="p">,</span>
+    <span class="n">interp_extrap_corners_2d</span><span class="p">,</span>
+    <span class="n">round_res</span><span class="p">,</span>
+    <span class="n">unwrap_corners</span><span class="p">,</span>
+<span class="p">)</span>
 
 
 <div class="viewcode-block" id="LatLon2DGridDescriptor"><a class="viewcode-back" href="../../../generated/pyremap.descriptor.LatLon2DGridDescriptor.html#pyremap.descriptor.LatLon2DGridDescriptor">[docs]</a><span class="k">class</span> <span class="nc">LatLon2DGridDescriptor</span><span class="p">(</span><span class="n">MeshDescriptor</span><span class="p">):</span>
