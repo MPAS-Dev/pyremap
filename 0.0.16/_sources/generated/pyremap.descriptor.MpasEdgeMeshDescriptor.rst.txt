@@ -1,0 +1,24 @@
+﻿pyremap.descriptor.MpasEdgeMeshDescriptor
+=========================================
+
+.. currentmodule:: pyremap.descriptor
+
+.. autoclass:: MpasEdgeMeshDescriptor
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~MpasEdgeMeshDescriptor.__init__
+      ~MpasEdgeMeshDescriptor.to_esmf
+      ~MpasEdgeMeshDescriptor.to_scrip
+   
+   
+
+   
+   
+   
