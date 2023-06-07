@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pyremap.descriptor.utility &mdash; pyremap 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            pyremap
+          </a>
+              <div class="version">
+                1.0.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../quick_start.html">Quick Start</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API reference</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../versions.html">Versions</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">pyremap</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">pyremap.descriptor.utility</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pyremap.descriptor.utility</h1><div class="highlight"><pre>
+<span></span><span class="c1"># This software is open source software available under the BSD-3 license.</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright (c) 2022 Triad National Security, LLC. All rights reserved.</span>
+<span class="c1"># Copyright (c) 2022 Lawrence Livermore National Security, LLC. All rights</span>
+<span class="c1"># reserved.</span>
+<span class="c1"># Copyright (c) 2022 UT-Battelle, LLC. All rights reserved.</span>
+<span class="c1">#</span>
+<span class="c1"># Additional copyright and license information can be found in the LICENSE file</span>
+<span class="c1"># distributed with this code, or at</span>
+<span class="c1"># https://raw.githubusercontent.com/MPAS-Dev/pyremap/main/LICENSE</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span>
+
+
+<div class="viewcode-block" id="interp_extrap_corner"><a class="viewcode-back" href="../../../generated/pyremap.descriptor.interp_extrap_corner.html#pyremap.descriptor.interp_extrap_corner">[docs]</a><span class="k">def</span> <span class="nf">interp_extrap_corner</span><span class="p">(</span><span class="n">inField</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Interpolate/extrapolate a 1D field from grid centers to grid corners&quot;&quot;&quot;</span>
+
+    <span class="n">outField</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">inField</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">outField</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">inField</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">inField</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+    <span class="c1"># extrapolate the ends</span>
+    <span class="n">outField</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.5</span> <span class="o">*</span> <span class="n">inField</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">inField</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">outField</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.5</span> <span class="o">*</span> <span class="n">inField</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">inField</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">outField</span></div>
+
+
+<div class="viewcode-block" id="interp_extrap_corners_2d"><a class="viewcode-back" href="../../../generated/pyremap.descriptor.interp_extrap_corners_2d.html#pyremap.descriptor.interp_extrap_corners_2d">[docs]</a><span class="k">def</span> <span class="nf">interp_extrap_corners_2d</span><span class="p">(</span><span class="n">inField</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Interpolate/extrapolate a 1D field from grid centers to grid corners&quot;&quot;&quot;</span>
+
+    <span class="n">temp</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">inField</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">inField</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="n">temp</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">inField</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">inField</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:])</span>
+    <span class="c1"># extrapolate the ends</span>
+    <span class="n">temp</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.5</span> <span class="o">*</span> <span class="n">inField</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">inField</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">temp</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.5</span> <span class="o">*</span> <span class="n">inField</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">inField</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+
+    <span class="n">outField</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">inField</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">inField</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="n">outField</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">temp</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="o">+</span> <span class="n">temp</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="p">:])</span>
+    <span class="c1"># extrapolate the ends</span>
+    <span class="n">outField</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="mf">1.5</span> <span class="o">*</span> <span class="n">temp</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:]</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">temp</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="n">outField</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="mf">1.5</span> <span class="o">*</span> <span class="n">temp</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">temp</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="p">:]</span>
+
+    <span class="k">return</span> <span class="n">outField</span></div>
+
+
+<span class="k">def</span> <span class="nf">create_scrip</span><span class="p">(</span><span class="n">outFile</span><span class="p">,</span> <span class="n">grid_size</span><span class="p">,</span> <span class="n">grid_corners</span><span class="p">,</span> <span class="n">grid_rank</span><span class="p">,</span> <span class="n">units</span><span class="p">,</span>
+                 <span class="n">meshName</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Given a SCRIP files, creates common variables and writes common values used</span>
+<span class="sd">    in various types of SCRIP files.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    outFile : file pointer</span>
+<span class="sd">        A SCRIP file opened in write mode</span>
+
+<span class="sd">    grid_size : int</span>
+<span class="sd">        The number of elements in the grid or mesh</span>
+
+<span class="sd">    grid_corners : int</span>
+<span class="sd">        The number of corners in the grid or mesh</span>
+
+<span class="sd">    grid_rank : int</span>
+<span class="sd">        The dimensionality of the grid (1 for mesh, 2 for grid)</span>
+
+<span class="sd">    units : {&#39;degrees&#39;, &#39;radians&#39;}</span>
+<span class="sd">        The units for latitude and longitude</span>
+
+<span class="sd">    meshName : str</span>
+<span class="sd">        The name of the mesh</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Write to output file</span>
+    <span class="c1"># Dimensions</span>
+    <span class="n">outFile</span><span class="o">.</span><span class="n">createDimension</span><span class="p">(</span><span class="s2">&quot;grid_size&quot;</span><span class="p">,</span> <span class="n">grid_size</span><span class="p">)</span>
+    <span class="n">outFile</span><span class="o">.</span><span class="n">createDimension</span><span class="p">(</span><span class="s2">&quot;grid_corners&quot;</span><span class="p">,</span> <span class="n">grid_corners</span><span class="p">)</span>
+    <span class="n">outFile</span><span class="o">.</span><span class="n">createDimension</span><span class="p">(</span><span class="s2">&quot;grid_rank&quot;</span><span class="p">,</span> <span class="n">grid_rank</span><span class="p">)</span>
+
+    <span class="c1"># Variables</span>
+    <span class="n">grid_center_lat</span> <span class="o">=</span> <span class="n">outFile</span><span class="o">.</span><span class="n">createVariable</span><span class="p">(</span><span class="s1">&#39;grid_center_lat&#39;</span><span class="p">,</span> <span class="s1">&#39;f8&#39;</span><span class="p">,</span>
+                                             <span class="p">(</span><span class="s1">&#39;grid_size&#39;</span><span class="p">,))</span>
+    <span class="n">grid_center_lat</span><span class="o">.</span><span class="n">units</span> <span class="o">=</span> <span class="n">units</span>
+    <span class="n">grid_center_lon</span> <span class="o">=</span> <span class="n">outFile</span><span class="o">.</span><span class="n">createVariable</span><span class="p">(</span><span class="s1">&#39;grid_center_lon&#39;</span><span class="p">,</span> <span class="s1">&#39;f8&#39;</span><span class="p">,</span>
+                                             <span class="p">(</span><span class="s1">&#39;grid_size&#39;</span><span class="p">,))</span>
+    <span class="n">grid_center_lon</span><span class="o">.</span><span class="n">units</span> <span class="o">=</span> <span class="n">units</span>
+    <span class="n">grid_corner_lat</span> <span class="o">=</span> <span class="n">outFile</span><span class="o">.</span><span class="n">createVariable</span><span class="p">(</span><span class="s1">&#39;grid_corner_lat&#39;</span><span class="p">,</span> <span class="s1">&#39;f8&#39;</span><span class="p">,</span>
+                                             <span class="p">(</span><span class="s1">&#39;grid_size&#39;</span><span class="p">,</span> <span class="s1">&#39;grid_corners&#39;</span><span class="p">))</span>
+    <span class="n">grid_corner_lat</span><span class="o">.</span><span class="n">units</span> <span class="o">=</span> <span class="n">units</span>
+    <span class="n">grid_corner_lon</span> <span class="o">=</span> <span class="n">outFile</span><span class="o">.</span><span class="n">createVariable</span><span class="p">(</span><span class="s1">&#39;grid_corner_lon&#39;</span><span class="p">,</span> <span class="s1">&#39;f8&#39;</span><span class="p">,</span>
+                                             <span class="p">(</span><span class="s1">&#39;grid_size&#39;</span><span class="p">,</span> <span class="s1">&#39;grid_corners&#39;</span><span class="p">))</span>
+    <span class="n">grid_corner_lon</span><span class="o">.</span><span class="n">units</span> <span class="o">=</span> <span class="n">units</span>
+    <span class="n">grid_imask</span> <span class="o">=</span> <span class="n">outFile</span><span class="o">.</span><span class="n">createVariable</span><span class="p">(</span><span class="s1">&#39;grid_imask&#39;</span><span class="p">,</span> <span class="s1">&#39;i4&#39;</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;grid_size&#39;</span><span class="p">,))</span>
+    <span class="n">grid_imask</span><span class="o">.</span><span class="n">units</span> <span class="o">=</span> <span class="s1">&#39;unitless&#39;</span>
+    <span class="n">outFile</span><span class="o">.</span><span class="n">createVariable</span><span class="p">(</span><span class="s1">&#39;grid_dims&#39;</span><span class="p">,</span> <span class="s1">&#39;i4&#39;</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;grid_rank&#39;</span><span class="p">,))</span>
+
+    <span class="n">outFile</span><span class="o">.</span><span class="n">meshName</span> <span class="o">=</span> <span class="n">meshName</span>
+
+
+<span class="k">def</span> <span class="nf">unwrap_corners</span><span class="p">(</span><span class="n">inField</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Turn a 2D array of corners into an array of rectangular mesh elements&quot;&quot;&quot;</span>
+    <span class="n">outField</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(((</span><span class="n">inField</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">inField</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="mi">4</span><span class="p">))</span>
+    <span class="c1"># corners are counterclockwise</span>
+    <span class="n">outField</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">inField</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">flat</span>
+    <span class="n">outField</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">inField</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">flat</span>
+    <span class="n">outField</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">inField</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">flat</span>
+    <span class="n">outField</span><span class="p">[:,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">inField</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">flat</span>
+
+    <span class="k">return</span> <span class="n">outField</span>
+
+
+<span class="k">def</span> <span class="nf">round_res</span><span class="p">(</span><span class="n">res</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Round the resoltuion to a reasonable number for grid names&quot;&quot;&quot;</span>
+    <span class="n">rounded</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">res</span> <span class="o">*</span> <span class="mf">1000.</span><span class="p">)</span> <span class="o">/</span> <span class="mf">1000.</span>
+    <span class="k">return</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">rounded</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright This software is open source software available under the BSD-3license. Copyright (c) 2019 Xylar Asay-Davis.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
