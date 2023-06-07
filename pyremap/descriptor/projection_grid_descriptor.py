@@ -184,7 +184,7 @@ class ProjectionGridDescriptor(MeshDescriptor):
         scripFileName : str
             The path to which the SCRIP file should be written
         """
-        outFile = netCDF4.Dataset(scripFileName, 'w')
+        outFile = netCDF4.Dataset(scripFileName, 'w', format=self.format)
 
         nx = len(self.x)
         ny = len(self.y)
@@ -274,7 +274,8 @@ class ProjectionGridDescriptor(MeshDescriptor):
         ds_out.attrs['gridType'] = 'unstructured mesh'
         ds_out.attrs['version'] = '0.9'
 
-        ds_out.to_netcdf(esmfFileName)
+        ds_out.to_netcdf(esmfFileName, format=self.format,
+                         engine=self.engine)
 
     def project_to_lat_lon(self, X, Y):
         """

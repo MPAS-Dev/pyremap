@@ -16,6 +16,7 @@ Documentation    On GitHub
 `v0.0.14`_        `0.0.14`_
 `v0.0.15`_        `0.0.15`_
 `v0.0.16`_        `0.0.16`_
+`v1.0.0`_         `1.0.0`_
 ================ ===============
 
 .. _`stable`: ../stable/index.html
@@ -30,6 +31,7 @@ Documentation    On GitHub
 .. _`v0.0.14`: ../0.0.14/index.html
 .. _`v0.0.15`: ../0.0.15/index.html
 .. _`v0.0.16`: ../0.0.16/index.html
+.. _`v1.0.0`: ../1.0.0/index.html
 .. _`main`: https://github.com/MPAS-Dev/pyremap/tree/main
 .. _`0.0.6`: https://github.com/MPAS-Dev/pyremap/tree/0.0.6
 .. _`0.0.7`: https://github.com/MPAS-Dev/pyremap/tree/0.0.7
@@ -42,3 +44,4 @@ Documentation    On GitHub
 .. _`0.0.14`: https://github.com/MPAS-Dev/pyremap/tree/0.0.14
 .. _`0.0.15`: https://github.com/MPAS-Dev/pyremap/tree/0.0.15
 .. _`0.0.16`: https://github.com/MPAS-Dev/pyremap/tree/0.0.16
+.. _`1.0.0`: https://github.com/MPAS-Dev/pyremap/tree/1.0.0
