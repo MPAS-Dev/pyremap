@@ -136,7 +136,7 @@ class LatLon2DGridDescriptor(MeshDescriptor):
         scripFileName : str
             The path to which the SCRIP file should be written
         """
-        outFile = netCDF4.Dataset(scripFileName, 'w')
+        outFile = netCDF4.Dataset(scripFileName, 'w', format=self.format)
 
         nLat, nLon = self.lat.shape
 

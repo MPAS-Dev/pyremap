@@ -78,7 +78,7 @@ class MpasEdgeMeshDescriptor(MeshDescriptor):
         """
 
         inFile = netCDF4.Dataset(self.fileName, 'r')
-        outFile = netCDF4.Dataset(scripFileName, 'w')
+        outFile = netCDF4.Dataset(scripFileName, 'w', format=self.format)
 
         # Get info from input file
         latCell = inFile.variables['latCell'][:]
@@ -214,4 +214,5 @@ class MpasEdgeMeshDescriptor(MeshDescriptor):
         ds_out.attrs['gridType'] = 'unstructured mesh'
         ds_out.attrs['version'] = '0.9'
 
-        ds_out.to_netcdf(esmfFileName)
+        ds_out.to_netcdf(esmfFileName, format=self.format,
+                         engine=self.engine)

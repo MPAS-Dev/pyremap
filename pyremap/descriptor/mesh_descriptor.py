@@ -31,6 +31,14 @@ class MeshDescriptor:
     coords : dict
         A dictionary that can be used to construct an xarray.DataArray for each
         coordinate in the mesh or grid
+
+    format : {'NETCDF4', 'NETCDF4_CLASSIC', 'NETCDF3_64BIT',
+              'NETCDF3_CLASSIC'}
+        The NetCDF file format to use.  Default is ``'NETCDF4'``
+
+    engine : {'netcdf4', 'scipy', 'h5netcdf'}
+        The library to use for xarray NetCDF output.  The default is
+        ``'netcdf4'``
     """
     def __init__(self, meshName=None, regional=None):
         """
@@ -50,6 +58,8 @@ class MeshDescriptor:
         self.dims = None
         self.dimSizes = None
         self.coords = None
+        self.format = 'NETCDF4'
+        self.engine = None
 
     def to_scrip(self, scripFileName):
         """
