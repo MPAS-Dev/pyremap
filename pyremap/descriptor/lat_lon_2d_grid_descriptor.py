@@ -151,9 +151,9 @@ class LatLon2DGridDescriptor(MeshDescriptor):
         outFile.variables['grid_imask'][:] = 1
 
         outFile.variables['grid_corner_lat'][:] = \
-            unwrap_corners(self.lonCorner)
-        outFile.variables['grid_corner_lon'][:] = \
             unwrap_corners(self.latCorner)
+        outFile.variables['grid_corner_lon'][:] = \
+            unwrap_corners(self.lonCorner)
 
         setattr(outFile, 'history', self.history)
 
