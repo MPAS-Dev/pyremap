@@ -1,8 +1,10 @@
 from pyremap.descriptor import (
     LatLon2DGridDescriptor,
     LatLonGridDescriptor,
+    MpasCellMeshDescriptor,
     MpasEdgeMeshDescriptor,
     MpasMeshDescriptor,
+    MpasVertexMeshDescriptor,
     PointCollectionDescriptor,
     ProjectionGridDescriptor,
     get_lat_lon_descriptor,
