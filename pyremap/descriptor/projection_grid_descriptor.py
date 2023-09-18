@@ -9,8 +9,6 @@
 # distributed with this code, or at
 # https://raw.githubusercontent.com/MPAS-Dev/pyremap/main/LICENSE
 
-import sys
-
 import netCDF4
 import numpy
 import pyproj
@@ -18,6 +16,7 @@ import xarray
 
 from pyremap.descriptor.mesh_descriptor import MeshDescriptor
 from pyremap.descriptor.utility import (
+    add_history,
     create_scrip,
     interp_extrap_corner,
     unwrap_corners,
@@ -58,6 +57,9 @@ class ProjectionGridDescriptor(MeshDescriptor):
 
     yVarName : str
         The name of the y variable
+
+    history : str
+        The history attribute written to SCRIP files
     """
     def __init__(self, projection, meshName=None):
         """
@@ -84,6 +86,7 @@ class ProjectionGridDescriptor(MeshDescriptor):
         self.history = None
         self.xVarName = None
         self.yVarName = None
+        self.history = None
 
     @classmethod
     def read(cls, projection, fileName, meshName=None, xVarName='x',
@@ -130,12 +133,7 @@ class ProjectionGridDescriptor(MeshDescriptor):
         descriptor.xCorner = interp_extrap_corner(descriptor.x)
         descriptor.yCorner = interp_extrap_corner(descriptor.y)
 
-        # Update history attribute of netCDF file
-        if 'history' in ds.attrs:
-            descriptor.history = '\n'.join([ds.attrs['history'],
-                                            ' '.join(sys.argv[:])])
-        else:
-            descriptor.history = sys.argv[:]
+        descriptor.history = add_history(ds=ds)
         return descriptor
 
     @classmethod
@@ -172,7 +170,7 @@ class ProjectionGridDescriptor(MeshDescriptor):
         # interp/extrap corners
         descriptor.xCorner = interp_extrap_corner(descriptor.x)
         descriptor.yCorner = interp_extrap_corner(descriptor.y)
-        descriptor.history = sys.argv[:]
+        descriptor.history = add_history()
         return descriptor
 
     def to_scrip(self, scripFileName):

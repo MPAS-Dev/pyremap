@@ -9,14 +9,12 @@
 # distributed with this code, or at
 # https://raw.githubusercontent.com/MPAS-Dev/pyremap/main/LICENSE
 
-import sys
-
 import netCDF4
 import numpy as np
 import xarray as xr
 
 from pyremap.descriptor.mesh_descriptor import MeshDescriptor
-from pyremap.descriptor.utility import create_scrip
+from pyremap.descriptor.utility import add_history, create_scrip
 
 
 class MpasVertexMeshDescriptor(MeshDescriptor):
@@ -27,6 +25,9 @@ class MpasVertexMeshDescriptor(MeshDescriptor):
     ----------
     fileName : str
         The path of the file containing the MPAS mesh
+
+    history : str
+        The history attribute written to SCRIP files
     """
     def __init__(self, fileName, meshName=None):
         """
@@ -66,6 +67,8 @@ class MpasVertexMeshDescriptor(MeshDescriptor):
                                          'attrs': {'units': 'radians'}}}
             self.dims = ['nVertices']
             self.dimSize = [ds.dims[dim] for dim in self.dims]
+
+            self.history = add_history(ds=ds)
 
     def to_scrip(self, scripFileName):
         """
@@ -147,13 +150,7 @@ class MpasVertexMeshDescriptor(MeshDescriptor):
         outFile.variables['grid_corner_lat'][:] = grid_corner_lat[:]
         outFile.variables['grid_corner_lon'][:] = grid_corner_lon[:]
 
-        # Update history attribute of netCDF file
-        if hasattr(inFile, 'history'):
-            newhist = '\n'.join([getattr(inFile, 'history'),
-                                 ' '.join(sys.argv[:])])
-        else:
-            newhist = sys.argv[:]
-        setattr(outFile, 'history', newhist)
+        setattr(outFile, 'history', self.history)
 
         inFile.close()
         outFile.close()

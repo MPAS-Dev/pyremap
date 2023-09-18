@@ -9,14 +9,12 @@
 # distributed with this code, or at
 # https://raw.githubusercontent.com/MPAS-Dev/pyremap/main/LICENSE
 
-import sys
-
 import netCDF4
 import numpy
 import xarray
 
 from pyremap.descriptor.mesh_descriptor import MeshDescriptor
-from pyremap.descriptor.utility import create_scrip
+from pyremap.descriptor.utility import add_history, create_scrip
 
 
 class PointCollectionDescriptor(MeshDescriptor):
@@ -33,6 +31,9 @@ class PointCollectionDescriptor(MeshDescriptor):
 
     units : {'degrees', 'radians'}
         The units of ``lats`` and ``lons``
+
+    history : str
+        The history attribute written to SCRIP files
     """
 
     def __init__(self, lats, lons, collectionName, units='degrees',
@@ -74,6 +75,7 @@ class PointCollectionDescriptor(MeshDescriptor):
                                'attrs': {'units': units}}}
         self.dims = [outDimension]
         self.dimSize = [len(self.lat)]
+        self.history = add_history()
 
     def to_scrip(self, scripFileName):
         """
@@ -114,7 +116,7 @@ class PointCollectionDescriptor(MeshDescriptor):
         outFile.variables['grid_corner_lon'][:] = grid_corner_lon[:]
 
         # Update history attribute of netCDF file
-        setattr(outFile, 'history', ' '.join(sys.argv[:]))
+        setattr(outFile, 'history', self.history)
 
         outFile.close()
 
