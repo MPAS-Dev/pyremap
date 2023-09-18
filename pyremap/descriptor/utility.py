@@ -9,6 +9,8 @@
 # distributed with this code, or at
 # https://raw.githubusercontent.com/MPAS-Dev/pyremap/main/LICENSE
 
+import sys
+
 import numpy
 
 
@@ -107,6 +109,17 @@ def unwrap_corners(inField):
 
 
 def round_res(res):
-    """Round the resoltuion to a reasonable number for grid names"""
+    """Round the resolution to a reasonable number for grid names"""
     rounded = numpy.round(res * 1000.) / 1000.
     return '{}'.format(rounded)
+
+
+def add_history(ds=None):
+    """Get the history attribute, possibly adding it to existing history"""
+    history = ' '.join(sys.argv[:])
+    if ds is not None and 'history' in ds.attrs:
+        prev_hist = ds.attrs['history']
+        if isinstance(prev_hist, numpy.ndarray):
+            prev_hist = '\n'.join(prev_hist)
+        history = '\n'.join([prev_hist, history])
+    return history

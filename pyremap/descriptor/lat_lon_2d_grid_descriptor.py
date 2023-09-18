@@ -9,14 +9,13 @@
 # distributed with this code, or at
 # https://raw.githubusercontent.com/MPAS-Dev/pyremap/main/LICENSE
 
-import sys
-
 import netCDF4
 import numpy
 import xarray
 
 from pyremap.descriptor.mesh_descriptor import MeshDescriptor
 from pyremap.descriptor.utility import (
+    add_history,
     create_scrip,
     interp_extrap_corners_2d,
     round_res,
@@ -120,11 +119,7 @@ class LatLon2DGridDescriptor(MeshDescriptor):
         descriptor._set_coords(latVarName, lonVarName, ds[latVarName].dims[0],
                                ds[latVarName].dims[1])
 
-        if 'history' in ds.attrs:
-            descriptor.history = '\n'.join([ds.attrs['history'],
-                                            ' '.join(sys.argv[:])])
-        else:
-            descriptor.history = sys.argv[:]
+        descriptor.history = add_history(ds=ds)
         return descriptor
 
     def to_scrip(self, scripFileName):

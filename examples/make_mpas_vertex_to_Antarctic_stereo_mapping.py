@@ -19,9 +19,10 @@ Modify the grid name, the path to the MPAS grid file and the output grid
 resolution.
 """
 
-import xarray
+import numpy as np
+import xarray as xr
 
-from pyremap import MpasCellMeshDescriptor, Remapper, get_polar_descriptor
+from pyremap import MpasVertexMeshDescriptor, Remapper, get_polar_descriptor
 
 
 # replace with the MPAS mesh name
@@ -32,32 +33,34 @@ inGridName = 'oQU240'
 # https://web.lcrc.anl.gov/public/e3sm/inputdata/ocn/mpas-o/oQU240/ocean.QU.240km.151209.nc
 inGridFileName = 'ocean.QU.240km.151209.nc'
 
-inDescriptor = MpasCellMeshDescriptor(inGridFileName, inGridName)
+inDescriptor = MpasVertexMeshDescriptor(inGridFileName, inGridName)
 
 # modify the size and resolution of the Antarctic grid as desired
 outDescriptor = get_polar_descriptor(Lx=6000., Ly=5000., dx=10., dy=10.,
                                      projection='antarctic')
 outGridName = outDescriptor.meshName
 
-mappingFileName = f'map_{inGridName}_to_{outGridName}_bilinear.nc'
+mappingFileName = f'map_{inGridName}_vertex_to_{outGridName}_conserve.nc'
 
 remapper = Remapper(inDescriptor, outDescriptor, mappingFileName)
 
 # conservative remapping with 4 MPI tasks (using mpirun)
-remapper.build_mapping_file(method='bilinear', mpiTasks=4)
+remapper.build_mapping_file(method='conserve', mpiTasks=4,
+                            esmf_parallel_exec='mpirun', include_logs=True)
 
 # select the SST at the initial time as an example data set
-srcFileName = f'temp_{inGridName}.nc'
-ds = xarray.open_dataset(inGridFileName)
-dsOut = xarray.Dataset()
-dsOut['temperature'] = ds['temperature'].isel(nVertLevels=0, Time=0)
+srcFileName = f'vertex_id_{inGridName}.nc'
+ds = xr.open_dataset(inGridFileName)
+dsOut = xr.Dataset()
+dsOut['indexToVertexID'] = ds['indexToVertexID'].astype(float)
+dsOut['random'] = ('nVertices', np.random.random(ds.sizes['nVertices']))
 dsOut.to_netcdf(srcFileName)
 
 # do remapping with ncremap
-outFileName = f'temp_{outGridName}_file.nc'
+outFileName = f'vertex_id_{outGridName}_file.nc'
 remapper.remap_file(srcFileName, outFileName)
 
 # do remapping again, this time with python remapping
-outFileName = f'temp_{outGridName}_array.nc'
+outFileName = f'vertex_id_{outGridName}_array.nc'
 dsOut = remapper.remap(dsOut)
 dsOut.to_netcdf(outFileName)

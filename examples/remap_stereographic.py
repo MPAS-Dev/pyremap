@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 
-'''
+"""
 Creates a mapping file and remaps the variables from an input file on an
 Antarctic grid to another grid with the same extent but a different resolution.
 The mapping file can be used with ncremap (NCO) to remap MPAS files between
 these same gridss.
 
 Usage: Copy this script into the main MPAS-Analysis directory (up one level).
-'''
+"""
 
 import numpy
 import xarray
@@ -33,7 +33,7 @@ args = parser.parse_args()
 
 
 if args.method not in ['bilinear', 'neareststod', 'conserve']:
-    raise ValueError('Unexpected method {}'.format(args.method))
+    raise ValueError(f'Unexpected method {args.method}')
 
 dsIn = xarray.open_dataset(args.inFileName)
 
@@ -43,7 +43,7 @@ dx = int((x[1]-x[0])/1000.)
 Lx = int((x[-1] - x[0])/1000.)
 Ly = int((y[-1] - y[0])/1000.)
 
-inMeshName = '{}x{}km_{}km_Antarctic_stereo'.format(Lx, Ly, dx)
+inMeshName = f'{Lx}x{Ly}km_{dx}km_Antarctic_stereo'
 
 projection = get_antarctic_stereographic_projection()
 
@@ -58,13 +58,12 @@ xOut = x[0] + outRes*numpy.arange(nxOut)
 yOut = y[0] + outRes*numpy.arange(nyOut)
 
 
-outMeshName = '{}x{}km_{}km_Antarctic_stereo'.format(Lx, Ly, args.resolution)
+outMeshName = f'{Lx}x{Ly}km_{args.resolution}km_Antarctic_stereo'
 
 outDescriptor = ProjectionGridDescriptor.create(projection, xOut, yOut,
                                                 outMeshName)
 
-mappingFileName = 'map_{}_to_{}_{}.nc'.format(inMeshName, outMeshName,
-                                              args.method)
+mappingFileName = f'map_{inMeshName}_to_{outMeshName}_{args.method}.nc'
 
 remapper = Remapper(inDescriptor, outDescriptor, mappingFileName)
 

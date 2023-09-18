@@ -25,8 +25,9 @@ from scipy.sparse import csr_matrix
 from pyremap.descriptor import (
     LatLon2DGridDescriptor,
     LatLonGridDescriptor,
+    MpasCellMeshDescriptor,
     MpasEdgeMeshDescriptor,
-    MpasMeshDescriptor,
+    MpasVertexMeshDescriptor,
     PointCollectionDescriptor,
     ProjectionGridDescriptor,
 )
@@ -74,14 +75,14 @@ class Remapper(object):
             raise TypeError("sourceDescriptor of type "
                             "PointCollectionDescriptor is not supported.")
         if not isinstance(sourceDescriptor,
-                          (MpasMeshDescriptor, MpasEdgeMeshDescriptor,
-                           LatLonGridDescriptor,
+                          (MpasCellMeshDescriptor, MpasEdgeMeshDescriptor,
+                           MpasVertexMeshDescriptor, LatLonGridDescriptor,
                            LatLon2DGridDescriptor, ProjectionGridDescriptor)):
             raise TypeError("sourceDescriptor is not of a recognized type.")
 
         if not isinstance(destinationDescriptor,
-                          (MpasMeshDescriptor, MpasEdgeMeshDescriptor,
-                           LatLonGridDescriptor,
+                          (MpasCellMeshDescriptor, MpasEdgeMeshDescriptor,
+                           MpasVertexMeshDescriptor, LatLonGridDescriptor,
                            LatLon2DGridDescriptor, ProjectionGridDescriptor,
                            PointCollectionDescriptor)):
             raise TypeError(
@@ -96,7 +97,8 @@ class Remapper(object):
     def build_mapping_file(self, method='bilinear',  # noqa: C901
                            additionalArgs=None, logger=None, mpiTasks=1,
                            tempdir=None, esmf_path=None,
-                           esmf_parallel_exec=None, extrap_method=None):
+                           esmf_parallel_exec=None, extrap_method=None,
+                           include_logs=False):
         """
         Given a source file defining either an MPAS mesh or a lat-lon grid and
         a destination file or set of arrays defining a lat-lon grid, constructs
@@ -137,6 +139,9 @@ class Remapper(object):
         extrap_method : {'neareststod', 'nearestidavg','creep'}, optional
             The method used to extrapolate unmapped destination locations
 
+        include_logs : bool, optional
+            Whether to include log files from ``ESMF_RegridWeightGen``
+
         Raises
         ------
         OSError
@@ -152,9 +157,8 @@ class Remapper(object):
         if isinstance(self.destinationDescriptor,
                       PointCollectionDescriptor) and \
                 method not in ['bilinear', 'neareststod']:
-            raise ValueError("method {} not supported for destination "
-                             "grid of type PointCollectionDescriptor."
-                             "".format(method))
+            raise ValueError(f'method {method} not supported for destination '
+                             f'grid of type PointCollectionDescriptor.')
 
         if self.mappingFileName is None or \
                 os.path.exists(self.mappingFileName):
@@ -182,66 +186,25 @@ class Remapper(object):
         else:
             tempobj = None
 
-        sourceFileName = '{}/src_mesh.nc'.format(tempdir)
-        destinationFileName = '{}/dst_mesh.nc'.format(tempdir)
+        sourceFileName = f'{tempdir}/src_mesh.nc'
+        destinationFileName = f'{tempdir}/dst_mesh.nc'
 
-        src_loc = 'center'
-        src_file_format = 'scrip'
-        if isinstance(self.sourceDescriptor,
-                      (MpasMeshDescriptor, MpasEdgeMeshDescriptor)):
-            src_file_format = 'esmf'
+        self.sourceDescriptor.to_scrip(sourceFileName)
 
-        if isinstance(self.sourceDescriptor, MpasMeshDescriptor) and \
-                self.sourceDescriptor.vertices:
-            if 'conserve' in method:
-                raise ValueError('Can\'t remap from MPAS vertices with '
-                                 'conservative methods')
-            src_loc = 'corner'
-
-        dst_loc = 'center'
-        dst_file_format = 'scrip'
-        if isinstance(self.destinationDescriptor,
-                      (MpasMeshDescriptor, MpasEdgeMeshDescriptor)):
-            dst_file_format = 'esmf'
-
-        if isinstance(self.destinationDescriptor, MpasMeshDescriptor) and \
-                self.destinationDescriptor.vertices:
-            if 'conserve' in method:
-                raise ValueError('Can\'t remap to MPAS vertices with '
-                                 'conservative methods')
-            dst_loc = 'corner'
-
-        if src_file_format == 'scrip':
-            self.sourceDescriptor.to_scrip(sourceFileName)
-        elif src_file_format == 'esmf':
-            self.sourceDescriptor.to_esmf(sourceFileName)
-        else:
-            raise ValueError('Unexpected file format {}'.format(
-                src_file_format))
-
-        if dst_file_format == 'scrip':
-            self.destinationDescriptor.to_scrip(destinationFileName)
-        elif dst_file_format == 'esmf':
-            self.destinationDescriptor.to_esmf(destinationFileName)
-        else:
-            raise ValueError('Unexpected file format {}'.format(
-                dst_file_format))
+        self.destinationDescriptor.to_scrip(destinationFileName)
 
         args = [rwgPath,
                 '--source', sourceFileName,
                 '--destination', destinationFileName,
                 '--weight', self.mappingFileName,
                 '--method', method,
-                '--netcdf4',
-                '--no_log']
+                '--netcdf4']
+
+        if not include_logs:
+            args.extend(['--no_log'])
 
         if extrap_method is not None:
             args.extend(['--extrap_method', extrap_method])
-
-        if src_file_format == 'esmf':
-            args.extend(['--src_loc', src_loc])
-        if dst_file_format == 'esmf':
-            args.extend(['--dst_loc', dst_loc])
 
         parallel_args = []
 
@@ -250,10 +213,10 @@ class Remapper(object):
             parallel_args = esmf_parallel_exec.split(' ')
 
             if 'srun' in esmf_parallel_exec:
-                parallel_args.extend(['-n', '{}'.format(mpiTasks)])
+                parallel_args.extend(['-n', f'{mpiTasks}'])
             else:
                 # presume mpirun syntax
-                parallel_args.extend(['-np', '{}'.format(mpiTasks)])
+                parallel_args.extend(['-np', f'{mpiTasks}'])
 
         elif 'CONDA_PREFIX' in os.environ and mpiTasks > 1:
             # this is a conda environment, so we need to find out if esmf
@@ -265,14 +228,13 @@ class Remapper(object):
 
             if 'mpi_mpich' in build_string or 'mpi_openmpi' in build_string:
                 # esmf was installed with MPI, so we should use mpirun
-                mpirun_path = '{}/bin/mpirun'.format(
-                    os.environ['CONDA_PREFIX'])
-                parallel_args = [mpirun_path, '-np', '{}'.format(mpiTasks)]
+                mpirun_path = f'{os.environ["CONDA_PREFIX"]}/bin/mpirun'
+                parallel_args = [mpirun_path, '-np', f'{mpiTasks}']
             else:
                 # esmf was installed without MPI, so we shouldn't try to
                 # use it
-                warnings.warn('Requesting {} MPI tasks but the MPI version'
-                              ' of ESMF is not installed'.format(mpiTasks))
+                warnings.warn(f'Requesting {mpiTasks} MPI tasks but the MPI '
+                              f'version of ESMF is not installed')
 
         args = parallel_args + args
 
@@ -379,10 +341,10 @@ class Remapper(object):
         # Xylar Asay-Davis
 
         if self.mappingFileName is None:
-            raise ValueError('No mapping file was given because remapping is '
-                             'not necessary. The calling\n'
-                             'code should simply use the constents of {} '
-                             'directly.'.format(inFileName))
+            raise ValueError(f'No mapping file was given because remapping is '
+                             f'not necessary. The calling\n'
+                             f'code should simply use the constents of '
+                             f'{inFileName} directly.')
 
         if not overwrite and os.path.exists(outFileName):
             # a remapped file already exists, so nothing to do
@@ -411,22 +373,22 @@ class Remapper(object):
 
         regridArgs = []
 
-        if isinstance(self.sourceDescriptor, MpasMeshDescriptor):
-            if self.sourceDescriptor.vertices:
-                regridArgs.extend(['--rgr col_nm=nVertices'])
-            else:
-                args.extend(['-P', 'mpas'])
-                if not replaceMpasFill:
-                    # the -C (climatology) flag prevents ncremap from trying to
-                    # add a _FillValue attribute that might already be present
-                    # and quits with an error
-                    args.append('-C')
+        if isinstance(self.sourceDescriptor, (MpasCellMeshDescriptor,
+                                              MpasEdgeMeshDescriptor,
+                                              MpasVertexMeshDescriptor)):
+            args.extend(['-P', 'mpas'])
+            if not replaceMpasFill:
+                # the -C (climatology) flag prevents ncremap from trying to
+                # add a _FillValue attribute that might already be present
+                # and quits with an error
+                args.append('-C')
 
         if isinstance(self.sourceDescriptor, MpasEdgeMeshDescriptor):
             regridArgs.extend(['--rgr col_nm=nEdges'])
 
-        if isinstance(self.sourceDescriptor,
-                      (MpasMeshDescriptor, MpasEdgeMeshDescriptor)) and \
+        if isinstance(self.sourceDescriptor, (MpasCellMeshDescriptor,
+                                              MpasEdgeMeshDescriptor,
+                                              MpasVertexMeshDescriptor)) and \
                 renormalize is not None:
             # we also want to make sure cells that receive no data are
             # marked with fill values, even if the source MPAS data
@@ -437,31 +399,28 @@ class Remapper(object):
             args.extend(['-v', ','.join(variableList)])
 
         if renormalize is not None:
-            regridArgs.append('--renormalize={}'.format(renormalize))
+            regridArgs.append(f'--renormalize={renormalize}')
 
         if isinstance(self.sourceDescriptor, LatLonGridDescriptor):
-            regridArgs.extend(['--rgr lat_nm={}'.format(
-                self.sourceDescriptor.latVarName),
-                '--rgr lon_nm={}'.format(
-                self.sourceDescriptor.lonVarName)])
+            regridArgs.extend(
+                [f'--rgr lat_nm={self.sourceDescriptor.latVarName}',
+                 f'--rgr lon_nm={self.sourceDescriptor.lonVarName}'])
         elif isinstance(self.sourceDescriptor, ProjectionGridDescriptor):
-            regridArgs.extend(['--rgr lat_nm={}'.format(
-                self.sourceDescriptor.yVarName),
-                '--rgr lon_nm={}'.format(
-                self.sourceDescriptor.xVarName)])
+            regridArgs.extend(
+                [f'--rgr lat_nm={self.sourceDescriptor.yVarName}',
+                 f'--rgr lon_nm={self.sourceDescriptor.xVarName}'])
 
         if isinstance(self.destinationDescriptor, LatLonGridDescriptor):
-            regridArgs.extend([
-                f'--rgr lat_nm_out={self.destinationDescriptor.latVarName}',
-                f'--rgr lon_nm_out={self.destinationDescriptor.lonVarName}',
-                f'--rgr lat_dmn_nm={self.destinationDescriptor.latVarName}',
-                f'--rgr lon_dmn_nm={self.destinationDescriptor.lonVarName}'])
+            regridArgs.extend(
+                [f'--rgr lat_nm_out={self.destinationDescriptor.latVarName}',
+                 f'--rgr lon_nm_out={self.destinationDescriptor.lonVarName}',
+                 f'--rgr lat_dmn_nm={self.destinationDescriptor.latVarName}',
+                 f'--rgr lon_dmn_nm={self.destinationDescriptor.lonVarName}'])
         elif isinstance(self.destinationDescriptor, ProjectionGridDescriptor):
-            regridArgs.extend(['--rgr lat_dmn_nm={}'.format(
-                self.destinationDescriptor.yVarName),
-                '--rgr lon_dmn_nm={}'.format(
-                self.destinationDescriptor.xVarName),
-                '--rgr lat_nm_out=lat', '--rgr lon_nm_out=lon'])
+            regridArgs.extend(
+                [f'--rgr lat_dmn_nm={self.destinationDescriptor.yVarName}',
+                 f'--rgr lon_dmn_nm={self.destinationDescriptor.xVarName}',
+                 '--rgr lat_nm_out=lat', '--rgr lon_nm_out=lon'])
         if isinstance(self.destinationDescriptor, PointCollectionDescriptor):
             regridArgs.extend(['--rgr lat_nm_out=lat', '--rgr lon_nm_out=lon'])
 
@@ -550,10 +509,10 @@ class Remapper(object):
 
         for index, dim in enumerate(self.sourceDescriptor.dims):
             if self.src_grid_dims[index] != ds.sizes[dim]:
-                raise ValueError('data set and remapping source dimension {} '
-                                 'don\'t have the same size: {} != {}'.format(
-                                     dim, self.src_grid_dims[index],
-                                     ds.sizes[dim]))
+                raise ValueError(
+                    f'data set and remapping source dimension {dim} don\'t '
+                    f'have the same size: {self.src_grid_dims[index]} != '
+                    f'{ds.sizes[dim]}')
 
         if isinstance(ds, xr.DataArray):
             remappedDs = self._remap_data_array(ds, renormalizationThreshold)
@@ -605,13 +564,13 @@ class Remapper(object):
         # check that the mapping file has the right number of dimensions
         if nSourceDims != src_grid_rank or \
                 nDestinationDims != dst_grid_rank:
-            raise ValueError('The number of source and/or '
-                             'destination dimensions does not\n'
-                             'match the expected number of source and '
-                             'destination dimensions in the mapping\n'
-                             'file. {} != {} and/or {} != {}'.format(
-                                 nSourceDims, src_grid_rank,
-                                 nDestinationDims, dst_grid_rank))
+            raise ValueError(
+                f'The number of source and/or destination dimensions does not '
+                f'match the expected \n'
+                f'number of source and destination dimensions in the mapping '
+                f'file. \n'
+                f'{nSourceDims} != {src_grid_rank} and/or {nDestinationDims} '
+                f'!= {dst_grid_rank}')
 
         # grid dimensions need to be reversed because they are in Fortran order
         self.src_grid_dims = dsMapping['src_grid_dims'].values[::-1]
@@ -623,17 +582,19 @@ class Remapper(object):
             dimSize = self.sourceDescriptor.dimSize[index]
             checkDimSize = self.src_grid_dims[index]
             if dimSize != checkDimSize:
-                raise ValueError('source mesh descriptor and remapping source '
-                                 'dimension {} don\'t have the same size: \n'
-                                 '{} != {}'.format(dim, dimSize, checkDimSize))
+                raise ValueError(
+                    f'source mesh descriptor and remapping source dimension '
+                    f'{dim} don\'t have the same size: \n'
+                    f'{dimSize} != {checkDimSize}')
         for index in range(len(self.destinationDescriptor.dims)):
             dim = self.destinationDescriptor.dims[index]
             dimSize = self.destinationDescriptor.dimSize[index]
             checkDimSize = self.dst_grid_dims[index]
             if dimSize != checkDimSize:
-                raise ValueError('dest. mesh descriptor and remapping dest. '
-                                 'dimension {} don\'t have the same size: \n'
-                                 '{} != {}'.format(dim, dimSize, checkDimSize))
+                raise ValueError(
+                    f'dest. mesh descriptor and remapping dest. dimension '
+                    f'{dim} don\'t have the same size: \n'
+                    f'{dimSize} != {checkDimSize}')
 
         self.frac_b = dsMapping['frac_b'].values
 
@@ -791,6 +752,6 @@ def _print_running(args, fn):
     print_args = []
     for arg in args:
         if ' ' in arg:
-            arg = '"{}"'.format(arg)
+            arg = f'"{arg}"'
         print_args.append(arg)
-    fn('running: {}'.format(' '.join(print_args)))
+    fn(f'running: {" ".join(print_args)}')
