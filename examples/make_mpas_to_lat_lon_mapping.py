@@ -10,18 +10,18 @@
 # distributed with this code, or at
 # https://raw.githubusercontent.com/MPAS-Dev/pyremap/main/LICENSE
 
-'''
+"""
 Creates a mapping file that can be used with ncremap (NCO) to remap MPAS files
 to a latitude/longitude grid.
 
 Usage: Copy this script into the main MPAS-Analysis directory (up one level).
 Modify the grid name, the path to the MPAS grid file and the output grid
 resolution.
-'''
+"""
 
 import xarray
 
-from pyremap import MpasMeshDescriptor, Remapper, get_lat_lon_descriptor
+from pyremap import MpasCellMeshDescriptor, Remapper, get_lat_lon_descriptor
 
 # replace with the MPAS mesh name
 inGridName = 'oQU240'
@@ -31,20 +31,20 @@ inGridName = 'oQU240'
 # https://web.lcrc.anl.gov/public/e3sm/inputdata/ocn/mpas-o/oQU240/ocean.QU.240km.151209.nc
 inGridFileName = 'ocean.QU.240km.151209.nc'
 
-inDescriptor = MpasMeshDescriptor(inGridFileName, inGridName)
+inDescriptor = MpasCellMeshDescriptor(inGridFileName, inGridName)
 
 # modify the resolution of the global lat-lon grid as desired
 outDescriptor = get_lat_lon_descriptor(dLon=0.5, dLat=0.5)
 outGridName = outDescriptor.meshName
 
-mappingFileName = 'map_{}_to_{}_bilinear.nc'.format(inGridName, outGridName)
+mappingFileName = f'map_{inGridName}_to_{outGridName}_bilinear.nc'
 
 
 remapper = Remapper(inDescriptor, outDescriptor, mappingFileName)
 
 remapper.build_mapping_file(method='bilinear', mpiTasks=1)
 
-outFileName = 'temp_{}.nc'.format(outGridName)
+outFileName = f'temp_{outGridName}.nc'
 ds = xarray.open_dataset(inGridFileName)
 dsOut = xarray.Dataset()
 dsOut['temperature'] = ds['temperature']
