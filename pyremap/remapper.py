@@ -98,7 +98,8 @@ class Remapper(object):
                            additionalArgs=None, logger=None, mpiTasks=1,
                            tempdir=None, esmf_path=None,
                            esmf_parallel_exec=None, extrap_method=None,
-                           include_logs=False):
+                           include_logs=False, expandDist=None,
+                           expandFactor=None):
         """
         Given a source file defining either an MPAS mesh or a lat-lon grid and
         a destination file or set of arrays defining a lat-lon grid, constructs
@@ -142,6 +143,16 @@ class Remapper(object):
         include_logs : bool, optional
             Whether to include log files from ``ESMF_RegridWeightGen``
 
+        expandDist : float, optional
+            A distance in meters to expand each cell of the destination mesh
+            outward from the center.  This can be used to smooth fields on
+            the destination grid.
+
+        expandFactor : float, optional
+            A factor by which to expand each cell of the destination mesh
+            outward from the center.  This can be used to smooth fields on
+            the destination grid.
+
         Raises
         ------
         OSError
@@ -159,6 +170,11 @@ class Remapper(object):
                 method not in ['bilinear', 'neareststod']:
             raise ValueError(f'method {method} not supported for destination '
                              f'grid of type PointCollectionDescriptor.')
+
+        if (expandFactor is not None or expandDist is not None) and \
+                method != 'conserve':
+            raise ValueError('expandFactor and expandDist only have an impact '
+                             'with method=conserve')
 
         if self.mappingFileName is None or \
                 os.path.exists(self.mappingFileName):
@@ -191,7 +207,9 @@ class Remapper(object):
 
         self.sourceDescriptor.to_scrip(sourceFileName)
 
-        self.destinationDescriptor.to_scrip(destinationFileName)
+        self.destinationDescriptor.to_scrip(destinationFileName,
+                                            expandDist=expandDist,
+                                            expandFactor=expandFactor)
 
         args = [rwgPath,
                 '--source', sourceFileName,

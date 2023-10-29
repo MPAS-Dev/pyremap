@@ -17,6 +17,7 @@ from pyremap.descriptor.mesh_descriptor import MeshDescriptor
 from pyremap.descriptor.utility import (
     add_history,
     create_scrip,
+    expand_scrip,
     interp_extrap_corners_2d,
     round_res,
     unwrap_corners,
@@ -122,7 +123,7 @@ class LatLon2DGridDescriptor(MeshDescriptor):
         descriptor.history = add_history(ds=ds)
         return descriptor
 
-    def to_scrip(self, scripFileName):
+    def to_scrip(self, scripFileName, expandDist=None, expandFactor=None):
         """
         Create a SCRIP file based on the grid.
 
@@ -130,6 +131,13 @@ class LatLon2DGridDescriptor(MeshDescriptor):
         ----------
         scripFileName : str
             The path to which the SCRIP file should be written
+
+        expandDist : float, optional
+            A distance in meters to expand each grid cell outward from the
+            center
+
+        expandFactor : float, optional
+            A factor by which to expand each grid cell outward from the center
         """
         outFile = netCDF4.Dataset(scripFileName, 'w', format=self.format)
 
@@ -149,6 +157,9 @@ class LatLon2DGridDescriptor(MeshDescriptor):
             unwrap_corners(self.latCorner)
         outFile.variables['grid_corner_lon'][:] = \
             unwrap_corners(self.lonCorner)
+
+        if expandDist is not None or expandFactor is not None:
+            expand_scrip(outFile, expandDist, expandFactor)
 
         setattr(outFile, 'history', self.history)
 
