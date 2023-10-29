@@ -61,7 +61,7 @@ class MeshDescriptor:
         self.format = 'NETCDF4'
         self.engine = None
 
-    def to_scrip(self, scripFileName):
+    def to_scrip(self, scripFileName, expandDist=None, expandFactor=None):
         """
         Subclasses should overload this method to write a SCRIP file based on
         the mesh.
@@ -70,6 +70,13 @@ class MeshDescriptor:
         ----------
         scripFileName : str
             The path to which the SCRIP file should be written
+
+        expandDist : float, optional
+            A distance in meters to expand each grid cell outward from the
+            center
+
+        expandFactor : float, optional
+            A factor by which to expand each grid cell outward from the center
         """
         raise NotImplementedError(
             'to_scrip is not implemented for this descriptor')

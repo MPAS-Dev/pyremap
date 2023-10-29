@@ -14,7 +14,7 @@ import numpy as np
 import xarray as xr
 
 from pyremap.descriptor.mesh_descriptor import MeshDescriptor
-from pyremap.descriptor.utility import add_history, create_scrip
+from pyremap.descriptor.utility import add_history, create_scrip, expand_scrip
 
 
 class MpasEdgeMeshDescriptor(MeshDescriptor):
@@ -70,7 +70,7 @@ class MpasEdgeMeshDescriptor(MeshDescriptor):
 
             self.history = add_history(ds=ds)
 
-    def to_scrip(self, scripFileName):
+    def to_scrip(self, scripFileName, expandDist=None, expandFactor=None):
         """
         Given an MPAS mesh file, create a SCRIP file based on the mesh.
 
@@ -78,6 +78,13 @@ class MpasEdgeMeshDescriptor(MeshDescriptor):
         ----------
         scripFileName : str
             The path to which the SCRIP file should be written
+
+        expandDist : float, optional
+            A distance in meters to expand each grid cell outward from the
+            center
+
+        expandFactor : float, optional
+            A factor by which to expand each grid cell outward from the center
         """
 
         inFile = netCDF4.Dataset(self.fileName, 'r')
@@ -145,6 +152,9 @@ class MpasEdgeMeshDescriptor(MeshDescriptor):
 
         outFile.variables['grid_corner_lat'][:] = grid_corner_lat[:]
         outFile.variables['grid_corner_lon'][:] = grid_corner_lon[:]
+
+        if expandDist is not None or expandFactor is not None:
+            expand_scrip(outFile, expandDist, expandFactor)
 
         setattr(outFile, 'history', self.history)
 

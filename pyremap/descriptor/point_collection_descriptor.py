@@ -77,7 +77,7 @@ class PointCollectionDescriptor(MeshDescriptor):
         self.dimSize = [len(self.lat)]
         self.history = add_history()
 
-    def to_scrip(self, scripFileName):
+    def to_scrip(self, scripFileName, expandDist=None, expandFactor=None):
         """
         Given an MPAS mesh file, create a SCRIP file based on the mesh.
 
@@ -85,6 +85,13 @@ class PointCollectionDescriptor(MeshDescriptor):
         ----------
         scripFileName : str
             The path to which the SCRIP file should be written
+
+        expandDist : float, optional
+            A distance in meters to expand each grid cell outward from the
+            center
+
+        expandFactor : float, optional
+            A factor by which to expand each grid cell outward from the center
         """
 
         outFile = netCDF4.Dataset(scripFileName, 'w', format=self.format)
