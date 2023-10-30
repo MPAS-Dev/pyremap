@@ -123,12 +123,6 @@ def expand_scrip(outFile, expandDist, expandFactor):
 
     radians = 'rad' in outFile.variables['grid_center_lat'].units
 
-    print(radians)
-
-    for index in range(grid_corners):
-        print(index)
-        print(grid_corner_lon[0, index], grid_corner_lat[0, index])
-
     trans_lon_lat_to_xyz = Transformer.from_crs(4979, 4978, always_xy=True)
     x_center, y_center, z_center = trans_lon_lat_to_xyz.transform(
         grid_center_lon, grid_center_lat, numpy.zeros(grid_size),
@@ -145,29 +139,18 @@ def expand_scrip(outFile, expandDist, expandFactor):
         expandDist = 0.
 
     for index in range(grid_corners):
-        print(index)
-        print(x_corner[0, index], y_corner[0, index], z_corner[0, index])
-        print(x_center[0], y_center[0], z_center[0])
         dx = x_corner[:, index] - x_center
         dy = y_corner[:, index] - y_center
         dz = z_corner[:, index] - z_center
-        print(dx[0], dy[0], dz[0])
         dist = numpy.sqrt(dx**2 + dy**2 + dz**2)
-        print(dist[0])
         factor = (expandFactor * dist + expandDist) / dist
-        print(factor[0])
         x_corner[:, index] = factor * dx + x_center
         y_corner[:, index] = factor * dy + y_center
         z_corner[:, index] = factor * dz + z_center
-        print(x_corner[0, index], y_corner[0, index], z_corner[0, index])
 
     grid_corner_lon, grid_corner_lat, _ = trans_lon_lat_to_xyz.transform(
         x_corner, y_corner, z_corner, radians=radians,
         direction=pyproj.enums.TransformDirection.INVERSE)
-
-    for index in range(grid_corners):
-        print(index)
-        print(grid_corner_lon[0, index], grid_corner_lat[0, index])
 
     outFile.variables['grid_corner_lat'][:] = grid_corner_lat[:]
     outFile.variables['grid_corner_lon'][:] = grid_corner_lon[:]
