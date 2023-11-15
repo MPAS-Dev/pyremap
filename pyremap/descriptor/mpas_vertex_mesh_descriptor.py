@@ -79,12 +79,13 @@ class MpasVertexMeshDescriptor(MeshDescriptor):
         scripFileName : str
             The path to which the SCRIP file should be written
 
-        expandDist : float, optional
+        expandDist : float or numpy.ndarray, optional
             A distance in meters to expand each grid cell outward from the
-            center
+            center.  If a ``numpy.ndarray``, one value per cell.
 
-        expandFactor : float, optional
-            A factor by which to expand each grid cell outward from the center
+        expandFactor : float or numpy.ndarray, optional
+            A factor by which to expand each grid cell outward from the center.
+            If a ``numpy.ndarray``, one value per cell.
         """
 
         inFile = netCDF4.Dataset(self.fileName, 'r')
