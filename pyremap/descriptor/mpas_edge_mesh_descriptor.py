@@ -66,7 +66,7 @@ class MpasEdgeMeshDescriptor(MeshDescriptor):
                                        'data': ds.lonEdge.values,
                                        'attrs': {'units': 'radians'}}}
             self.dims = ['nEdges']
-            self.dimSize = [ds.dims[dim] for dim in self.dims]
+            self.dimSize = [ds.sizes[dim] for dim in self.dims]
 
             self.history = add_history(ds=ds)
 

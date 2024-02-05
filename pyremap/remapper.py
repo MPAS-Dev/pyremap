@@ -571,13 +571,13 @@ class Remapper(object):
             return
 
         dsMapping = xr.open_dataset(self.mappingFileName)
-        n_a = dsMapping.dims['n_a']
-        n_b = dsMapping.dims['n_b']
+        n_a = dsMapping.sizes['n_a']
+        n_b = dsMapping.sizes['n_b']
 
         nSourceDims = len(self.sourceDescriptor.dims)
-        src_grid_rank = dsMapping.dims['src_grid_rank']
+        src_grid_rank = dsMapping.sizes['src_grid_rank']
         nDestinationDims = len(self.destinationDescriptor.dims)
-        dst_grid_rank = dsMapping.dims['dst_grid_rank']
+        dst_grid_rank = dsMapping.sizes['dst_grid_rank']
 
         # check that the mapping file has the right number of dimensions
         if nSourceDims != src_grid_rank or \

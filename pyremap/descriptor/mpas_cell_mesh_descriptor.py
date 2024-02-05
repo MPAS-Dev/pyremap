@@ -94,7 +94,7 @@ class MpasCellMeshDescriptor(MeshDescriptor):
                                            'data': ds.lonCell.values,
                                            'attrs': {'units': 'radians'}}}
                 self.dims = ['nCells']
-            self.dimSize = [ds.dims[dim] for dim in self.dims]
+            self.dimSize = [ds.sizes[dim] for dim in self.dims]
 
             self.history = add_history(ds=ds)
 
