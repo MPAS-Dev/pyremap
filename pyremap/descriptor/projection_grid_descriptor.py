@@ -183,12 +183,13 @@ class ProjectionGridDescriptor(MeshDescriptor):
         scripFileName : str
             The path to which the SCRIP file should be written
 
-        expandDist : float, optional
+        expandDist : float or numpy.ndarray, optional
             A distance in meters to expand each grid cell outward from the
-            center
+            center.  If a ``numpy.ndarray``, one value per cell.
 
-        expandFactor : float, optional
-            A factor by which to expand each grid cell outward from the center
+        expandFactor : float or numpy.ndarray, optional
+            A factor by which to expand each grid cell outward from the center.
+            If a ``numpy.ndarray``, one value per cell.
         """
         outFile = netCDF4.Dataset(scripFileName, 'w', format=self.format)
 

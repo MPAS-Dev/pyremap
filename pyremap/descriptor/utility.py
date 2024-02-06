@@ -107,12 +107,13 @@ def expand_scrip(outFile, expandDist, expandFactor):
     outFile : file pointer
         A SCRIP file opened in write mode
 
-    expandDist : float
+    expandDist : float or numpy.ndarray
         A distance in meters to expand each grid cell outward from the
-        center
+        center.  If a ``numpy.ndarray``, one value per cell.
 
-    expandFactor : float
-        A factor by which to expand each grid cell outward from the center
+    expandFactor : float or numpy.ndarray
+        A factor by which to expand each grid cell outward from the center.
+        If a ``numpy.ndarray``, one value per cell.
     """
     grid_center_lat = outFile.variables['grid_center_lat'][:]
     grid_center_lon = outFile.variables['grid_center_lon'][:]

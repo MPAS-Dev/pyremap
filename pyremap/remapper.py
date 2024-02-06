@@ -143,15 +143,17 @@ class Remapper(object):
         include_logs : bool, optional
             Whether to include log files from ``ESMF_RegridWeightGen``
 
-        expandDist : float, optional
+        expandDist : float or numpy.ndarray, optional
             A distance in meters to expand each cell of the destination mesh
             outward from the center.  This can be used to smooth fields on
-            the destination grid.
+            the destination grid.  If a ``numpy.ndarray``, one value per cell
+            on the destination mesh.
 
-        expandFactor : float, optional
+        expandFactor : float or numpy.ndarray, optional
             A factor by which to expand each cell of the destination mesh
             outward from the center.  This can be used to smooth fields on
-            the destination grid.
+            the destination grid.  If a ``numpy.ndarray``, one value per cell
+            on the destination mesh.
 
         Raises
         ------
