@@ -17,6 +17,7 @@ import warnings
 from distutils.spawn import find_executable
 from subprocess import check_output
 from tempfile import TemporaryDirectory
+from warnings import warn
 
 import numpy
 import xarray as xr
@@ -94,7 +95,68 @@ class Remapper(object):
 
         self.mappingLoaded = False
 
-    def build_mapping_file(self, method='bilinear',  # noqa: C901
+    def esmf_build_map(self, method='bilinear', logger=None, mpi_tasks=1,
+                       tempdir=None, parallel_exec=None, include_logs=False,
+                       expand_dist=None, expand_factor=None):
+        """
+        Use ``ESMF_RegridWeightGen`` to construct a mapping file used for
+        interpolation between the source and destination grids.
+
+        Parameters
+        ----------
+        method : {'bilinear', 'neareststod', 'conserve'}, optional
+            The method of interpolation used, see documentation for
+            ``ESMF_RegridWeightGen`` for details.
+
+        logger : ``logging.Logger``, optional
+            A logger to which ncclimo output should be redirected
+
+        mpi_tasks : int, optional
+            The number of MPI tasks (a number > 1 implies that
+            ``ESMF_RegridWeightGen`` will be called the given parallel
+            executable)
+
+        tempdir : str, optional
+            A temporary directory.  By default, a temporary directory is
+            created, typically in ``/tmp`` but on some systems such as compute
+            nodes this may not be visible to all processors in the subsequent
+            ``ESMF_RegridWeightGen`` call
+
+        parallel_exec : {'srun', 'mpirun'}, optional
+            The name of the parallel executable to use to launch ESMF tools.
+            By default, 'mpirun' from the conda environment is used
+
+        include_logs : bool, optional
+            Whether to include log files from ``ESMF_RegridWeightGen``
+
+        expand_dist : float or numpy.ndarray, optional
+            A distance in meters to expand each cell of the destination mesh
+            outward from the center.  This can be used to smooth fields on
+            the destination grid.  If a ``numpy.ndarray``, one value per cell
+            on the destination mesh.
+
+        expand_factor : float or numpy.ndarray, optional
+            A factor by which to expand each cell of the destination mesh
+            outward from the center.  This can be used to smooth fields on
+            the destination grid.  If a ``numpy.ndarray``, one value per cell
+            on the destination mesh.
+
+        Raises
+        ------
+        OSError
+            If ``ESMF_RegridWeightGen`` is not in the system path.
+
+        ValueError
+            If the type of mesh used in ``sourceDescriptor`` and/or
+            ``destinationDescriptor`` are not compatible with other arguments
+        """
+        self._esmf_build_map(method=method, logger=logger, mpi_tasks=mpi_tasks,
+                             tempdir=tempdir, parallel_exec=parallel_exec,
+                             include_logs=include_logs,
+                             expand_dist=expand_dist,
+                             expand_factor=expand_factor)
+
+    def build_mapping_file(self, method='bilinear',
                            additionalArgs=None, logger=None, mpiTasks=1,
                            tempdir=None, esmf_path=None,
                            esmf_parallel_exec=None, extrap_method=None,
@@ -167,144 +229,17 @@ class Remapper(object):
         # -------
         # Xylar Asay-Davis
 
-        if isinstance(self.destinationDescriptor,
-                      PointCollectionDescriptor) and \
-                method not in ['bilinear', 'neareststod']:
-            raise ValueError(f'method {method} not supported for destination '
-                             f'grid of type PointCollectionDescriptor.')
+        warn('build_mapping_file() is deprecated.  Use esmf_build_map() or '
+             'mbtempest_build_map() instead', DeprecationWarning, stacklevel=2)
 
-        if (expandFactor is not None or expandDist is not None) and \
-                method != 'conserve':
-            raise ValueError('expandFactor and expandDist only have an impact '
-                             'with method=conserve')
-
-        if self.mappingFileName is None or \
-                os.path.exists(self.mappingFileName):
-            # a valid weight file already exists, so nothing to do
-            return
-
-        if esmf_path is not None:
-            # use the system build of ESMF
-            rwgPath = os.path.join(esmf_path, 'bin', 'ESMF_RegridWeightGen')
-
-        else:
-            rwgPath = find_executable('ESMF_RegridWeightGen')
-
-            if rwgPath is None:
-                raise OSError('ESMF_RegridWeightGen not found. Make sure esmf '
-                              'package is installed: \n'
-                              'conda install esmf\n'
-                              'Note: this presumes use of the conda-forge '
-                              'channel.')
-
-        # Write source and destination SCRIP files in temporary locations
-        if tempdir is None:
-            tempobj = TemporaryDirectory()
-            tempdir = tempobj.name
-        else:
-            tempobj = None
-
-        sourceFileName = f'{tempdir}/src_mesh.nc'
-        destinationFileName = f'{tempdir}/dst_mesh.nc'
-
-        self.sourceDescriptor.to_scrip(sourceFileName)
-
-        self.destinationDescriptor.to_scrip(destinationFileName,
-                                            expandDist=expandDist,
-                                            expandFactor=expandFactor)
-
-        args = [rwgPath,
-                '--source', sourceFileName,
-                '--destination', destinationFileName,
-                '--weight', self.mappingFileName,
-                '--method', method,
-                '--netcdf4']
-
-        if not include_logs:
-            args.extend(['--no_log'])
-
-        if extrap_method is not None:
-            args.extend(['--extrap_method', extrap_method])
-
-        parallel_args = []
-
-        if esmf_parallel_exec is not None:
-            # use the specified parallel executable
-            parallel_args = esmf_parallel_exec.split(' ')
-
-            if 'srun' in esmf_parallel_exec:
-                parallel_args.extend(['-n', f'{mpiTasks}'])
-            else:
-                # presume mpirun syntax
-                parallel_args.extend(['-np', f'{mpiTasks}'])
-
-        elif 'CONDA_PREFIX' in os.environ and mpiTasks > 1:
-            # this is a conda environment, so we need to find out if esmf
-            # needs mpirun or not
-            conda_args = ['conda', 'list', 'esmf', '--json']
-            output = check_output(conda_args).decode("utf-8")
-            output = json.loads(output)
-            build_string = output[0]['build_string']
-
-            if 'mpi_mpich' in build_string or 'mpi_openmpi' in build_string:
-                # esmf was installed with MPI, so we should use mpirun
-                mpirun_path = f'{os.environ["CONDA_PREFIX"]}/bin/mpirun'
-                parallel_args = [mpirun_path, '-np', f'{mpiTasks}']
-            else:
-                # esmf was installed without MPI, so we shouldn't try to
-                # use it
-                warnings.warn(f'Requesting {mpiTasks} MPI tasks but the MPI '
-                              f'version of ESMF is not installed')
-
-        args = parallel_args + args
-
-        if self.sourceDescriptor.regional:
-            args.append('--src_regional')
-
-        if self.destinationDescriptor.regional:
-            args.append('--dst_regional')
-
-        if self.sourceDescriptor.regional or \
-                self.destinationDescriptor.regional:
-            args.append('--ignore_unmapped')
-
-        if additionalArgs is not None:
-            args.extend(additionalArgs)
-
-        if logger is None:
-            _print_running(args, fn=print)
-            # make sure any output is flushed before we add output from the
-            # subprocess
-            sys.stdout.flush()
-            sys.stderr.flush()
-
-            # throw out the standard output from ESMF_RegridWeightGen, as it's
-            # rather verbose but keep stderr
-            with open(os.devnull, 'wb') as DEVNULL:
-                subprocess.check_call(args, stdout=DEVNULL)
-
-        else:
-            _print_running(args, fn=logger.info)
-            for handler in logger.handlers:
-                handler.flush()
-
-            process = subprocess.Popen(args, stdout=subprocess.PIPE,
-                                       stderr=subprocess.PIPE)
-            stdout, stderr = process.communicate()
-
-            # throw out the standard output from ESMF_RegridWeightGen, as it's
-            # rather verbose but keep stderr
-            if stderr:
-                stderr = stderr.decode('utf-8')
-                for line in stderr.split('\n'):
-                    logger.error(line)
-
-            if process.returncode != 0:
-                raise subprocess.CalledProcessError(process.returncode,
-                                                    ' '.join(args))
-
-        if tempobj is not None:
-            tempobj.cleanup()
+        self._esmf_build_map(method=method, logger=logger, mpi_tasks=mpiTasks,
+                             tempdir=tempdir, parallel_exec=esmf_parallel_exec,
+                             include_logs=include_logs,
+                             expand_dist=expandDist,
+                             expand_factor=expandFactor,
+                             additional_args=additionalArgs,
+                             esmf_path=esmf_path,
+                             extrap_method=extrap_method)
 
     def remap_file(self, inFileName, outFileName,  # noqa: C901
                    variableList=None, overwrite=False, renormalize=None,
@@ -766,6 +701,176 @@ class Remapper(object):
         outField = numpy.transpose(outField, axes=unpermuteAxes)
 
         return outField
+
+    def _esmf_build_map(self, method, logger, mpi_tasks, tempdir,
+                        parallel_exec, include_logs, expand_dist,
+                        expand_factor, additional_args=None, esmf_path=None,
+                        extrap_method=None):
+        """
+        Use ``ESMF_RegridWeightGen`` to construct a mapping file used for
+        interpolation between the source and destination grids.
+        """
+
+        if self.mappingFileName is None or \
+                os.path.exists(self.mappingFileName):
+            # a valid weight file already exists, so nothing to do
+            return
+
+        self._validate_descriptors(method, expand_factor, expand_dist)
+
+        rwg_path = self._get_rwg_path(esmf_path)
+
+        # Write source and destination SCRIP files in temporary locations
+        if tempdir is None:
+            tempobj = TemporaryDirectory()
+            tempdir = tempobj.name
+        else:
+            tempobj = None
+
+        src_filename = f'{tempdir}/src_mesh.nc'
+        dst_filename = f'{tempdir}/dst_mesh.nc'
+
+        self.sourceDescriptor.to_scrip(src_filename)
+
+        self.destinationDescriptor.to_scrip(dst_filename,
+                                            expandDist=expand_dist,
+                                            expandFactor=expand_factor)
+
+        args = [rwg_path,
+                '--source', src_filename,
+                '--destination', dst_filename,
+                '--weight', self.mappingFileName,
+                '--method', method,
+                '--netcdf4']
+
+        if not include_logs:
+            args.extend(['--no_log'])
+
+        if extrap_method is not None:
+            args.extend(['--extrap_method', extrap_method])
+
+        parallel_args = self._get_parallel_args(parallel_exec, mpi_tasks,
+                                                conda_package='esmf')
+
+        regional_args = self._get_esmf_regional_args()
+
+        args = parallel_args + args + regional_args
+
+        if additional_args is not None:
+            args.extend(additional_args)
+
+        if logger is None:
+            _print_running(args, fn=print)
+            # make sure any output is flushed before we add output from the
+            # subprocess
+            sys.stdout.flush()
+            sys.stderr.flush()
+
+            # throw out the standard output from ESMF_RegridWeightGen, as it's
+            # rather verbose but keep stderr
+            with open(os.devnull, 'wb') as DEVNULL:
+                subprocess.check_call(args, stdout=DEVNULL)
+
+        else:
+            _print_running(args, fn=logger.info)
+            for handler in logger.handlers:
+                handler.flush()
+
+            process = subprocess.Popen(args, stdout=subprocess.PIPE,
+                                       stderr=subprocess.PIPE)
+            _, stderr = process.communicate()
+
+            # throw out the standard output from ESMF_RegridWeightGen, as it's
+            # rather verbose but keep stderr
+            if stderr:
+                stderr = stderr.decode('utf-8')
+                for line in stderr.split('\n'):
+                    logger.error(line)
+
+            if process.returncode != 0:
+                raise subprocess.CalledProcessError(process.returncode,
+                                                    ' '.join(args))
+
+        if tempobj is not None:
+            tempobj.cleanup()
+
+    def _validate_descriptors(self, method, expand_factor, expand_dist):
+
+        if isinstance(self.destinationDescriptor,
+                      PointCollectionDescriptor) and \
+                method not in ['bilinear', 'neareststod']:
+            raise ValueError(f'method {method} not supported for destination '
+                             f'grid of type PointCollectionDescriptor.')
+
+        if (expand_factor is not None or expand_dist is not None) and \
+                method != 'conserve':
+            raise ValueError('expandFactor and expandDist only have an impact '
+                             'with method=conserve')
+
+    def _get_rwg_path(self, esmf_path):
+
+        if esmf_path is not None:
+            # use the system build of ESMF
+            rwg_path = os.path.join(esmf_path, 'bin', 'ESMF_RegridWeightGen')
+
+        else:
+            rwg_path = find_executable('ESMF_RegridWeightGen')
+
+            if rwg_path is None:
+                raise OSError('ESMF_RegridWeightGen not found. Make sure esmf '
+                              'package is installed: \n'
+                              'conda install esmf\n'
+                              'Note: this presumes use of the conda-forge '
+                              'channel.')
+        return rwg_path
+
+    def _get_parallel_args(self, parallel_exec, mpi_tasks, conda_package):
+        parallel_args = []
+
+        if parallel_exec is not None:
+            # use the specified parallel executable
+            parallel_args = parallel_exec.split(' ')
+
+            if 'srun' in parallel_exec:
+                parallel_args.extend(['-n', f'{mpi_tasks}'])
+            else:
+                # presume mpirun syntax
+                parallel_args.extend(['-np', f'{mpi_tasks}'])
+
+        elif 'CONDA_PREFIX' in os.environ and mpi_tasks > 1:
+            # this is a conda environment, so we need to find out if the conda
+            # package needs mpirun or not
+            conda_args = ['conda', 'list', conda_package, '--json']
+            output = check_output(conda_args).decode("utf-8")
+            output = json.loads(output)
+            build_string = output[0]['build_string']
+
+            if 'mpi_mpich' in build_string or 'mpi_openmpi' in build_string:
+                # conda package was installed with MPI, so we should use mpirun
+                mpirun_path = f'{os.environ["CONDA_PREFIX"]}/bin/mpirun'
+                parallel_args = [mpirun_path, '-np', f'{mpi_tasks}']
+            else:
+                # conda package was installed without MPI, so we shouldn't try
+                # to use it
+                warnings.warn(f'Requesting {mpi_tasks} MPI tasks but the MPI '
+                              f'version of {conda_package} is not installed')
+        return parallel_args
+
+    def _get_esmf_regional_args(self):
+
+        regional_args = []
+
+        if self.sourceDescriptor.regional:
+            regional_args.append('--src_regional')
+
+        if self.destinationDescriptor.regional:
+            regional_args.append('--dst_regional')
+
+        if self.sourceDescriptor.regional or \
+                self.destinationDescriptor.regional:
+            regional_args.append('--ignore_unmapped')
+
+        return regional_args
 
 
 def _print_running(args, fn):
