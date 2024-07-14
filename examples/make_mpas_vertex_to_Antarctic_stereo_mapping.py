@@ -45,8 +45,8 @@ mappingFileName = f'map_{inGridName}_vertex_to_{outGridName}_conserve.nc'
 remapper = Remapper(inDescriptor, outDescriptor, mappingFileName)
 
 # conservative remapping with 4 MPI tasks (using mpirun)
-remapper.build_mapping_file(method='conserve', mpiTasks=4,
-                            esmf_parallel_exec='mpirun', include_logs=True)
+remapper.esmf_build_map(method='conserve', mpi_tasks=4,
+                        parallel_exec='mpirun', include_logs=True)
 
 # select the SST at the initial time as an example data set
 srcFileName = f'vertex_id_{inGridName}.nc'

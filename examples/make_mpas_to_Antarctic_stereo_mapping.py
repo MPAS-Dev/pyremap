@@ -44,7 +44,7 @@ mappingFileName = f'map_{inGridName}_to_{outGridName}_bilinear.nc'
 remapper = Remapper(inDescriptor, outDescriptor, mappingFileName)
 
 # conservative remapping with 4 MPI tasks (using mpirun)
-remapper.build_mapping_file(method='bilinear', mpiTasks=4)
+remapper.esmf_build_map(method='bilinear', mpi_tasks=4)
 
 # select the SST at the initial time as an example data set
 srcFileName = f'temp_{inGridName}.nc'
