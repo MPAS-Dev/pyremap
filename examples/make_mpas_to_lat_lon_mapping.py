@@ -42,7 +42,7 @@ mappingFileName = f'map_{inGridName}_to_{outGridName}_bilinear.nc'
 
 remapper = Remapper(inDescriptor, outDescriptor, mappingFileName)
 
-remapper.build_mapping_file(method='bilinear', mpiTasks=1)
+remapper.esmf_build_map(method='bilinear', mpi_tasks=1)
 
 outFileName = f'temp_{outGridName}.nc'
 ds = xarray.open_dataset(inGridFileName)

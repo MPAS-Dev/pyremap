@@ -39,9 +39,9 @@ dsIn = xarray.open_dataset(args.inFileName)
 
 x = dsIn.x.values
 y = dsIn.y.values
-dx = int((x[1]-x[0])/1000.)
-Lx = int((x[-1] - x[0])/1000.)
-Ly = int((y[-1] - y[0])/1000.)
+dx = int((x[1] - x[0]) / 1000.)
+Lx = int((x[-1] - x[0]) / 1000.)
+Ly = int((y[-1] - y[0]) / 1000.)
 
 inMeshName = f'{Lx}x{Ly}km_{dx}km_Antarctic_stereo'
 
@@ -49,13 +49,13 @@ projection = get_antarctic_stereographic_projection()
 
 inDescriptor = ProjectionGridDescriptor.create(projection, x, y, inMeshName)
 
-outRes = args.resolution*1e3
+outRes = args.resolution * 1e3
 
-nxOut = int((x[-1] - x[0])/outRes + 0.5) + 1
-nyOut = int((y[-1] - y[0])/outRes + 0.5) + 1
+nxOut = int((x[-1] - x[0]) / outRes + 0.5) + 1
+nyOut = int((y[-1] - y[0]) / outRes + 0.5) + 1
 
-xOut = x[0] + outRes*numpy.arange(nxOut)
-yOut = y[0] + outRes*numpy.arange(nyOut)
+xOut = x[0] + outRes * numpy.arange(nxOut)
+yOut = y[0] + outRes * numpy.arange(nyOut)
 
 
 outMeshName = f'{Lx}x{Ly}km_{args.resolution}km_Antarctic_stereo'
@@ -67,7 +67,7 @@ mappingFileName = f'map_{inMeshName}_to_{outMeshName}_{args.method}.nc'
 
 remapper = Remapper(inDescriptor, outDescriptor, mappingFileName)
 
-remapper.build_mapping_file(method=args.method, mpiTasks=args.mpiTasks)
+remapper.esmf_build_map(method=args.method, mpi_tasks=args.mpiTasks)
 
 dsOut = remapper.remap(dsIn, renormalizationThreshold=0.01)
 dsOut.to_netcdf(args.outFileName)
