@@ -58,7 +58,7 @@ class MeshDescriptor:
         self.dims = None
         self.dimSizes = None
         self.coords = None
-        self.format = 'NETCDF4'
+        self.format = 'NETCDF3_64BIT_OFFSET'
         self.engine = None
 
     def to_scrip(self, scripFileName, expandDist=None, expandFactor=None):
