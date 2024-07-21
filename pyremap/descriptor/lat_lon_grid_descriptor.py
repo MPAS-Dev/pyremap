@@ -244,68 +244,6 @@ class LatLonGridDescriptor(MeshDescriptor):
 
         outFile.close()
 
-    def to_esmf(self, esmfFileName):
-        """
-        Create an ESMF mesh file for the mesh
-
-        Parameters
-        ----------
-        esmfFileName : str
-            The path to which the ESMF mesh file should be written
-        """
-        nLat = len(self.lat)
-        nLon = len(self.lon)
-
-        (Lon, Lat) = numpy.meshgrid(self.lon, self.lat)
-        (LonCorner, LatCorner) = numpy.meshgrid(self.lonCorner, self.latCorner)
-        (XIndices, YIndices) = numpy.meshgrid(numpy.arange(nLon + 1),
-                                              numpy.arange(nLat + 1))
-
-        elementCount = nLon * nLat
-        nodeCount = (nLon + 1) * (nLat + 1)
-        coordDim = 2
-        maxNodePElement = 4
-
-        nodeCoords = numpy.zeros((nodeCount, coordDim))
-        nodeCoords[:, 0] = LonCorner.flat
-        nodeCoords[:, 1] = LatCorner.flat
-
-        centerCoords = numpy.zeros((elementCount, coordDim))
-        centerCoords[:, 0] = Lon.flat
-        centerCoords[:, 1] = Lat.flat
-
-        elementConn = numpy.zeros((elementCount, maxNodePElement), dtype=int)
-        elementConn[:, 0] = (XIndices[0:-1, 0:-1].ravel() +
-                             (nLon + 1) * YIndices[0:-1, 0:-1].ravel())
-        elementConn[:, 1] = (XIndices[0:-1, 1:].ravel() +
-                             (nLon + 1) * YIndices[0:-1, 1:].ravel())
-        elementConn[:, 2] = (XIndices[1:, 1:].ravel() +
-                             (nLon + 1) * YIndices[1:, 1:].ravel())
-        elementConn[:, 3] = (XIndices[1:, 0:-1].ravel() +
-                             (nLon + 1) * YIndices[1:, 0:-1].ravel())
-
-        ds_out = xarray.Dataset()
-        ds_out['nodeCoords'] = (('nodeCount', 'coordDim'), nodeCoords)
-        ds_out.nodeCoords.attrs['units'] = self.units
-        ds_out['centerCoords'] = \
-            (('elementCount', 'coordDim'), centerCoords)
-        ds_out.centerCoords.attrs['units'] = self.units
-        ds_out['elementConn'] = \
-            (('elementCount', 'maxNodePElement'), elementConn + 1)
-        ds_out.elementConn.attrs['start_index'] = 1
-        ds_out.elementConn.attrs['_FillValue'] = -1
-        ds_out['numElementConn'] = \
-            (('elementCount',), maxNodePElement * numpy.ones(elementCount,
-                                                             dtype=int))
-
-        ds_out['origGridDims'] = (('origGridRank',), [nLon, nLat])
-
-        ds_out.attrs['gridType'] = 'unstructured mesh'
-        ds_out.attrs['version'] = '0.9'
-
-        ds_out.to_netcdf(esmfFileName, format=self.format,
-                         engine=self.engine)
-
     def _set_coords(self, latVarName, lonVarName, latDimName,
                     lonDimName):
         """
