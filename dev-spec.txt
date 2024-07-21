@@ -5,6 +5,7 @@
 python >=3.8
 dask
 esmf
+moab=*=*_tempest_*
 nco >=4.8.1
 netcdf4
 numpy

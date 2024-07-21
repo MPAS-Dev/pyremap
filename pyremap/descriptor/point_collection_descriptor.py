@@ -11,7 +11,6 @@
 
 import netCDF4
 import numpy
-import xarray
 
 from pyremap.descriptor.mesh_descriptor import MeshDescriptor
 from pyremap.descriptor.utility import add_history, create_scrip
@@ -127,54 +126,3 @@ class PointCollectionDescriptor(MeshDescriptor):
         setattr(outFile, 'history', self.history)
 
         outFile.close()
-
-    def to_esmf(self, esmfFileName):
-        """
-        Create an ESMF mesh file for the mesh
-
-        Parameters
-        ----------
-        esmfFileName : str
-            The path to which the ESMF mesh file should be written
-        """
-        nPoints = len(self.lat)
-
-        elementCount = nPoints
-        nodeCount = 3 * nPoints
-        coordDim = 2
-        maxNodePElement = 3
-
-        nodeCoords = numpy.zeros((nodeCount, coordDim))
-        # just repeat the center lat and lon
-        for iVertex in range(maxNodePElement):
-            nodeCoords[iVertex::maxNodePElement, 0] = self.lon
-            nodeCoords[iVertex::maxNodePElement, 1] = self.lat
-
-        centerCoords = numpy.zeros((elementCount, coordDim))
-        centerCoords[:, 0] = self.lon
-        centerCoords[:, 1] = self.lat
-
-        elementConn = numpy.zeros((elementCount, maxNodePElement), dtype=int)
-        elementConn[:, 0] = maxNodePElement * numpy.arange(nPoints)
-        elementConn[:, 1] = maxNodePElement * numpy.arange(nPoints) + 1
-        elementConn[:, 2] = maxNodePElement * numpy.arange(nPoints) + 2
-
-        ds_out = xarray.Dataset()
-        ds_out['nodeCoords'] = (('nodeCount', 'coordDim'), nodeCoords)
-        ds_out.nodeCoords.attrs['units'] = self.units
-        ds_out['centerCoords'] = \
-            (('elementCount', 'coordDim'), centerCoords)
-        ds_out.centerCoords.attrs['units'] = self.units
-        ds_out['elementConn'] = \
-            (('elementCount', 'maxNodePElement'), elementConn + 1)
-        ds_out.elementConn.attrs['start_index'] = 1
-        ds_out.elementConn.attrs['_FillValue'] = -1
-        ds_out['numElementConn'] = \
-            (('elementCount',), maxNodePElement * numpy.ones(elementCount,
-                                                             dtype=int))
-
-        ds_out.attrs['gridType'] = 'unstructured mesh'
-        ds_out.attrs['version'] = '0.9'
-
-        ds_out.to_netcdf(esmfFileName, format=self.format,
-                         engine=self.engine)
