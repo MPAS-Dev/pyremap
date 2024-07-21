@@ -156,6 +156,63 @@ class Remapper(object):
                              expand_dist=expand_dist,
                              expand_factor=expand_factor)
 
+    def moab_build_map(self, method='bilinear', logger=None, mpi_tasks=1,
+                       tempdir=None, parallel_exec=None, expand_dist=None,
+                       expand_factor=None):
+        """
+        Use ``mbtempest`` to construct a mapping file used for interpolation
+        between the source and destination grids.
+
+        Parameters
+        ----------
+        method : {'bilinear', 'conserve'}, optional
+            The method of interpolation used, see documentation for
+            ``mbtempest`` for details.
+
+        logger : ``logging.Logger``, optional
+            A logger to which ncclimo output should be redirected
+
+        mpi_tasks : int, optional
+            The number of MPI tasks (a number > 1 implies that ``mbtempest``
+            will be called with the given parallel executable)
+
+        tempdir : str, optional
+            A temporary directory.  By default, a temporary directory is
+            created, typically in ``/tmp`` but on some systems such as compute
+            nodes this may not be visible to all processors in the subsequent
+            ``ESMF_RegridWeightGen`` call
+
+        parallel_exec : {'srun', 'mpirun'}, optional
+            The name of the parallel executable to use to launch ``mbtempest``.
+            By default, 'mpirun' from the conda environment is used
+
+        expand_dist : float or numpy.ndarray, optional
+            A distance in meters to expand each cell of the destination mesh
+            outward from the center.  This can be used to smooth fields on
+            the destination grid.  If a ``numpy.ndarray``, one value per cell
+            on the destination mesh.
+
+        expand_factor : float or numpy.ndarray, optional
+            A factor by which to expand each cell of the destination mesh
+            outward from the center.  This can be used to smooth fields on
+            the destination grid.  If a ``numpy.ndarray``, one value per cell
+            on the destination mesh.
+
+        Raises
+        ------
+        OSError
+            If ``mbtempest`` is not in the system path.
+
+        ValueError
+            If the type of mesh used in ``sourceDescriptor`` and/or
+            ``destinationDescriptor`` are not compatible with other arguments
+        """
+        self._moab_build_map(method=method, logger=logger,
+                             mpi_tasks=mpi_tasks,
+                             tempdir=tempdir, parallel_exec=parallel_exec,
+                             expand_dist=expand_dist,
+                             expand_factor=expand_factor)
+
     def build_mapping_file(self, method='bilinear',
                            additionalArgs=None, logger=None, mpiTasks=1,
                            tempdir=None, esmf_path=None,
@@ -230,7 +287,7 @@ class Remapper(object):
         # Xylar Asay-Davis
 
         warn('build_mapping_file() is deprecated.  Use esmf_build_map() or '
-             'mbtempest_build_map() instead', DeprecationWarning, stacklevel=2)
+             'moab_build_map() instead', DeprecationWarning, stacklevel=2)
 
         self._esmf_build_map(method=method, logger=logger, mpi_tasks=mpiTasks,
                              tempdir=tempdir, parallel_exec=esmf_parallel_exec,
@@ -759,42 +816,13 @@ class Remapper(object):
         if additional_args is not None:
             args.extend(additional_args)
 
-        if logger is None:
-            _print_running(args, fn=print)
-            # make sure any output is flushed before we add output from the
-            # subprocess
-            sys.stdout.flush()
-            sys.stderr.flush()
-
-            # throw out the standard output from ESMF_RegridWeightGen, as it's
-            # rather verbose but keep stderr
-            with open(os.devnull, 'wb') as DEVNULL:
-                subprocess.check_call(args, stdout=DEVNULL)
-
-        else:
-            _print_running(args, fn=logger.info)
-            for handler in logger.handlers:
-                handler.flush()
-
-            process = subprocess.Popen(args, stdout=subprocess.PIPE,
-                                       stderr=subprocess.PIPE)
-            _, stderr = process.communicate()
-
-            # throw out the standard output from ESMF_RegridWeightGen, as it's
-            # rather verbose but keep stderr
-            if stderr:
-                stderr = stderr.decode('utf-8')
-                for line in stderr.split('\n'):
-                    logger.error(line)
-
-            if process.returncode != 0:
-                raise subprocess.CalledProcessError(process.returncode,
-                                                    ' '.join(args))
+        _run_subprocess(args, logger)
 
         if tempobj is not None:
             tempobj.cleanup()
 
-    def _validate_descriptors(self, method, expand_factor, expand_dist):
+    def _validate_descriptors(self, method, expand_factor, expand_dist,
+                              netcdf3=False):
 
         if isinstance(self.destinationDescriptor,
                       PointCollectionDescriptor) and \
@@ -806,6 +834,17 @@ class Remapper(object):
                 method != 'conserve':
             raise ValueError('expandFactor and expandDist only have an impact '
                              'with method=conserve')
+
+        if netcdf3:
+            allowed_formats = ['NETCDF3_64BIT', 'NETCDF3_CLASSIC']
+            if self.sourceDescriptor.format not in allowed_formats:
+                raise ValueError(f'sourceDescriptor must be in one of the '
+                                 f'formats {allowed_formats} but it is '
+                                 f'{self.sourceDescriptor.format}')
+            if self.destinationDescriptor.format not in allowed_formats:
+                raise ValueError(f'destinationDescriptor must be in one of '
+                                 f'the formats {allowed_formats} but it is '
+                                 f'{self.destinationDescriptor.format}')
 
     def _get_rwg_path(self, esmf_path):
 
@@ -872,6 +911,103 @@ class Remapper(object):
 
         return regional_args
 
+    def _moab_build_map(self, method, logger, mpi_tasks, tempdir,
+                        parallel_exec, expand_dist, expand_factor):
+        """
+        Use ``mbtempest`` to construct a mapping file used for interpolation
+        between the source and destination grids.
+        """
+
+        if self.mappingFileName is None or \
+                os.path.exists(self.mappingFileName):
+            # a valid weight file already exists, so nothing to do
+            return
+
+        self._validate_descriptors(method, expand_factor, expand_dist,
+                                   netcdf3=True)
+
+        mbtempest_path = self._get_mbtempest_path()
+
+        # Write source and destination SCRIP files in temporary locations
+        if tempdir is None:
+            tempobj = TemporaryDirectory()
+            tempdir = tempobj.name
+        else:
+            tempobj = None
+
+        src_filename = f'{tempdir}/src_mesh.nc'
+        dst_filename = f'{tempdir}/dst_mesh.nc'
+        src_descriptor = self.sourceDescriptor
+        dst_descriptor = self.destinationDescriptor
+
+        src_descriptor.to_scrip(src_filename)
+
+        dst_descriptor.to_scrip(dst_filename,
+                                expandDist=expand_dist,
+                                expandFactor=expand_factor)
+
+        parallel_args = self._get_parallel_args(parallel_exec, mpi_tasks,
+                                                conda_package='moab')
+        regional_args = self._get_mbtempest_regional_args()
+
+        intx_filename = \
+            f'moab_intx_{src_descriptor.meshName}_to_' \
+            f'{dst_descriptor.meshName}.h5m'
+
+        intx_args = parallel_args + [
+            mbtempest_path,
+            '--type', '5',
+            '--load', src_filename,
+            '--load', dst_filename,
+            '--intx', intx_filename
+        ] + regional_args
+
+        _run_subprocess(intx_args, logger)
+
+        fvmethod = {
+            'conserve': 'none',
+            'bilinear': 'bilin'}
+
+        map_args = parallel_args + [
+            mbtempest_path,
+            '--type', '5',
+            '--load', src_filename,
+            '--load', dst_filename,
+            '--intx', intx_filename,
+            '--weights',
+            '--method', 'fv',
+            '--method', 'fv',
+            '--file', self.mappingFileName,
+            '--order', '1',
+            '--order', '1',
+            '--fvmethod', fvmethod[method]
+        ] + regional_args
+
+        _run_subprocess(map_args, logger)
+
+        if tempobj is not None:
+            tempobj.cleanup()
+
+    def _get_mbtempest_path(self):
+
+        mbtempest_path = find_executable('mbtempest')
+
+        if mbtempest_path is None:
+            raise OSError('mbtempest not found. Make sure moab package is '
+                          'installed with tempest support: \n'
+                          'conda install "moab=*=*_tempest_*"\n')
+        return mbtempest_path
+
+    def _get_mbtempest_regional_args(self):
+
+        regional_args = []
+
+        if self.sourceDescriptor.regional or \
+                self.destinationDescriptor.regional:
+            regional_args.append('--rrmgrids')
+
+        return regional_args
+
 
 def _print_running(args, fn):
     print_args = []
@@ -880,3 +1016,36 @@ def _print_running(args, fn):
             arg = f'"{arg}"'
         print_args.append(arg)
     fn(f'running: {" ".join(print_args)}')
+
+
+def _run_subprocess(args, logger):
+    if logger is None:
+        log_err_fn = print
+        log_out_fn = print
+        _print_running(args, fn=log_out_fn)
+        sys.stdout.flush()
+        sys.stderr.flush()
+    else:
+        log_err_fn = logger.error
+        log_out_fn = logger.info
+        _print_running(args, fn=log_out_fn)
+        for handler in logger.handlers:
+            handler.flush()
+
+    with subprocess.Popen(args, stdout=subprocess.PIPE,
+                          stderr=subprocess.PIPE) as process:
+        stdout, stderr = process.communicate()
+
+        if stdout:
+            stdout = stdout.decode('utf-8')
+            for line in stdout.split('\n'):
+                log_out_fn(line)
+
+        if stderr:
+            stderr = stderr.decode('utf-8')
+            for line in stderr.split('\n'):
+                log_err_fn(line)
+
+        if process.returncode != 0:
+            raise subprocess.CalledProcessError(process.returncode,
+                                                ' '.join(args))
