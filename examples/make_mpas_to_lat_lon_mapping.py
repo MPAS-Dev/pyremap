@@ -32,17 +32,19 @@ inGridName = 'oQU240'
 inGridFileName = 'ocean.QU.240km.151209.nc'
 
 inDescriptor = MpasCellMeshDescriptor(inGridFileName, inGridName)
+inDescriptor.format = 'NETCDF3_64BIT'
 
 # modify the resolution of the global lat-lon grid as desired
 outDescriptor = get_lat_lon_descriptor(dLon=0.5, dLat=0.5)
 outGridName = outDescriptor.meshName
+outDescriptor.format = 'NETCDF3_64BIT'
 
 mappingFileName = f'map_{inGridName}_to_{outGridName}_bilinear.nc'
 
 
 remapper = Remapper(inDescriptor, outDescriptor, mappingFileName)
 
-remapper.esmf_build_map(method='bilinear', mpi_tasks=1)
+remapper.moab_build_map(method='bilinear', mpi_tasks=1)
 
 outFileName = f'temp_{outGridName}.nc'
 ds = xarray.open_dataset(inGridFileName)

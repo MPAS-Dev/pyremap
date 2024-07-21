@@ -34,19 +34,21 @@ inGridName = 'oQU240'
 inGridFileName = 'ocean.QU.240km.151209.nc'
 
 inDescriptor = MpasVertexMeshDescriptor(inGridFileName, inGridName)
+inDescriptor.format = 'NETCDF3_64BIT'
 
 # modify the size and resolution of the Antarctic grid as desired
 outDescriptor = get_polar_descriptor(Lx=6000., Ly=5000., dx=10., dy=10.,
                                      projection='antarctic')
 outGridName = outDescriptor.meshName
+outDescriptor.format = 'NETCDF3_64BIT'
 
 mappingFileName = f'map_{inGridName}_vertex_to_{outGridName}_conserve.nc'
 
 remapper = Remapper(inDescriptor, outDescriptor, mappingFileName)
 
 # conservative remapping with 4 MPI tasks (using mpirun)
-remapper.esmf_build_map(method='conserve', mpi_tasks=4,
-                        parallel_exec='mpirun', include_logs=True)
+remapper.moab_build_map(method='conserve', mpi_tasks=4,
+                        parallel_exec='mpirun')
 
 # select the SST at the initial time as an example data set
 srcFileName = f'vertex_id_{inGridName}.nc'

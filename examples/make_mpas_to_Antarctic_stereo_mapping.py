@@ -33,18 +33,20 @@ inGridName = 'oQU240'
 inGridFileName = 'ocean.QU.240km.151209.nc'
 
 inDescriptor = MpasCellMeshDescriptor(inGridFileName, inGridName)
+inDescriptor.format = 'NETCDF3_64BIT'
 
 # modify the size and resolution of the Antarctic grid as desired
 outDescriptor = get_polar_descriptor(Lx=6000., Ly=5000., dx=10., dy=10.,
                                      projection='antarctic')
 outGridName = outDescriptor.meshName
+outDescriptor.format = 'NETCDF3_64BIT'
 
 mappingFileName = f'map_{inGridName}_to_{outGridName}_bilinear.nc'
 
 remapper = Remapper(inDescriptor, outDescriptor, mappingFileName)
 
 # conservative remapping with 4 MPI tasks (using mpirun)
-remapper.esmf_build_map(method='bilinear', mpi_tasks=4)
+remapper.moab_build_map(method='bilinear', mpi_tasks=4)
 
 # select the SST at the initial time as an example data set
 srcFileName = f'temp_{inGridName}.nc'

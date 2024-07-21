@@ -48,6 +48,7 @@ inMeshName = f'{Lx}x{Ly}km_{dx}km_Antarctic_stereo'
 projection = get_antarctic_stereographic_projection()
 
 inDescriptor = ProjectionGridDescriptor.create(projection, x, y, inMeshName)
+inDescriptor.format = 'NETCDF3_64BIT'
 
 outRes = args.resolution * 1e3
 
@@ -62,12 +63,13 @@ outMeshName = f'{Lx}x{Ly}km_{args.resolution}km_Antarctic_stereo'
 
 outDescriptor = ProjectionGridDescriptor.create(projection, xOut, yOut,
                                                 outMeshName)
+outDescriptor.format = 'NETCDF3_64BIT'
 
 mappingFileName = f'map_{inMeshName}_to_{outMeshName}_{args.method}.nc'
 
 remapper = Remapper(inDescriptor, outDescriptor, mappingFileName)
 
-remapper.esmf_build_map(method=args.method, mpi_tasks=args.mpiTasks)
+remapper.moab_build_map(method=args.method, mpi_tasks=args.mpiTasks)
 
 dsOut = remapper.remap(dsIn, renormalizationThreshold=0.01)
 dsOut.to_netcdf(args.outFileName)
