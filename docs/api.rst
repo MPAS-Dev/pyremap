@@ -53,6 +53,11 @@ Remapping
    :toctree: generated/
 
    Remapper
+   Remapper.esmf_build_map
+   Remapper.moab_build_map
+   Remapper.remap_file
+   Remapper.remap
+
 
 
 Polar projections
