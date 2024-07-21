@@ -836,7 +836,8 @@ class Remapper(object):
                              'with method=conserve')
 
         if netcdf3:
-            allowed_formats = ['NETCDF3_64BIT', 'NETCDF3_CLASSIC']
+            allowed_formats = ['NETCDF3_64BIT', 'NETCDF3_64BIT_OFFSET',
+                               'NETCDF3_64BIT_DATA', 'NETCDF3_CLASSIC']
             if self.sourceDescriptor.format not in allowed_formats:
                 raise ValueError(f'sourceDescriptor must be in one of the '
                                  f'formats {allowed_formats} but it is '

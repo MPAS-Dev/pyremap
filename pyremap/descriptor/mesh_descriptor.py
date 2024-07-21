@@ -33,7 +33,7 @@ class MeshDescriptor:
         coordinate in the mesh or grid
 
     format : {'NETCDF4', 'NETCDF4_CLASSIC', 'NETCDF3_64BIT',
-              'NETCDF3_CLASSIC'}
+              'NETCDF3_64BIT_OFFSET', 'NETCDF3_64BIT_DATA', 'NETCDF3_CLASSIC'}
         The NetCDF file format to use.  Default is ``'NETCDF4'``
 
     engine : {'netcdf4', 'scipy', 'h5netcdf'}
