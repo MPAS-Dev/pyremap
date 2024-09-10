@@ -51,7 +51,7 @@ jobs:
         shell: bash -l {0}
     strategy:
       matrix:
-        python-version: ["3.9", "3.10", "3.11"]
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
     steps:
       - id: skip_check
         uses: fkirc/skip-duplicate-actions@master
@@ -84,19 +84,21 @@ jobs:
           channels: conda-forge
           channel-priority: strict
           auto-update-conda: true
-          # IMPORTANT: This needs to be set for caching to work properly!
-          use-only-tar-bz2: true
           python-version: ${{ matrix.python-version }}
 
       - if: ${{ steps.skip_check.outputs.should_skip != 'true' }}
         name: Install pyremap
         run: |
-          conda install --file dev-spec.txt
+          conda create -n pyremap_dev --file dev-spec.txt \
+              python=${{ matrix.python-version }}
+          conda activate pyremap_dev
           python -m pip install .
 
       - if: ${{ steps.skip_check.outputs.should_skip != 'true' }}
         name: Run Tests
         env:
           CHECK_IMAGES: False
-        run: pytest --pyargs pyremap
+        run: |
+            conda activate pyremap_dev
+            pytest --pyargs pyremap
 
