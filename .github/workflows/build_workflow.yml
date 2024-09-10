@@ -89,12 +89,16 @@ jobs:
       - if: ${{ steps.skip_check.outputs.should_skip != 'true' }}
         name: Install pyremap
         run: |
-          conda install --file dev-spec.txt
+          conda create -n pyremap_dev --file dev-spec.txt \
+              python=${{ matrix.python-version }}
+          conda activate pyremap_dev
           python -m pip install .
 
       - if: ${{ steps.skip_check.outputs.should_skip != 'true' }}
         name: Run Tests
         env:
           CHECK_IMAGES: False
-        run: pytest --pyargs pyremap
+        run: |
+            conda activate pyremap_dev
+            pytest --pyargs pyremap
 
