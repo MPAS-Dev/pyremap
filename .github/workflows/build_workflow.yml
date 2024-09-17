@@ -92,7 +92,7 @@ jobs:
           conda create -n pyremap_dev --file dev-spec.txt \
               python=${{ matrix.python-version }}
           conda activate pyremap_dev
-          python -m pip install .
+          python -m pip install -vv --no-deps --no-build-isolation .
 
       - if: ${{ steps.skip_check.outputs.should_skip != 'true' }}
         name: Run Tests

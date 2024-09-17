@@ -21,7 +21,7 @@ conda config --add channels conda-forge
 conda config --set channel_priority strict
 conda create -y -n pyremap --file dev-spec.txt
 conda activate pyremap
-python -m pip install -e .
+python -m pip install --no-deps --no-build-isolation -e .
 ```
 
 ## Examples
