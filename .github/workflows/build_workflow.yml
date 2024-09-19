@@ -40,7 +40,7 @@ jobs:
         # Getting only staged files can be tricky in case a new PR is opened
         # since the action is run on a branch in detached head state
         name: Install and Run Pre-commit
-        uses: pre-commit/action@v3.0.1
+        uses: pre-commit/action@v3
 
   build:
     name: test pyremap - python ${{ matrix.python-version }}
