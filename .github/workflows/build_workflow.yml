@@ -91,7 +91,7 @@ jobs:
         name: Install pyremap
         run: |
           conda create -n pyremap_dev --file dev-spec.txt \
-              python=${{ matrix.python-version }}
+            python=${{ matrix.python-version }}
           conda activate pyremap_dev
           python -m pip install -vv --no-deps --no-build-isolation .
 
@@ -100,6 +100,6 @@ jobs:
         env:
           CHECK_IMAGES: False
         run: |
-            conda activate pyremap_dev
-            pytest --pyargs pyremap
+          conda activate pyremap_dev
+          pytest --pyargs pyremap
 
