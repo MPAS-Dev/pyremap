@@ -36,11 +36,19 @@ jobs:
           python-version: "3.10"
 
       - if: ${{ steps.skip_check.outputs.should_skip != 'true' }}
+        id: file_changes
+        uses: trilom/file-changes-action@1.2.4
+        with:
+          output: ' '
+
+      - if: ${{ steps.skip_check.outputs.should_skip != 'true' }}
         # Run all pre-commit hooks on all the files.
         # Getting only staged files can be tricky in case a new PR is opened
         # since the action is run on a branch in detached head state
         name: Install and Run Pre-commit
         uses: pre-commit/action@v3.0.1
+        with:
+          extra_args: --files ${{ steps.file_changes.outputs.files}}
 
   build:
     name: test pyremap - python ${{ matrix.python-version }}
@@ -91,7 +99,7 @@ jobs:
         name: Install pyremap
         run: |
           conda create -n pyremap_dev --file dev-spec.txt \
-              python=${{ matrix.python-version }}
+            python=${{ matrix.python-version }}
           conda activate pyremap_dev
           python -m pip install -vv --no-deps --no-build-isolation .
 
@@ -100,6 +108,6 @@ jobs:
         env:
           CHECK_IMAGES: False
         run: |
-            conda activate pyremap_dev
-            pytest --pyargs pyremap
+          conda activate pyremap_dev
+          pytest --pyargs pyremap
 

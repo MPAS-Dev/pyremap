@@ -14,21 +14,3 @@ exclude =
     .idea,
     .mypy_cache,
     .pytest_cache,
-
-[isort]
-multi_line_output=3
-include_trailing_comma=True
-force_grid_wrap=0
-use_parentheses=True
-line_length=79
-skip=
-    e3sm_diags/e3sm_diags_driver.py
-
-[pycodestyle]
-max-line-length = 79
-exclude =
-    .git
-    docs
-    .idea
-    .mypy_cache
-    .pytest_cache
