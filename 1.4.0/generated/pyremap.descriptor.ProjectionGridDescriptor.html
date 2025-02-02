@@ -1,0 +1,252 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pyremap.descriptor.ProjectionGridDescriptor &mdash; pyremap 1.4.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=9172181d"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="pyremap.descriptor.ProjectionGridDescriptor.read" href="pyremap.descriptor.ProjectionGridDescriptor.read.html" />
+    <link rel="prev" title="pyremap.descriptor.LatLon2DGridDescriptor.to_scrip" href="pyremap.descriptor.LatLon2DGridDescriptor.to_scrip.html" />
+    <link href="../_static/style.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            pyremap
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../quick_start.html">Quick Start</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../api.html#mesh-descriptors">Mesh Descriptors</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.interp_extrap_corner.html">pyremap.descriptor.interp_extrap_corner</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.interp_extrap_corners_2d.html">pyremap.descriptor.interp_extrap_corners_2d</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.MpasMeshDescriptor.html">pyremap.descriptor.MpasMeshDescriptor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.MpasMeshDescriptor.to_scrip.html">pyremap.descriptor.MpasMeshDescriptor.to_scrip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.MpasMeshDescriptor.to_esmf.html">pyremap.descriptor.MpasMeshDescriptor.to_esmf</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.MpasEdgeMeshDescriptor.html">pyremap.descriptor.MpasEdgeMeshDescriptor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.MpasEdgeMeshDescriptor.to_scrip.html">pyremap.descriptor.MpasEdgeMeshDescriptor.to_scrip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.MpasEdgeMeshDescriptor.to_esmf.html">pyremap.descriptor.MpasEdgeMeshDescriptor.to_esmf</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.get_lat_lon_descriptor.html">pyremap.descriptor.get_lat_lon_descriptor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.LatLonGridDescriptor.html">pyremap.descriptor.LatLonGridDescriptor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.LatLonGridDescriptor.read.html">pyremap.descriptor.LatLonGridDescriptor.read</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.LatLonGridDescriptor.create.html">pyremap.descriptor.LatLonGridDescriptor.create</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.LatLonGridDescriptor.to_scrip.html">pyremap.descriptor.LatLonGridDescriptor.to_scrip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.LatLonGridDescriptor.to_esmf.html">pyremap.descriptor.LatLonGridDescriptor.to_esmf</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.LatLon2DGridDescriptor.html">pyremap.descriptor.LatLon2DGridDescriptor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.LatLon2DGridDescriptor.read.html">pyremap.descriptor.LatLon2DGridDescriptor.read</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.LatLon2DGridDescriptor.to_scrip.html">pyremap.descriptor.LatLon2DGridDescriptor.to_scrip</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">pyremap.descriptor.ProjectionGridDescriptor</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pyremap.descriptor.ProjectionGridDescriptor"><code class="docutils literal notranslate"><span class="pre">ProjectionGridDescriptor</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.ProjectionGridDescriptor.read.html">pyremap.descriptor.ProjectionGridDescriptor.read</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.ProjectionGridDescriptor.create.html">pyremap.descriptor.ProjectionGridDescriptor.create</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.ProjectionGridDescriptor.to_scrip.html">pyremap.descriptor.ProjectionGridDescriptor.to_scrip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.ProjectionGridDescriptor.to_esmf.html">pyremap.descriptor.ProjectionGridDescriptor.to_esmf</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.PointCollectionDescriptor.html">pyremap.descriptor.PointCollectionDescriptor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.PointCollectionDescriptor.to_scrip.html">pyremap.descriptor.PointCollectionDescriptor.to_scrip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.PointCollectionDescriptor.to_esmf.html">pyremap.descriptor.PointCollectionDescriptor.to_esmf</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#remapping">Remapping</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#polar-projections">Polar projections</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../versions.html">Versions</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">pyremap</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../api.html">API reference</a></li>
+      <li class="breadcrumb-item active">pyremap.descriptor.ProjectionGridDescriptor</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/generated/pyremap.descriptor.ProjectionGridDescriptor.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="pyremap-descriptor-projectiongriddescriptor">
+<h1>pyremap.descriptor.ProjectionGridDescriptor<a class="headerlink" href="#pyremap-descriptor-projectiongriddescriptor" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyremap.descriptor.ProjectionGridDescriptor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyremap.descriptor.</span></span><span class="sig-name descname"><span class="pre">ProjectionGridDescriptor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">projection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">meshName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyremap/descriptor/projection_grid_descriptor.html#ProjectionGridDescriptor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyremap.descriptor.ProjectionGridDescriptor" title="Link to this definition"></a></dt>
+<dd><p>A class for describing a general logically rectangular grid that can be
+defined by a <code class="docutils literal notranslate"><span class="pre">pyproj</span></code> projection.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>projection</strong> (<em>pyproj.Proj</em>) – The projection used to map from grid x-y space to latitude and
+longitude</p></li>
+<li><p><strong>latLonProjection</strong> (<em>pyproj.Proj</em>) – lat-lon projection used to transform from x-y to lat-lon space</p></li>
+<li><p><strong>x</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><em>numpy.ndarray</em></a>) – The latitude coordinate at grid-cell centers</p></li>
+<li><p><strong>y</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><em>numpy.ndarray</em></a>) – The longitude coordinate at grid-cell centers</p></li>
+<li><p><strong>xCorner</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><em>numpy.ndarray</em></a>) – The latitude coordinate at grid-cell corners</p></li>
+<li><p><strong>yCorner</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><em>numpy.ndarray</em></a>) – The longitude coordinate at grid-cell corners</p></li>
+<li><p><strong>history</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – The history attribute written to SCRIP files</p></li>
+<li><p><strong>xVarName</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – The name of the x variable</p></li>
+<li><p><strong>yVarName</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – The name of the y variable</p></li>
+<li><p><strong>history</strong> – The history attribute written to SCRIP files</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyremap.descriptor.ProjectionGridDescriptor.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">projection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">meshName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyremap/descriptor/projection_grid_descriptor.html#ProjectionGridDescriptor.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyremap.descriptor.ProjectionGridDescriptor.__init__" title="Link to this definition"></a></dt>
+<dd><p>Constructor stores the projection</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>projection</strong> (<em>pyproj.Proj</em>) – The projection used to map from grid x-y space to latitude and
+longitude</p></li>
+<li><p><strong>meshName</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><em>optional</em>) – The name of the grid (e.g. <code class="docutils literal notranslate"><span class="pre">'10km_Antarctic_stereo'</span></code>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyremap.descriptor.ProjectionGridDescriptor.__init__" title="pyremap.descriptor.ProjectionGridDescriptor.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(projection[, meshName])</p></td>
+<td><p>Constructor stores the projection</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="pyremap.descriptor.ProjectionGridDescriptor.create.html#pyremap.descriptor.ProjectionGridDescriptor.create" title="pyremap.descriptor.ProjectionGridDescriptor.create"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create</span></code></a>(projection, x, y, meshName)</p></td>
+<td><p>Given x and y coordinates defining the axes of the logically rectangular grid, save the coordinates interpolate/extrapolate to locate corners.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">project_to_lat_lon</span></code>(X, Y)</p></td>
+<td><p>Given X and Y locations of points in a projection, returns the corresponding latitude and longitude of each point.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="pyremap.descriptor.ProjectionGridDescriptor.read.html#pyremap.descriptor.ProjectionGridDescriptor.read" title="pyremap.descriptor.ProjectionGridDescriptor.read"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read</span></code></a>(projection, fileName[, meshName, ...])</p></td>
+<td><p>Given a grid file with x and y coordinates defining the axes of the logically rectangular grid, read in the x and y coordinates and interpolate/extrapolate to locate corners.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="pyremap.descriptor.ProjectionGridDescriptor.to_esmf.html#pyremap.descriptor.ProjectionGridDescriptor.to_esmf" title="pyremap.descriptor.ProjectionGridDescriptor.to_esmf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_esmf</span></code></a>(esmfFileName)</p></td>
+<td><p>Create an ESMF mesh file for the mesh</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="pyremap.descriptor.ProjectionGridDescriptor.to_scrip.html#pyremap.descriptor.ProjectionGridDescriptor.to_scrip" title="pyremap.descriptor.ProjectionGridDescriptor.to_scrip"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_scrip</span></code></a>(scripFileName[, expandDist, ...])</p></td>
+<td><p>Create a SCRIP file based on the grid and projection.</p></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="pyremap.descriptor.LatLon2DGridDescriptor.to_scrip.html" class="btn btn-neutral float-left" title="pyremap.descriptor.LatLon2DGridDescriptor.to_scrip" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="pyremap.descriptor.ProjectionGridDescriptor.read.html" class="btn btn-neutral float-right" title="pyremap.descriptor.ProjectionGridDescriptor.read" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright This software is open source software available under the BSD-3license. Copyright (c) 2025.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+<div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    <span class="fa fa-book"> Other Versions</span>
+    v: 1.4.0
+    <span class="fa fa-caret-down"></span>
+  </span>
+  <div class="rst-other-versions">
+    <dl>
+      <dt>Tags</dt>
+      <dd><a href="../../0.0.10/index.html">0.0.10</a></dd>
+      <dd><a href="../../0.0.11/index.html">0.0.11</a></dd>
+      <dd><a href="../../0.0.12/index.html">0.0.12</a></dd>
+      <dd><a href="../../0.0.13/index.html">0.0.13</a></dd>
+      <dd><a href="../../0.0.14/index.html">0.0.14</a></dd>
+      <dd><a href="../../0.0.15/index.html">0.0.15</a></dd>
+      <dd><a href="../../0.0.16/index.html">0.0.16</a></dd>
+      <dd><a href="../../0.0.2/index.html">0.0.2</a></dd>
+      <dd><a href="../../0.0.3/index.html">0.0.3</a></dd>
+      <dd><a href="../../0.0.4/index.html">0.0.4</a></dd>
+      <dd><a href="../../0.0.5/index.html">0.0.5</a></dd>
+      <dd><a href="../../0.0.6/index.html">0.0.6</a></dd>
+      <dd><a href="../../0.0.7/index.html">0.0.7</a></dd>
+      <dd><a href="../../0.0.8/index.html">0.0.8</a></dd>
+      <dd><a href="../../0.0.9/index.html">0.0.9</a></dd>
+      <dd><a href="../../1.0.0/index.html">1.0.0</a></dd>
+      <dd><a href="../../1.0.1/index.html">1.0.1</a></dd>
+      <dd><a href="../../1.1.0/index.html">1.1.0</a></dd>
+      <dd><a href="../../1.2.0/index.html">1.2.0</a></dd>
+      <dd><a href="../../1.3.0/index.html">1.3.0</a></dd>
+      <dd><a href="pyremap.descriptor.ProjectionGridDescriptor.html">1.4.0</a></dd>
+    </dl>
+    <dl>
+      <dt>Branches</dt>
+      <dd><a href="../../main/index.html">main</a></dd>
+    </dl>
+  </div>
+</div>
+<script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
