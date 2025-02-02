@@ -1,0 +1,294 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>API reference &mdash; pyremap 1.4.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=350a9c04"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="pyremap.descriptor.interp_extrap_corner" href="generated/pyremap.descriptor.interp_extrap_corner.html" />
+    <link rel="prev" title="Quick Start" href="quick_start.html" />
+    <link href="_static/style.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            pyremap
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="quick_start.html">Quick Start</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">API reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#mesh-descriptors">Mesh Descriptors</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="generated/pyremap.descriptor.interp_extrap_corner.html">pyremap.descriptor.interp_extrap_corner</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pyremap.descriptor.interp_extrap_corners_2d.html">pyremap.descriptor.interp_extrap_corners_2d</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pyremap.descriptor.MpasMeshDescriptor.html">pyremap.descriptor.MpasMeshDescriptor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pyremap.descriptor.MpasMeshDescriptor.to_scrip.html">pyremap.descriptor.MpasMeshDescriptor.to_scrip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pyremap.descriptor.MpasMeshDescriptor.to_esmf.html">pyremap.descriptor.MpasMeshDescriptor.to_esmf</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pyremap.descriptor.MpasEdgeMeshDescriptor.html">pyremap.descriptor.MpasEdgeMeshDescriptor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pyremap.descriptor.MpasEdgeMeshDescriptor.to_scrip.html">pyremap.descriptor.MpasEdgeMeshDescriptor.to_scrip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pyremap.descriptor.MpasEdgeMeshDescriptor.to_esmf.html">pyremap.descriptor.MpasEdgeMeshDescriptor.to_esmf</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pyremap.descriptor.get_lat_lon_descriptor.html">pyremap.descriptor.get_lat_lon_descriptor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pyremap.descriptor.LatLonGridDescriptor.html">pyremap.descriptor.LatLonGridDescriptor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pyremap.descriptor.LatLonGridDescriptor.read.html">pyremap.descriptor.LatLonGridDescriptor.read</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pyremap.descriptor.LatLonGridDescriptor.create.html">pyremap.descriptor.LatLonGridDescriptor.create</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pyremap.descriptor.LatLonGridDescriptor.to_scrip.html">pyremap.descriptor.LatLonGridDescriptor.to_scrip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pyremap.descriptor.LatLonGridDescriptor.to_esmf.html">pyremap.descriptor.LatLonGridDescriptor.to_esmf</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pyremap.descriptor.LatLon2DGridDescriptor.html">pyremap.descriptor.LatLon2DGridDescriptor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pyremap.descriptor.LatLon2DGridDescriptor.read.html">pyremap.descriptor.LatLon2DGridDescriptor.read</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pyremap.descriptor.LatLon2DGridDescriptor.to_scrip.html">pyremap.descriptor.LatLon2DGridDescriptor.to_scrip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pyremap.descriptor.ProjectionGridDescriptor.html">pyremap.descriptor.ProjectionGridDescriptor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pyremap.descriptor.ProjectionGridDescriptor.read.html">pyremap.descriptor.ProjectionGridDescriptor.read</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pyremap.descriptor.ProjectionGridDescriptor.create.html">pyremap.descriptor.ProjectionGridDescriptor.create</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pyremap.descriptor.ProjectionGridDescriptor.to_scrip.html">pyremap.descriptor.ProjectionGridDescriptor.to_scrip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pyremap.descriptor.ProjectionGridDescriptor.to_esmf.html">pyremap.descriptor.ProjectionGridDescriptor.to_esmf</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pyremap.descriptor.PointCollectionDescriptor.html">pyremap.descriptor.PointCollectionDescriptor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pyremap.descriptor.PointCollectionDescriptor.to_scrip.html">pyremap.descriptor.PointCollectionDescriptor.to_scrip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pyremap.descriptor.PointCollectionDescriptor.to_esmf.html">pyremap.descriptor.PointCollectionDescriptor.to_esmf</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#remapping">Remapping</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="generated/pyremap.remapper.Remapper.html">pyremap.remapper.Remapper</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#polar-projections">Polar projections</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="generated/pyremap.polar.get_arctic_stereographic_projection.html">pyremap.polar.get_arctic_stereographic_projection</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pyremap.polar.get_antarctic_stereographic_projection.html">pyremap.polar.get_antarctic_stereographic_projection</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pyremap.polar.get_polar_descriptor_from_file.html">pyremap.polar.get_polar_descriptor_from_file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pyremap.polar.get_polar_descriptor.html">pyremap.polar.get_polar_descriptor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pyremap.polar.to_polar.html">pyremap.polar.to_polar</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pyremap.polar.from_polar.html">pyremap.polar.from_polar</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">pyremap</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">API reference</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/api.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="api-reference">
+<h1>API reference<a class="headerlink" href="#api-reference" title="Link to this heading"></a></h1>
+<p>This page provides an auto-generated summary of the pyremap API.</p>
+<section id="mesh-descriptors">
+<h2>Mesh Descriptors<a class="headerlink" href="#mesh-descriptors" title="Link to this heading"></a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pyremap.descriptor.interp_extrap_corner.html#pyremap.descriptor.interp_extrap_corner" title="pyremap.descriptor.interp_extrap_corner"><code class="xref py py-obj docutils literal notranslate"><span class="pre">interp_extrap_corner</span></code></a>(inField)</p></td>
+<td><p>Interpolate/extrapolate a 1D field from grid centers to grid corners</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pyremap.descriptor.interp_extrap_corners_2d.html#pyremap.descriptor.interp_extrap_corners_2d" title="pyremap.descriptor.interp_extrap_corners_2d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">interp_extrap_corners_2d</span></code></a>(inField)</p></td>
+<td><p>Interpolate/extrapolate a 1D field from grid centers to grid corners</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pyremap.descriptor.MpasMeshDescriptor.html#pyremap.descriptor.MpasMeshDescriptor" title="pyremap.descriptor.MpasMeshDescriptor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MpasMeshDescriptor</span></code></a>(fileName[, meshName, ...])</p></td>
+<td><p>A class for describing an MPAS cell mesh (which also supports non-conservative remapping from vertices)</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pyremap.descriptor.MpasMeshDescriptor.to_scrip.html#pyremap.descriptor.MpasMeshDescriptor.to_scrip" title="pyremap.descriptor.MpasMeshDescriptor.to_scrip"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MpasMeshDescriptor.to_scrip</span></code></a>(scripFileName[, ...])</p></td>
+<td><p>Given an MPAS mesh file, create a SCRIP file based on the mesh.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pyremap.descriptor.MpasMeshDescriptor.to_esmf.html#pyremap.descriptor.MpasMeshDescriptor.to_esmf" title="pyremap.descriptor.MpasMeshDescriptor.to_esmf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MpasMeshDescriptor.to_esmf</span></code></a>(esmfFileName)</p></td>
+<td><p>Create an ESMF mesh file for the mesh</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pyremap.descriptor.MpasEdgeMeshDescriptor.html#pyremap.descriptor.MpasEdgeMeshDescriptor" title="pyremap.descriptor.MpasEdgeMeshDescriptor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MpasEdgeMeshDescriptor</span></code></a>(fileName[, meshName])</p></td>
+<td><p>A class for describing an MPAS edge mesh</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pyremap.descriptor.MpasEdgeMeshDescriptor.to_scrip.html#pyremap.descriptor.MpasEdgeMeshDescriptor.to_scrip" title="pyremap.descriptor.MpasEdgeMeshDescriptor.to_scrip"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MpasEdgeMeshDescriptor.to_scrip</span></code></a>(scripFileName)</p></td>
+<td><p>Given an MPAS mesh file, create a SCRIP file based on the mesh.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pyremap.descriptor.MpasEdgeMeshDescriptor.to_esmf.html#pyremap.descriptor.MpasEdgeMeshDescriptor.to_esmf" title="pyremap.descriptor.MpasEdgeMeshDescriptor.to_esmf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MpasEdgeMeshDescriptor.to_esmf</span></code></a>(esmfFileName)</p></td>
+<td><p>Create an ESMF mesh file for the mesh</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pyremap.descriptor.get_lat_lon_descriptor.html#pyremap.descriptor.get_lat_lon_descriptor" title="pyremap.descriptor.get_lat_lon_descriptor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_lat_lon_descriptor</span></code></a>(dLon, dLat[, lonMin, ...])</p></td>
+<td><p>Get a descriptor of a lat-lon grid, used for remapping</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pyremap.descriptor.LatLonGridDescriptor.html#pyremap.descriptor.LatLonGridDescriptor" title="pyremap.descriptor.LatLonGridDescriptor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LatLonGridDescriptor</span></code></a>([meshName, regional])</p></td>
+<td><p>A class for describing a lat-lon grid</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pyremap.descriptor.LatLonGridDescriptor.read.html#pyremap.descriptor.LatLonGridDescriptor.read" title="pyremap.descriptor.LatLonGridDescriptor.read"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LatLonGridDescriptor.read</span></code></a>([fileName, ds, ...])</p></td>
+<td><p>Read the lat-lon grid from a file with the given lat/lon var names.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pyremap.descriptor.LatLonGridDescriptor.create.html#pyremap.descriptor.LatLonGridDescriptor.create" title="pyremap.descriptor.LatLonGridDescriptor.create"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LatLonGridDescriptor.create</span></code></a>(latCorner, lonCorner)</p></td>
+<td><p>Create the lat-lon grid with the given arrays and units.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pyremap.descriptor.LatLonGridDescriptor.to_scrip.html#pyremap.descriptor.LatLonGridDescriptor.to_scrip" title="pyremap.descriptor.LatLonGridDescriptor.to_scrip"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LatLonGridDescriptor.to_scrip</span></code></a>(scripFileName)</p></td>
+<td><p>Given a lat-lon grid file, create a SCRIP file based on the grid.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pyremap.descriptor.LatLonGridDescriptor.to_esmf.html#pyremap.descriptor.LatLonGridDescriptor.to_esmf" title="pyremap.descriptor.LatLonGridDescriptor.to_esmf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LatLonGridDescriptor.to_esmf</span></code></a>(esmfFileName)</p></td>
+<td><p>Create an ESMF mesh file for the mesh</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pyremap.descriptor.LatLon2DGridDescriptor.html#pyremap.descriptor.LatLon2DGridDescriptor" title="pyremap.descriptor.LatLon2DGridDescriptor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LatLon2DGridDescriptor</span></code></a>([meshName, regional])</p></td>
+<td><p>A class for describing a lat-lon grid that may not be a tensor grid (lat/lon are 2D arrays).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pyremap.descriptor.LatLon2DGridDescriptor.read.html#pyremap.descriptor.LatLon2DGridDescriptor.read" title="pyremap.descriptor.LatLon2DGridDescriptor.read"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LatLon2DGridDescriptor.read</span></code></a>([fileName, ds, ...])</p></td>
+<td><p>Read the lat-lon grid from a file with the given lat/lon var names.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pyremap.descriptor.LatLon2DGridDescriptor.to_scrip.html#pyremap.descriptor.LatLon2DGridDescriptor.to_scrip" title="pyremap.descriptor.LatLon2DGridDescriptor.to_scrip"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LatLon2DGridDescriptor.to_scrip</span></code></a>(scripFileName)</p></td>
+<td><p>Create a SCRIP file based on the grid.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pyremap.descriptor.ProjectionGridDescriptor.html#pyremap.descriptor.ProjectionGridDescriptor" title="pyremap.descriptor.ProjectionGridDescriptor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProjectionGridDescriptor</span></code></a>(projection[, meshName])</p></td>
+<td><p>A class for describing a general logically rectangular grid that can be defined by a <code class="docutils literal notranslate"><span class="pre">pyproj</span></code> projection.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pyremap.descriptor.ProjectionGridDescriptor.read.html#pyremap.descriptor.ProjectionGridDescriptor.read" title="pyremap.descriptor.ProjectionGridDescriptor.read"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProjectionGridDescriptor.read</span></code></a>(projection, ...)</p></td>
+<td><p>Given a grid file with x and y coordinates defining the axes of the logically rectangular grid, read in the x and y coordinates and interpolate/extrapolate to locate corners.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pyremap.descriptor.ProjectionGridDescriptor.create.html#pyremap.descriptor.ProjectionGridDescriptor.create" title="pyremap.descriptor.ProjectionGridDescriptor.create"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProjectionGridDescriptor.create</span></code></a>(projection, ...)</p></td>
+<td><p>Given x and y coordinates defining the axes of the logically rectangular grid, save the coordinates interpolate/extrapolate to locate corners.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pyremap.descriptor.ProjectionGridDescriptor.to_scrip.html#pyremap.descriptor.ProjectionGridDescriptor.to_scrip" title="pyremap.descriptor.ProjectionGridDescriptor.to_scrip"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProjectionGridDescriptor.to_scrip</span></code></a>(scripFileName)</p></td>
+<td><p>Create a SCRIP file based on the grid and projection.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pyremap.descriptor.ProjectionGridDescriptor.to_esmf.html#pyremap.descriptor.ProjectionGridDescriptor.to_esmf" title="pyremap.descriptor.ProjectionGridDescriptor.to_esmf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProjectionGridDescriptor.to_esmf</span></code></a>(esmfFileName)</p></td>
+<td><p>Create an ESMF mesh file for the mesh</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pyremap.descriptor.PointCollectionDescriptor.html#pyremap.descriptor.PointCollectionDescriptor" title="pyremap.descriptor.PointCollectionDescriptor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PointCollectionDescriptor</span></code></a>(lats, lons, ...[, ...])</p></td>
+<td><p>A class for describing a collection of points</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pyremap.descriptor.PointCollectionDescriptor.to_scrip.html#pyremap.descriptor.PointCollectionDescriptor.to_scrip" title="pyremap.descriptor.PointCollectionDescriptor.to_scrip"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PointCollectionDescriptor.to_scrip</span></code></a>(scripFileName)</p></td>
+<td><p>Given an MPAS mesh file, create a SCRIP file based on the mesh.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pyremap.descriptor.PointCollectionDescriptor.to_esmf.html#pyremap.descriptor.PointCollectionDescriptor.to_esmf" title="pyremap.descriptor.PointCollectionDescriptor.to_esmf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PointCollectionDescriptor.to_esmf</span></code></a>(esmfFileName)</p></td>
+<td><p>Create an ESMF mesh file for the mesh</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="remapping">
+<h2>Remapping<a class="headerlink" href="#remapping" title="Link to this heading"></a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pyremap.remapper.Remapper.html#pyremap.remapper.Remapper" title="pyremap.remapper.Remapper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Remapper</span></code></a>(sourceDescriptor, destinationDescriptor)</p></td>
+<td><p>A class for remapping fields using a given mapping file.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="polar-projections">
+<h2>Polar projections<a class="headerlink" href="#polar-projections" title="Link to this heading"></a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pyremap.polar.get_arctic_stereographic_projection.html#pyremap.polar.get_arctic_stereographic_projection" title="pyremap.polar.get_arctic_stereographic_projection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_arctic_stereographic_projection</span></code></a>()</p></td>
+<td><p>Get a projection for an Arctic stereographic comparison grid</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pyremap.polar.get_antarctic_stereographic_projection.html#pyremap.polar.get_antarctic_stereographic_projection" title="pyremap.polar.get_antarctic_stereographic_projection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_antarctic_stereographic_projection</span></code></a>()</p></td>
+<td><p>Get a projection for an Antarctic steregraphic grid</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pyremap.polar.get_polar_descriptor_from_file.html#pyremap.polar.get_polar_descriptor_from_file" title="pyremap.polar.get_polar_descriptor_from_file"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_polar_descriptor_from_file</span></code></a>(fileName[, ...])</p></td>
+<td><p>Get a descriptor of a polar stereographic grid used for remapping</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pyremap.polar.get_polar_descriptor.html#pyremap.polar.get_polar_descriptor" title="pyremap.polar.get_polar_descriptor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_polar_descriptor</span></code></a>(Lx, Ly, dx, dy[, ...])</p></td>
+<td><p>Get a descriptor of a polar stereographic grid used for remapping</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pyremap.polar.to_polar.html#pyremap.polar.to_polar" title="pyremap.polar.to_polar"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_polar</span></code></a>(points)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pyremap.polar.from_polar.html#pyremap.polar.from_polar" title="pyremap.polar.from_polar"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_polar</span></code></a>(points)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="quick_start.html" class="btn btn-neutral float-left" title="Quick Start" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="generated/pyremap.descriptor.interp_extrap_corner.html" class="btn btn-neutral float-right" title="pyremap.descriptor.interp_extrap_corner" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright This software is open source software available under the BSD-3license. Copyright (c) 2025.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+<div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    <span class="fa fa-book"> Other Versions</span>
+    v: 1.4.1
+    <span class="fa fa-caret-down"></span>
+  </span>
+  <div class="rst-other-versions">
+    <dl>
+      <dt>Tags</dt>
+      <dd><a href="../0.0.2/api.html">0.0.2</a></dd>
+      <dd><a href="../0.0.3/api.html">0.0.3</a></dd>
+      <dd><a href="api.html">1.4.1</a></dd>
+    </dl>
+    <dl>
+      <dt>Branches</dt>
+      <dd><a href="../main/api.html">main</a></dd>
+    </dl>
+  </div>
+</div>
+<script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
