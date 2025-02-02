@@ -1,0 +1,318 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pyremap.polar &mdash; pyremap 1.3.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=1f29e9d3"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link href="../../_static/style.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            pyremap
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../quick_start.html">Quick Start</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API reference</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../versions.html">Versions</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pyremap</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">pyremap.polar</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pyremap.polar</h1><div class="highlight"><pre>
+<span></span><span class="c1"># This software is open source software available under the BSD-3 license.</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright (c) 2019 Triad National Security, LLC. All rights reserved.</span>
+<span class="c1"># Copyright (c) 2019 Lawrence Livermore National Security, LLC. All rights</span>
+<span class="c1"># reserved.</span>
+<span class="c1"># Copyright (c) 2019 UT-Battelle, LLC. All rights reserved.</span>
+<span class="c1">#</span>
+<span class="c1"># Additional copyright and license information can be found in the LICENSE file</span>
+<span class="c1"># distributed with this code, or at</span>
+<span class="c1"># https://raw.githubusercontent.com/MPAS-Dev/pyremap/main/LICENSE</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pyproj</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyremap.descriptor</span><span class="w"> </span><span class="kn">import</span> <span class="n">ProjectionGridDescriptor</span>
+
+
+<div class="viewcode-block" id="get_arctic_stereographic_projection">
+<a class="viewcode-back" href="../../generated/pyremap.polar.get_arctic_stereographic_projection.html#pyremap.polar.get_arctic_stereographic_projection">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_arctic_stereographic_projection</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get a projection for an Arctic stereographic comparison grid</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    projection : ``pyproj.Proj`` object</span>
+<span class="sd">        The projection</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Authors</span>
+    <span class="c1"># -------</span>
+    <span class="c1"># Milena Veneziani</span>
+
+    <span class="n">projection</span> <span class="o">=</span> <span class="n">pyproj</span><span class="o">.</span><span class="n">Proj</span><span class="p">(</span><span class="s1">&#39;+proj=stere +lat_ts=75.0 +lat_0=90 +lon_0=0.0 &#39;</span>
+                             <span class="s1">&#39;+k_0=1.0 +x_0=0.0 +y_0=0.0 +ellps=WGS84&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">projection</span></div>
+
+
+
+<div class="viewcode-block" id="get_antarctic_stereographic_projection">
+<a class="viewcode-back" href="../../generated/pyremap.polar.get_antarctic_stereographic_projection.html#pyremap.polar.get_antarctic_stereographic_projection">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_antarctic_stereographic_projection</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get a projection for an Antarctic steregraphic grid</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">projection</span> <span class="o">=</span> <span class="n">pyproj</span><span class="o">.</span><span class="n">Proj</span><span class="p">(</span><span class="s1">&#39;+proj=stere +lat_ts=-71.0 +lat_0=-90 +lon_0=0.0 &#39;</span>
+                             <span class="s1">&#39;+k_0=1.0 +x_0=0.0 +y_0=0.0 +ellps=WGS84&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">projection</span></div>
+
+
+
+<div class="viewcode-block" id="get_polar_descriptor_from_file">
+<a class="viewcode-back" href="../../generated/pyremap.polar.get_polar_descriptor_from_file.html#pyremap.polar.get_polar_descriptor_from_file">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_polar_descriptor_from_file</span><span class="p">(</span><span class="n">fileName</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="s1">&#39;antarctic&#39;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get a descriptor of a polar stereographic grid used for remapping</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    fileName :  str</span>
+<span class="sd">        A file containing x and y coordinates for the grid</span>
+
+<span class="sd">    projection : {&#39;arctic&#39;, &#39;antarctic&#39;, pyproj.Proj}</span>
+<span class="sd">        The projection to use.  &#39;arctic&#39; and &#39;antarctic&#39; are polar</span>
+<span class="sd">        stereographic projections with reference latitude at +/- 71 degrees</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    descriptor : ``ProjectionGridDescriptor`` object</span>
+<span class="sd">        A descriptor of the polar grid</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dsIn</span> <span class="o">=</span> <span class="n">xarray</span><span class="o">.</span><span class="n">open_dataset</span><span class="p">(</span><span class="n">fileName</span><span class="p">)</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">dsIn</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">dsIn</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">dx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="mf">1000.</span><span class="p">)</span>
+    <span class="n">Lx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">x</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="mf">1000.</span><span class="p">)</span>
+    <span class="n">Ly</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">y</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="mf">1000.</span><span class="p">)</span>
+
+    <span class="n">meshName</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">x</span><span class="si">{}</span><span class="s1">km_</span><span class="si">{}</span><span class="s1">km_Antarctic_stereo&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">Lx</span><span class="p">,</span> <span class="n">Ly</span><span class="p">,</span> <span class="n">dx</span><span class="p">)</span>
+
+    <span class="n">projection</span> <span class="o">=</span> <span class="n">_get_projection</span><span class="p">(</span><span class="n">projection</span><span class="p">)</span>
+
+    <span class="n">descriptor</span> <span class="o">=</span> <span class="n">ProjectionGridDescriptor</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">projection</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">meshName</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">descriptor</span></div>
+
+
+
+<div class="viewcode-block" id="get_polar_descriptor">
+<a class="viewcode-back" href="../../generated/pyremap.polar.get_polar_descriptor.html#pyremap.polar.get_polar_descriptor">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_polar_descriptor</span><span class="p">(</span><span class="n">Lx</span><span class="p">,</span> <span class="n">Ly</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="s1">&#39;antarctic&#39;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get a descriptor of a polar stereographic grid used for remapping</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    Lx, Ly :  double</span>
+<span class="sd">        Size of the domain in x and y in km</span>
+
+<span class="sd">    dx, dy : double</span>
+<span class="sd">        Resolution of the grid in km</span>
+
+<span class="sd">    projection : {&#39;arctic&#39;, &#39;antarctic&#39;, pyproj.Proj}</span>
+<span class="sd">        The projection to use.  &#39;arctic&#39; and &#39;antarctic&#39; are polar</span>
+<span class="sd">        stereographic projections with reference latitude at +/- 71 degrees</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    descriptor : ``ProjectionGridDescriptor`` object</span>
+<span class="sd">        A descriptor of the Antarctic grid</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">upperProj</span> <span class="o">=</span> <span class="n">projection</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">+</span> <span class="n">projection</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+
+    <span class="n">meshName</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">x</span><span class="si">{}</span><span class="s1">km_</span><span class="si">{}</span><span class="s1">km_</span><span class="si">{}</span><span class="s1">_stereo&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">Lx</span><span class="p">,</span> <span class="n">Ly</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">upperProj</span><span class="p">)</span>
+
+    <span class="n">xMax</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">Lx</span> <span class="o">*</span> <span class="mf">1e3</span>
+    <span class="n">nx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">Lx</span> <span class="o">/</span> <span class="n">dx</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="n">xMax</span><span class="p">,</span> <span class="n">xMax</span><span class="p">,</span> <span class="n">nx</span><span class="p">)</span>
+
+    <span class="n">yMax</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">Ly</span> <span class="o">*</span> <span class="mf">1e3</span>
+    <span class="n">ny</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">Ly</span> <span class="o">/</span> <span class="n">dy</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="n">yMax</span><span class="p">,</span> <span class="n">yMax</span><span class="p">,</span> <span class="n">ny</span><span class="p">)</span>
+
+    <span class="n">projection</span> <span class="o">=</span> <span class="n">_get_projection</span><span class="p">(</span><span class="n">projection</span><span class="p">)</span>
+
+    <span class="n">descriptor</span> <span class="o">=</span> <span class="n">ProjectionGridDescriptor</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">projection</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">meshName</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">descriptor</span></div>
+
+
+
+<div class="viewcode-block" id="to_polar">
+<a class="viewcode-back" href="../../generated/pyremap.polar.to_polar.html#pyremap.polar.to_polar">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">to_polar</span><span class="p">(</span><span class="n">points</span><span class="p">):</span>
+
+    <span class="n">projection</span> <span class="o">=</span> <span class="n">get_antarctic_stereographic_projection</span><span class="p">()</span>
+    <span class="n">latLonProjection</span> <span class="o">=</span> <span class="n">pyproj</span><span class="o">.</span><span class="n">Proj</span><span class="p">(</span><span class="n">proj</span><span class="o">=</span><span class="s1">&#39;latlong&#39;</span><span class="p">,</span> <span class="n">datum</span><span class="o">=</span><span class="s1">&#39;WGS84&#39;</span><span class="p">)</span>
+
+    <span class="n">transformer</span> <span class="o">=</span> <span class="n">pyproj</span><span class="o">.</span><span class="n">Transformer</span><span class="o">.</span><span class="n">from_proj</span><span class="p">(</span><span class="n">latLonProjection</span><span class="p">,</span> <span class="n">projection</span><span class="p">)</span>
+    <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">transformer</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">points</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">points</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">radians</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">points</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span>
+    <span class="n">points</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">y</span>
+    <span class="k">return</span> <span class="n">points</span></div>
+
+
+
+<div class="viewcode-block" id="from_polar">
+<a class="viewcode-back" href="../../generated/pyremap.polar.from_polar.html#pyremap.polar.from_polar">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">from_polar</span><span class="p">(</span><span class="n">points</span><span class="p">):</span>
+
+    <span class="n">projection</span> <span class="o">=</span> <span class="n">get_antarctic_stereographic_projection</span><span class="p">()</span>
+    <span class="n">latLonProjection</span> <span class="o">=</span> <span class="n">pyproj</span><span class="o">.</span><span class="n">Proj</span><span class="p">(</span><span class="n">proj</span><span class="o">=</span><span class="s1">&#39;latlong&#39;</span><span class="p">,</span> <span class="n">datum</span><span class="o">=</span><span class="s1">&#39;WGS84&#39;</span><span class="p">)</span>
+
+    <span class="n">transformer</span> <span class="o">=</span> <span class="n">pyproj</span><span class="o">.</span><span class="n">Transformer</span><span class="o">.</span><span class="n">from_proj</span><span class="p">(</span><span class="n">projection</span><span class="p">,</span> <span class="n">latLonProjection</span><span class="p">)</span>
+    <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span> <span class="o">=</span> <span class="n">transformer</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">points</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">points</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">radians</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">points</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">lon</span>
+    <span class="n">points</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">lat</span>
+    <span class="k">return</span> <span class="n">points</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_projection</span><span class="p">(</span><span class="n">projection</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">projection</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">projection</span> <span class="o">==</span> <span class="s1">&#39;arctic&#39;</span><span class="p">:</span>
+            <span class="n">projection</span> <span class="o">=</span> <span class="n">get_arctic_stereographic_projection</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">projection</span> <span class="o">==</span> <span class="s1">&#39;antarctic&#39;</span><span class="p">:</span>
+            <span class="n">projection</span> <span class="o">=</span> <span class="n">get_antarctic_stereographic_projection</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Bad projection name </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">projection</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">projection</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright This software is open source software available under the BSD-3license. Copyright (c) 2025.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+<div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    <span class="fa fa-book"> Other Versions</span>
+    v: 1.0.1
+    <span class="fa fa-caret-down"></span>
+  </span>
+  <div class="rst-other-versions">
+    <dl>
+      <dt>Tags</dt>
+      <dd><a href="../../../0.0.10/index.html">0.0.10</a></dd>
+      <dd><a href="../../../0.0.11/index.html">0.0.11</a></dd>
+      <dd><a href="../../../0.0.12/index.html">0.0.12</a></dd>
+      <dd><a href="../../../0.0.13/index.html">0.0.13</a></dd>
+      <dd><a href="../../../0.0.14/index.html">0.0.14</a></dd>
+      <dd><a href="../../../0.0.15/index.html">0.0.15</a></dd>
+      <dd><a href="../../../0.0.16/index.html">0.0.16</a></dd>
+      <dd><a href="../../../0.0.2/index.html">0.0.2</a></dd>
+      <dd><a href="../../../0.0.3/index.html">0.0.3</a></dd>
+      <dd><a href="../../../0.0.4/index.html">0.0.4</a></dd>
+      <dd><a href="../../../0.0.5/index.html">0.0.5</a></dd>
+      <dd><a href="../../../0.0.6/index.html">0.0.6</a></dd>
+      <dd><a href="../../../0.0.7/index.html">0.0.7</a></dd>
+      <dd><a href="../../../0.0.8/index.html">0.0.8</a></dd>
+      <dd><a href="../../../0.0.9/index.html">0.0.9</a></dd>
+      <dd><a href="../../../1.0.0/index.html">1.0.0</a></dd>
+      <dd><a href="polar.html">1.0.1</a></dd>
+      <dd><a href="../../../1.1.0/index.html">1.1.0</a></dd>
+      <dd><a href="../../../1.2.0/index.html">1.2.0</a></dd>
+      <dd><a href="../../../1.3.0/index.html">1.3.0</a></dd>
+    </dl>
+    <dl>
+      <dt>Branches</dt>
+      <dd><a href="../../../main/index.html">main</a></dd>
+    </dl>
+  </div>
+</div>
+<script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

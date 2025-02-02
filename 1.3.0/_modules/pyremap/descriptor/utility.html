@@ -1,0 +1,338 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pyremap.descriptor.utility &mdash; pyremap 1.3.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=1f29e9d3"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link href="../../../_static/style.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            pyremap
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../quick_start.html">Quick Start</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API reference</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../versions.html">Versions</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">pyremap</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">pyremap.descriptor.utility</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pyremap.descriptor.utility</h1><div class="highlight"><pre>
+<span></span><span class="c1"># This software is open source software available under the BSD-3 license.</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright (c) 2022 Triad National Security, LLC. All rights reserved.</span>
+<span class="c1"># Copyright (c) 2022 Lawrence Livermore National Security, LLC. All rights</span>
+<span class="c1"># reserved.</span>
+<span class="c1"># Copyright (c) 2022 UT-Battelle, LLC. All rights reserved.</span>
+<span class="c1">#</span>
+<span class="c1"># Additional copyright and license information can be found in the LICENSE file</span>
+<span class="c1"># distributed with this code, or at</span>
+<span class="c1"># https://raw.githubusercontent.com/MPAS-Dev/pyremap/main/LICENSE</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pyproj.enums</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyproj</span><span class="w"> </span><span class="kn">import</span> <span class="n">Transformer</span>
+
+
+<div class="viewcode-block" id="interp_extrap_corner">
+<a class="viewcode-back" href="../../../generated/pyremap.descriptor.interp_extrap_corner.html#pyremap.descriptor.interp_extrap_corner">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">interp_extrap_corner</span><span class="p">(</span><span class="n">inField</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Interpolate/extrapolate a 1D field from grid centers to grid corners&quot;&quot;&quot;</span>
+
+    <span class="n">outField</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">inField</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">outField</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">inField</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">inField</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+    <span class="c1"># extrapolate the ends</span>
+    <span class="n">outField</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.5</span> <span class="o">*</span> <span class="n">inField</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">inField</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">outField</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.5</span> <span class="o">*</span> <span class="n">inField</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">inField</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">outField</span></div>
+
+
+
+<div class="viewcode-block" id="interp_extrap_corners_2d">
+<a class="viewcode-back" href="../../../generated/pyremap.descriptor.interp_extrap_corners_2d.html#pyremap.descriptor.interp_extrap_corners_2d">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">interp_extrap_corners_2d</span><span class="p">(</span><span class="n">inField</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Interpolate/extrapolate a 1D field from grid centers to grid corners&quot;&quot;&quot;</span>
+
+    <span class="n">temp</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">inField</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">inField</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="n">temp</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">inField</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">inField</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:])</span>
+    <span class="c1"># extrapolate the ends</span>
+    <span class="n">temp</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.5</span> <span class="o">*</span> <span class="n">inField</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">inField</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">temp</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.5</span> <span class="o">*</span> <span class="n">inField</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">inField</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+
+    <span class="n">outField</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">inField</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">inField</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="n">outField</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">temp</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="o">+</span> <span class="n">temp</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="p">:])</span>
+    <span class="c1"># extrapolate the ends</span>
+    <span class="n">outField</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="mf">1.5</span> <span class="o">*</span> <span class="n">temp</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:]</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">temp</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="n">outField</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="mf">1.5</span> <span class="o">*</span> <span class="n">temp</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">temp</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="p">:]</span>
+
+    <span class="k">return</span> <span class="n">outField</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">create_scrip</span><span class="p">(</span><span class="n">outFile</span><span class="p">,</span> <span class="n">grid_size</span><span class="p">,</span> <span class="n">grid_corners</span><span class="p">,</span> <span class="n">grid_rank</span><span class="p">,</span> <span class="n">units</span><span class="p">,</span>
+                 <span class="n">meshName</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Given a SCRIP files, creates common variables and writes common values used</span>
+<span class="sd">    in various types of SCRIP files.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    outFile : file pointer</span>
+<span class="sd">        A SCRIP file opened in write mode</span>
+
+<span class="sd">    grid_size : int</span>
+<span class="sd">        The number of elements in the grid or mesh</span>
+
+<span class="sd">    grid_corners : int</span>
+<span class="sd">        The number of corners in the grid or mesh</span>
+
+<span class="sd">    grid_rank : int</span>
+<span class="sd">        The dimensionality of the grid (1 for mesh, 2 for grid)</span>
+
+<span class="sd">    units : {&#39;degrees&#39;, &#39;radians&#39;}</span>
+<span class="sd">        The units for latitude and longitude</span>
+
+<span class="sd">    meshName : str</span>
+<span class="sd">        The name of the mesh</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Write to output file</span>
+    <span class="c1"># Dimensions</span>
+    <span class="n">outFile</span><span class="o">.</span><span class="n">createDimension</span><span class="p">(</span><span class="s2">&quot;grid_size&quot;</span><span class="p">,</span> <span class="n">grid_size</span><span class="p">)</span>
+    <span class="n">outFile</span><span class="o">.</span><span class="n">createDimension</span><span class="p">(</span><span class="s2">&quot;grid_corners&quot;</span><span class="p">,</span> <span class="n">grid_corners</span><span class="p">)</span>
+    <span class="n">outFile</span><span class="o">.</span><span class="n">createDimension</span><span class="p">(</span><span class="s2">&quot;grid_rank&quot;</span><span class="p">,</span> <span class="n">grid_rank</span><span class="p">)</span>
+
+    <span class="c1"># Variables</span>
+    <span class="n">grid_center_lat</span> <span class="o">=</span> <span class="n">outFile</span><span class="o">.</span><span class="n">createVariable</span><span class="p">(</span><span class="s1">&#39;grid_center_lat&#39;</span><span class="p">,</span> <span class="s1">&#39;f8&#39;</span><span class="p">,</span>
+                                             <span class="p">(</span><span class="s1">&#39;grid_size&#39;</span><span class="p">,))</span>
+    <span class="n">grid_center_lat</span><span class="o">.</span><span class="n">units</span> <span class="o">=</span> <span class="n">units</span>
+    <span class="n">grid_center_lon</span> <span class="o">=</span> <span class="n">outFile</span><span class="o">.</span><span class="n">createVariable</span><span class="p">(</span><span class="s1">&#39;grid_center_lon&#39;</span><span class="p">,</span> <span class="s1">&#39;f8&#39;</span><span class="p">,</span>
+                                             <span class="p">(</span><span class="s1">&#39;grid_size&#39;</span><span class="p">,))</span>
+    <span class="n">grid_center_lon</span><span class="o">.</span><span class="n">units</span> <span class="o">=</span> <span class="n">units</span>
+    <span class="n">grid_corner_lat</span> <span class="o">=</span> <span class="n">outFile</span><span class="o">.</span><span class="n">createVariable</span><span class="p">(</span><span class="s1">&#39;grid_corner_lat&#39;</span><span class="p">,</span> <span class="s1">&#39;f8&#39;</span><span class="p">,</span>
+                                             <span class="p">(</span><span class="s1">&#39;grid_size&#39;</span><span class="p">,</span> <span class="s1">&#39;grid_corners&#39;</span><span class="p">))</span>
+    <span class="n">grid_corner_lat</span><span class="o">.</span><span class="n">units</span> <span class="o">=</span> <span class="n">units</span>
+    <span class="n">grid_corner_lon</span> <span class="o">=</span> <span class="n">outFile</span><span class="o">.</span><span class="n">createVariable</span><span class="p">(</span><span class="s1">&#39;grid_corner_lon&#39;</span><span class="p">,</span> <span class="s1">&#39;f8&#39;</span><span class="p">,</span>
+                                             <span class="p">(</span><span class="s1">&#39;grid_size&#39;</span><span class="p">,</span> <span class="s1">&#39;grid_corners&#39;</span><span class="p">))</span>
+    <span class="n">grid_corner_lon</span><span class="o">.</span><span class="n">units</span> <span class="o">=</span> <span class="n">units</span>
+    <span class="n">grid_imask</span> <span class="o">=</span> <span class="n">outFile</span><span class="o">.</span><span class="n">createVariable</span><span class="p">(</span><span class="s1">&#39;grid_imask&#39;</span><span class="p">,</span> <span class="s1">&#39;i4&#39;</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;grid_size&#39;</span><span class="p">,))</span>
+    <span class="n">grid_imask</span><span class="o">.</span><span class="n">units</span> <span class="o">=</span> <span class="s1">&#39;unitless&#39;</span>
+    <span class="n">outFile</span><span class="o">.</span><span class="n">createVariable</span><span class="p">(</span><span class="s1">&#39;grid_dims&#39;</span><span class="p">,</span> <span class="s1">&#39;i4&#39;</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;grid_rank&#39;</span><span class="p">,))</span>
+
+    <span class="n">outFile</span><span class="o">.</span><span class="n">meshName</span> <span class="o">=</span> <span class="n">meshName</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">expand_scrip</span><span class="p">(</span><span class="n">outFile</span><span class="p">,</span> <span class="n">expandDist</span><span class="p">,</span> <span class="n">expandFactor</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Given a SCRIP files, creates common variables and writes common values used</span>
+<span class="sd">    in various types of SCRIP files.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    outFile : file pointer</span>
+<span class="sd">        A SCRIP file opened in write mode</span>
+
+<span class="sd">    expandDist : float or numpy.ndarray</span>
+<span class="sd">        A distance in meters to expand each grid cell outward from the</span>
+<span class="sd">        center.  If a ``numpy.ndarray``, one value per cell.</span>
+
+<span class="sd">    expandFactor : float or numpy.ndarray</span>
+<span class="sd">        A factor by which to expand each grid cell outward from the center.</span>
+<span class="sd">        If a ``numpy.ndarray``, one value per cell.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">grid_center_lat</span> <span class="o">=</span> <span class="n">outFile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s1">&#39;grid_center_lat&#39;</span><span class="p">][:]</span>
+    <span class="n">grid_center_lon</span> <span class="o">=</span> <span class="n">outFile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s1">&#39;grid_center_lon&#39;</span><span class="p">][:]</span>
+    <span class="n">grid_corner_lat</span> <span class="o">=</span> <span class="n">outFile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s1">&#39;grid_corner_lat&#39;</span><span class="p">][:]</span>
+    <span class="n">grid_corner_lon</span> <span class="o">=</span> <span class="n">outFile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s1">&#39;grid_corner_lon&#39;</span><span class="p">][:]</span>
+    <span class="n">grid_size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">outFile</span><span class="o">.</span><span class="n">dimensions</span><span class="p">[</span><span class="s1">&#39;grid_size&#39;</span><span class="p">])</span>
+    <span class="n">grid_corners</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">outFile</span><span class="o">.</span><span class="n">dimensions</span><span class="p">[</span><span class="s1">&#39;grid_corners&#39;</span><span class="p">])</span>
+
+    <span class="n">radians</span> <span class="o">=</span> <span class="s1">&#39;rad&#39;</span> <span class="ow">in</span> <span class="n">outFile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s1">&#39;grid_center_lat&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">units</span>
+
+    <span class="n">trans_lon_lat_to_xyz</span> <span class="o">=</span> <span class="n">Transformer</span><span class="o">.</span><span class="n">from_crs</span><span class="p">(</span><span class="mi">4979</span><span class="p">,</span> <span class="mi">4978</span><span class="p">,</span> <span class="n">always_xy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">x_center</span><span class="p">,</span> <span class="n">y_center</span><span class="p">,</span> <span class="n">z_center</span> <span class="o">=</span> <span class="n">trans_lon_lat_to_xyz</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span>
+        <span class="n">grid_center_lon</span><span class="p">,</span> <span class="n">grid_center_lat</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">grid_size</span><span class="p">),</span>
+        <span class="n">radians</span><span class="o">=</span><span class="n">radians</span><span class="p">)</span>
+
+    <span class="n">x_corner</span><span class="p">,</span> <span class="n">y_corner</span><span class="p">,</span> <span class="n">z_corner</span> <span class="o">=</span> <span class="n">trans_lon_lat_to_xyz</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span>
+        <span class="n">grid_corner_lon</span><span class="p">,</span> <span class="n">grid_corner_lat</span><span class="p">,</span>
+        <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">grid_size</span><span class="p">,</span> <span class="n">grid_corners</span><span class="p">)),</span> <span class="n">radians</span><span class="o">=</span><span class="n">radians</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">expandFactor</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">expandFactor</span> <span class="o">=</span> <span class="mf">1.</span>
+
+    <span class="k">if</span> <span class="n">expandDist</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">expandDist</span> <span class="o">=</span> <span class="mf">0.</span>
+
+    <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">grid_corners</span><span class="p">):</span>
+        <span class="n">dx</span> <span class="o">=</span> <span class="n">x_corner</span><span class="p">[:,</span> <span class="n">index</span><span class="p">]</span> <span class="o">-</span> <span class="n">x_center</span>
+        <span class="n">dy</span> <span class="o">=</span> <span class="n">y_corner</span><span class="p">[:,</span> <span class="n">index</span><span class="p">]</span> <span class="o">-</span> <span class="n">y_center</span>
+        <span class="n">dz</span> <span class="o">=</span> <span class="n">z_corner</span><span class="p">[:,</span> <span class="n">index</span><span class="p">]</span> <span class="o">-</span> <span class="n">z_center</span>
+        <span class="n">dist</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">dx</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">dy</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">dz</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">factor</span> <span class="o">=</span> <span class="p">(</span><span class="n">expandFactor</span> <span class="o">*</span> <span class="n">dist</span> <span class="o">+</span> <span class="n">expandDist</span><span class="p">)</span> <span class="o">/</span> <span class="n">dist</span>
+        <span class="n">x_corner</span><span class="p">[:,</span> <span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">factor</span> <span class="o">*</span> <span class="n">dx</span> <span class="o">+</span> <span class="n">x_center</span>
+        <span class="n">y_corner</span><span class="p">[:,</span> <span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">factor</span> <span class="o">*</span> <span class="n">dy</span> <span class="o">+</span> <span class="n">y_center</span>
+        <span class="n">z_corner</span><span class="p">[:,</span> <span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">factor</span> <span class="o">*</span> <span class="n">dz</span> <span class="o">+</span> <span class="n">z_center</span>
+
+    <span class="n">grid_corner_lon</span><span class="p">,</span> <span class="n">grid_corner_lat</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">trans_lon_lat_to_xyz</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span>
+        <span class="n">x_corner</span><span class="p">,</span> <span class="n">y_corner</span><span class="p">,</span> <span class="n">z_corner</span><span class="p">,</span> <span class="n">radians</span><span class="o">=</span><span class="n">radians</span><span class="p">,</span>
+        <span class="n">direction</span><span class="o">=</span><span class="n">pyproj</span><span class="o">.</span><span class="n">enums</span><span class="o">.</span><span class="n">TransformDirection</span><span class="o">.</span><span class="n">INVERSE</span><span class="p">)</span>
+
+    <span class="n">outFile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s1">&#39;grid_corner_lat&#39;</span><span class="p">][:]</span> <span class="o">=</span> <span class="n">grid_corner_lat</span><span class="p">[:]</span>
+    <span class="n">outFile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s1">&#39;grid_corner_lon&#39;</span><span class="p">][:]</span> <span class="o">=</span> <span class="n">grid_corner_lon</span><span class="p">[:]</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">unwrap_corners</span><span class="p">(</span><span class="n">inField</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Turn a 2D array of corners into an array of rectangular mesh elements&quot;&quot;&quot;</span>
+    <span class="n">outField</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(((</span><span class="n">inField</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">inField</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="mi">4</span><span class="p">))</span>
+    <span class="c1"># corners are counterclockwise</span>
+    <span class="n">outField</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">inField</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">flat</span>
+    <span class="n">outField</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">inField</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">flat</span>
+    <span class="n">outField</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">inField</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">flat</span>
+    <span class="n">outField</span><span class="p">[:,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">inField</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">flat</span>
+
+    <span class="k">return</span> <span class="n">outField</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">round_res</span><span class="p">(</span><span class="n">res</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Round the resolution to a reasonable number for grid names&quot;&quot;&quot;</span>
+    <span class="n">rounded</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">res</span> <span class="o">*</span> <span class="mf">1000.</span><span class="p">)</span> <span class="o">/</span> <span class="mf">1000.</span>
+    <span class="k">return</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">rounded</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">add_history</span><span class="p">(</span><span class="n">ds</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the history attribute, possibly adding it to existing history&quot;&quot;&quot;</span>
+    <span class="n">history</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[:])</span>
+    <span class="k">if</span> <span class="n">ds</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="s1">&#39;history&#39;</span> <span class="ow">in</span> <span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="p">:</span>
+        <span class="n">prev_hist</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;history&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">prev_hist</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="n">prev_hist</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">prev_hist</span><span class="p">)</span>
+        <span class="n">history</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">prev_hist</span><span class="p">,</span> <span class="n">history</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">history</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright This software is open source software available under the BSD-3license. Copyright (c) 2025.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+<div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    <span class="fa fa-book"> Other Versions</span>
+    v: 1.3.0
+    <span class="fa fa-caret-down"></span>
+  </span>
+  <div class="rst-other-versions">
+    <dl>
+      <dt>Tags</dt>
+      <dd><a href="../../../../0.0.10/index.html">0.0.10</a></dd>
+      <dd><a href="../../../../0.0.11/index.html">0.0.11</a></dd>
+      <dd><a href="../../../../0.0.12/index.html">0.0.12</a></dd>
+      <dd><a href="../../../../0.0.13/index.html">0.0.13</a></dd>
+      <dd><a href="../../../../0.0.14/index.html">0.0.14</a></dd>
+      <dd><a href="../../../../0.0.15/index.html">0.0.15</a></dd>
+      <dd><a href="../../../../0.0.16/index.html">0.0.16</a></dd>
+      <dd><a href="../../../../0.0.2/index.html">0.0.2</a></dd>
+      <dd><a href="../../../../0.0.3/index.html">0.0.3</a></dd>
+      <dd><a href="../../../../0.0.4/index.html">0.0.4</a></dd>
+      <dd><a href="../../../../0.0.5/index.html">0.0.5</a></dd>
+      <dd><a href="../../../../0.0.6/index.html">0.0.6</a></dd>
+      <dd><a href="../../../../0.0.7/index.html">0.0.7</a></dd>
+      <dd><a href="../../../../0.0.8/index.html">0.0.8</a></dd>
+      <dd><a href="../../../../0.0.9/index.html">0.0.9</a></dd>
+      <dd><a href="../../../../1.0.0/index.html">1.0.0</a></dd>
+      <dd><a href="../../../../1.0.1/index.html">1.0.1</a></dd>
+      <dd><a href="../../../../1.1.0/index.html">1.1.0</a></dd>
+      <dd><a href="../../../../1.2.0/index.html">1.2.0</a></dd>
+      <dd><a href="utility.html">1.3.0</a></dd>
+    </dl>
+    <dl>
+      <dt>Branches</dt>
+      <dd><a href="../../../../main/index.html">main</a></dd>
+    </dl>
+  </div>
+</div>
+<script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

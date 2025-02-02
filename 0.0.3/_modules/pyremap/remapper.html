@@ -1,0 +1,1027 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pyremap.remapper &mdash; pyremap 0.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=47de8214"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link href="../../_static/style.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            pyremap
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pyremap</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">pyremap.remapper</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pyremap.remapper</h1><div class="highlight"><pre>
+<span></span><span class="c1"># This software is open source software available under the BSD-3 license.</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright (c) 2019 Triad National Security, LLC. All rights reserved.</span>
+<span class="c1"># Copyright (c) 2019 Lawrence Livermore National Security, LLC. All rights</span>
+<span class="c1"># reserved.</span>
+<span class="c1"># Copyright (c) 2019 UT-Battelle, LLC. All rights reserved.</span>
+<span class="c1">#</span>
+<span class="c1"># Additional copyright and license information can be found in the LICENSE file</span>
+<span class="c1"># distributed with this code, or at</span>
+<span class="c1"># https://raw.githubusercontent.com/MPAS-Dev/pyremap/main/LICENSE</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">shutil</span><span class="w"> </span><span class="kn">import</span> <span class="n">which</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">subprocess</span><span class="w"> </span><span class="kn">import</span> <span class="n">check_output</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tempfile</span><span class="w"> </span><span class="kn">import</span> <span class="n">TemporaryDirectory</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">warnings</span><span class="w"> </span><span class="kn">import</span> <span class="n">warn</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.sparse</span><span class="w"> </span><span class="kn">import</span> <span class="n">csr_matrix</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyremap.descriptor</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">LatLon2DGridDescriptor</span><span class="p">,</span>
+    <span class="n">LatLonGridDescriptor</span><span class="p">,</span>
+    <span class="n">MpasCellMeshDescriptor</span><span class="p">,</span>
+    <span class="n">MpasEdgeMeshDescriptor</span><span class="p">,</span>
+    <span class="n">MpasVertexMeshDescriptor</span><span class="p">,</span>
+    <span class="n">PointCollectionDescriptor</span><span class="p">,</span>
+    <span class="n">ProjectionGridDescriptor</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="Remapper">
+<a class="viewcode-back" href="../../generated/pyremap.remapper.Remapper.html#pyremap.remapper.Remapper">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Remapper</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class for remapping fields using a given mapping file.  The weights and</span>
+<span class="sd">    indices from the mapping file can be loaded once and reused multiple times</span>
+<span class="sd">    to map several fields between the same source and destination grids.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Authors</span>
+    <span class="c1"># -------</span>
+    <span class="c1"># Xylar Asay-Davis</span>
+
+<div class="viewcode-block" id="Remapper.__init__">
+<a class="viewcode-back" href="../../generated/pyremap.remapper.Remapper.html#pyremap.remapper.Remapper.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sourceDescriptor</span><span class="p">,</span> <span class="n">destinationDescriptor</span><span class="p">,</span>
+                 <span class="n">mappingFileName</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create the remapper and read weights and indices from the given file</span>
+<span class="sd">        for later used in remapping fields.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        sourceDescriptor : ``shared.grid.MeshDescriptor``</span>
+<span class="sd">            An object used to write a scrip file and to determine the type of</span>
+<span class="sd">            the source mesh or grid.</span>
+
+<span class="sd">        destinationDescriptor : ``shared.grid.MeshDescriptor``</span>
+<span class="sd">            An object used to write a scrip files and to determine the type of</span>
+<span class="sd">            the destination mesh or grid.</span>
+
+<span class="sd">        mappingFileName : str, optional</span>
+<span class="sd">            The path where the mapping file containing interpolation weights</span>
+<span class="sd">            and indices will be written and/or read.  If ``None``,</span>
+<span class="sd">            no interpolation is performed and data sets are returned unchanged.</span>
+<span class="sd">            This is useful if the source and destination grids are determined</span>
+<span class="sd">            to be the same (though the Remapper does not attempt to determine</span>
+<span class="sd">            if this is the case).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Authors</span>
+        <span class="c1"># -------</span>
+        <span class="c1"># Xylar Asay-Davis</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sourceDescriptor</span><span class="p">,</span> <span class="n">PointCollectionDescriptor</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;sourceDescriptor of type &quot;</span>
+                            <span class="s2">&quot;PointCollectionDescriptor is not supported.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sourceDescriptor</span><span class="p">,</span>
+                          <span class="p">(</span><span class="n">MpasCellMeshDescriptor</span><span class="p">,</span> <span class="n">MpasEdgeMeshDescriptor</span><span class="p">,</span>
+                           <span class="n">MpasVertexMeshDescriptor</span><span class="p">,</span> <span class="n">LatLonGridDescriptor</span><span class="p">,</span>
+                           <span class="n">LatLon2DGridDescriptor</span><span class="p">,</span> <span class="n">ProjectionGridDescriptor</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;sourceDescriptor is not of a recognized type.&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">destinationDescriptor</span><span class="p">,</span>
+                          <span class="p">(</span><span class="n">MpasCellMeshDescriptor</span><span class="p">,</span> <span class="n">MpasEdgeMeshDescriptor</span><span class="p">,</span>
+                           <span class="n">MpasVertexMeshDescriptor</span><span class="p">,</span> <span class="n">LatLonGridDescriptor</span><span class="p">,</span>
+                           <span class="n">LatLon2DGridDescriptor</span><span class="p">,</span> <span class="n">ProjectionGridDescriptor</span><span class="p">,</span>
+                           <span class="n">PointCollectionDescriptor</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="s2">&quot;destinationDescriptor is not of a recognized type.&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">sourceDescriptor</span> <span class="o">=</span> <span class="n">sourceDescriptor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">destinationDescriptor</span> <span class="o">=</span> <span class="n">destinationDescriptor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mappingFileName</span> <span class="o">=</span> <span class="n">mappingFileName</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">mappingLoaded</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">esmf_build_map</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;bilinear&#39;</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mpi_tasks</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                       <span class="n">tempdir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">parallel_exec</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">include_logs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                       <span class="n">expand_dist</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">expand_factor</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Use ``ESMF_RegridWeightGen`` to construct a mapping file used for</span>
+<span class="sd">        interpolation between the source and destination grids.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        method : {&#39;bilinear&#39;, &#39;neareststod&#39;, &#39;conserve&#39;}, optional</span>
+<span class="sd">            The method of interpolation used, see documentation for</span>
+<span class="sd">            ``ESMF_RegridWeightGen`` for details.</span>
+
+<span class="sd">        logger : ``logging.Logger``, optional</span>
+<span class="sd">            A logger to which ncclimo output should be redirected</span>
+
+<span class="sd">        mpi_tasks : int, optional</span>
+<span class="sd">            The number of MPI tasks (a number &gt; 1 implies that</span>
+<span class="sd">            ``ESMF_RegridWeightGen`` will be called the given parallel</span>
+<span class="sd">            executable)</span>
+
+<span class="sd">        tempdir : str, optional</span>
+<span class="sd">            A temporary directory.  By default, a temporary directory is</span>
+<span class="sd">            created, typically in ``/tmp`` but on some systems such as compute</span>
+<span class="sd">            nodes this may not be visible to all processors in the subsequent</span>
+<span class="sd">            ``ESMF_RegridWeightGen`` call</span>
+
+<span class="sd">        parallel_exec : {&#39;srun&#39;, &#39;mpirun&#39;}, optional</span>
+<span class="sd">            The name of the parallel executable to use to launch ESMF tools.</span>
+<span class="sd">            By default, &#39;mpirun&#39; from the conda environment is used</span>
+
+<span class="sd">        include_logs : bool, optional</span>
+<span class="sd">            Whether to include log files from ``ESMF_RegridWeightGen``</span>
+
+<span class="sd">        expand_dist : float or numpy.ndarray, optional</span>
+<span class="sd">            A distance in meters to expand each cell of the destination mesh</span>
+<span class="sd">            outward from the center.  This can be used to smooth fields on</span>
+<span class="sd">            the destination grid.  If a ``numpy.ndarray``, one value per cell</span>
+<span class="sd">            on the destination mesh.</span>
+
+<span class="sd">        expand_factor : float or numpy.ndarray, optional</span>
+<span class="sd">            A factor by which to expand each cell of the destination mesh</span>
+<span class="sd">            outward from the center.  This can be used to smooth fields on</span>
+<span class="sd">            the destination grid.  If a ``numpy.ndarray``, one value per cell</span>
+<span class="sd">            on the destination mesh.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        OSError</span>
+<span class="sd">            If ``ESMF_RegridWeightGen`` is not in the system path.</span>
+
+<span class="sd">        ValueError</span>
+<span class="sd">            If the type of mesh used in ``sourceDescriptor`` and/or</span>
+<span class="sd">            ``destinationDescriptor`` are not compatible with other arguments</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_esmf_build_map</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">,</span> <span class="n">mpi_tasks</span><span class="o">=</span><span class="n">mpi_tasks</span><span class="p">,</span>
+                             <span class="n">tempdir</span><span class="o">=</span><span class="n">tempdir</span><span class="p">,</span> <span class="n">parallel_exec</span><span class="o">=</span><span class="n">parallel_exec</span><span class="p">,</span>
+                             <span class="n">include_logs</span><span class="o">=</span><span class="n">include_logs</span><span class="p">,</span>
+                             <span class="n">expand_dist</span><span class="o">=</span><span class="n">expand_dist</span><span class="p">,</span>
+                             <span class="n">expand_factor</span><span class="o">=</span><span class="n">expand_factor</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">build_mapping_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;bilinear&#39;</span><span class="p">,</span>
+                           <span class="n">additionalArgs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mpiTasks</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                           <span class="n">tempdir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">esmf_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                           <span class="n">esmf_parallel_exec</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">extrap_method</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                           <span class="n">include_logs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">expandDist</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                           <span class="n">expandFactor</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Given a source file defining either an MPAS mesh or a lat-lon grid and</span>
+<span class="sd">        a destination file or set of arrays defining a lat-lon grid, constructs</span>
+<span class="sd">        a mapping file used for interpolation between the source and</span>
+<span class="sd">        destination grids.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        method : {&#39;bilinear&#39;, &#39;neareststod&#39;, &#39;conserve&#39;}, optional</span>
+<span class="sd">            The method of interpolation used, see documentation for</span>
+<span class="sd">            `ESMF_RegridWeightGen` for details.</span>
+
+<span class="sd">        additionalArgs : list of str, optional</span>
+<span class="sd">            A list of additional arguments to ``ESMF_RegridWeightGen``</span>
+
+<span class="sd">        logger : ``logging.Logger``, optional</span>
+<span class="sd">            A logger to which ncclimo output should be redirected</span>
+
+<span class="sd">        mpiTasks : int, optional</span>
+<span class="sd">            The number of MPI tasks (a number &gt; 1 implies that</span>
+<span class="sd">            ESMF_RegridWeightGen will be called with ``mpirun``)</span>
+
+<span class="sd">        tempdir : str, optional</span>
+<span class="sd">            A temporary directory.  By default, a temporary directory is</span>
+<span class="sd">            created, typically in ``/tmp`` but on some systems such as compute</span>
+<span class="sd">            nodes this may not be visible to all processors in the subsequent</span>
+<span class="sd">            ``ESMF_RegridWeightGen`` call</span>
+
+<span class="sd">        esmf_path : str, optional</span>
+<span class="sd">            A path to a system build of ESMF (containing a &#39;bin&#39; directory with</span>
+<span class="sd">            the ESMF tools).  By default, ESMF tools are found in the conda</span>
+<span class="sd">            environment</span>
+
+<span class="sd">        esmf_parallel_exec : {&#39;srun&#39;, &#39;mpirun}, optional</span>
+<span class="sd">            The name of the parallel executable to use to launch ESMF tools.</span>
+<span class="sd">            By default, &#39;mpirun&#39; from the conda environment is used</span>
+
+<span class="sd">        extrap_method : {&#39;neareststod&#39;, &#39;nearestidavg&#39;,&#39;creep&#39;}, optional</span>
+<span class="sd">            The method used to extrapolate unmapped destination locations</span>
+
+<span class="sd">        include_logs : bool, optional</span>
+<span class="sd">            Whether to include log files from ``ESMF_RegridWeightGen``</span>
+
+<span class="sd">        expandDist : float or numpy.ndarray, optional</span>
+<span class="sd">            A distance in meters to expand each cell of the destination mesh</span>
+<span class="sd">            outward from the center.  This can be used to smooth fields on</span>
+<span class="sd">            the destination grid.  If a ``numpy.ndarray``, one value per cell</span>
+<span class="sd">            on the destination mesh.</span>
+
+<span class="sd">        expandFactor : float or numpy.ndarray, optional</span>
+<span class="sd">            A factor by which to expand each cell of the destination mesh</span>
+<span class="sd">            outward from the center.  This can be used to smooth fields on</span>
+<span class="sd">            the destination grid.  If a ``numpy.ndarray``, one value per cell</span>
+<span class="sd">            on the destination mesh.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        OSError</span>
+<span class="sd">            If ``ESMF_RegridWeightGen`` is not in the system path.</span>
+
+<span class="sd">        ValueError</span>
+<span class="sd">            If sourceDescriptor or destinationDescriptor is of an unknown type</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Authors</span>
+        <span class="c1"># -------</span>
+        <span class="c1"># Xylar Asay-Davis</span>
+
+        <span class="n">warn</span><span class="p">(</span><span class="s1">&#39;build_mapping_file() is deprecated.  Use esmf_build_map() or &#39;</span>
+             <span class="s1">&#39;mbtempest_build_map() instead&#39;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_esmf_build_map</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">,</span> <span class="n">mpi_tasks</span><span class="o">=</span><span class="n">mpiTasks</span><span class="p">,</span>
+                             <span class="n">tempdir</span><span class="o">=</span><span class="n">tempdir</span><span class="p">,</span> <span class="n">parallel_exec</span><span class="o">=</span><span class="n">esmf_parallel_exec</span><span class="p">,</span>
+                             <span class="n">include_logs</span><span class="o">=</span><span class="n">include_logs</span><span class="p">,</span>
+                             <span class="n">expand_dist</span><span class="o">=</span><span class="n">expandDist</span><span class="p">,</span>
+                             <span class="n">expand_factor</span><span class="o">=</span><span class="n">expandFactor</span><span class="p">,</span>
+                             <span class="n">additional_args</span><span class="o">=</span><span class="n">additionalArgs</span><span class="p">,</span>
+                             <span class="n">esmf_path</span><span class="o">=</span><span class="n">esmf_path</span><span class="p">,</span>
+                             <span class="n">extrap_method</span><span class="o">=</span><span class="n">extrap_method</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">remap_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inFileName</span><span class="p">,</span> <span class="n">outFileName</span><span class="p">,</span>  <span class="c1"># noqa: C901</span>
+                   <span class="n">variableList</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">renormalize</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                   <span class="n">logger</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">replaceMpasFill</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">parallel_exec</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Given a source file defining either an MPAS mesh or a lat-lon grid and</span>
+<span class="sd">        a destination file or set of arrays defining a lat-lon grid, constructs</span>
+<span class="sd">        a mapping file used for interpolation between the source and</span>
+<span class="sd">        destination grids.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        inFileName : str</span>
+<span class="sd">            The path to the file containing a data set on the source grid</span>
+
+<span class="sd">        outFileName : str</span>
+<span class="sd">            The path where the data on the destination grid should be written</span>
+
+<span class="sd">        variableList : list of str, optional</span>
+<span class="sd">            A list of variables to be mapped.  By default, all variables are</span>
+<span class="sd">            mapped</span>
+
+<span class="sd">        overwrite : bool, optional</span>
+<span class="sd">            Whether the destination file should be overwritten if it already</span>
+<span class="sd">            exists. If `False`, and the destination file is already present,</span>
+<span class="sd">            the function does nothing and returns immediately</span>
+
+<span class="sd">        renormalize : float, optional</span>
+<span class="sd">            A threshold to use to renormalize the data</span>
+
+<span class="sd">        logger : ``logging.Logger``, optional</span>
+<span class="sd">            A logger to which ncclimo output should be redirected</span>
+
+<span class="sd">        replaceMpasFill : bool, optional</span>
+<span class="sd">            For MPAS meshes, whether add a ``_FillValue`` attribute (missing</span>
+<span class="sd">            from MPAS output).  If this has been handled before the call,</span>
+<span class="sd">            replacing the fill value again may cause errors.</span>
+
+<span class="sd">        parallel_exec : {&#39;srun&#39;}, optional</span>
+<span class="sd">            The name of the parallel executable to use to launch ncremap.</span>
+<span class="sd">            By default, none is used.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        OSError</span>
+<span class="sd">            If ``ncremap`` is not in the system path.</span>
+
+<span class="sd">        ValueError</span>
+<span class="sd">            If ``mappingFileName`` is ``None`` (meaning no remapping is</span>
+<span class="sd">            needed).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Authors</span>
+        <span class="c1"># -------</span>
+        <span class="c1"># Xylar Asay-Davis</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mappingFileName</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;No mapping file was given because remapping is &#39;</span>
+                             <span class="sa">f</span><span class="s1">&#39;not necessary. The calling</span><span class="se">\n</span><span class="s1">&#39;</span>
+                             <span class="sa">f</span><span class="s1">&#39;code should simply use the constents of &#39;</span>
+                             <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">inFileName</span><span class="si">}</span><span class="s1"> directly.&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">overwrite</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">outFileName</span><span class="p">):</span>
+            <span class="c1"># a remapped file already exists, so nothing to do</span>
+            <span class="k">return</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sourceDescriptor</span><span class="p">,</span> <span class="n">PointCollectionDescriptor</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Source grid is a point collection, which is not&#39;</span>
+                            <span class="s1">&#39;supported.&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">which</span><span class="p">(</span><span class="s1">&#39;ncremap&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="s1">&#39;ncremap not found. Make sure the latest nco &#39;</span>
+                          <span class="s1">&#39;package is installed: </span><span class="se">\n</span><span class="s1">&#39;</span>
+                          <span class="s1">&#39;conda install nco</span><span class="se">\n</span><span class="s1">&#39;</span>
+                          <span class="s1">&#39;Note: this presumes use of the conda-forge &#39;</span>
+                          <span class="s1">&#39;channel.&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">parallel_exec</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># use the specified parallel executable</span>
+            <span class="n">args</span> <span class="o">=</span> <span class="n">parallel_exec</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">args</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
+        <span class="n">args</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;ncremap&#39;</span><span class="p">,</span>
+                     <span class="s1">&#39;-m&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mappingFileName</span><span class="p">,</span>
+                     <span class="s1">&#39;--vrb=1&#39;</span><span class="p">])</span>
+
+        <span class="n">regridArgs</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sourceDescriptor</span><span class="p">,</span> <span class="p">(</span><span class="n">MpasCellMeshDescriptor</span><span class="p">,</span>
+                                              <span class="n">MpasEdgeMeshDescriptor</span><span class="p">,</span>
+                                              <span class="n">MpasVertexMeshDescriptor</span><span class="p">)):</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;-P&#39;</span><span class="p">,</span> <span class="s1">&#39;mpas&#39;</span><span class="p">])</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">replaceMpasFill</span><span class="p">:</span>
+                <span class="c1"># the -C (climatology) flag prevents ncremap from trying to</span>
+                <span class="c1"># add a _FillValue attribute that might already be present</span>
+                <span class="c1"># and quits with an error</span>
+                <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;-C&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sourceDescriptor</span><span class="p">,</span> <span class="n">MpasEdgeMeshDescriptor</span><span class="p">):</span>
+            <span class="n">regridArgs</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;--rgr col_nm=nEdges&#39;</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sourceDescriptor</span><span class="p">,</span> <span class="p">(</span><span class="n">MpasCellMeshDescriptor</span><span class="p">,</span>
+                                              <span class="n">MpasEdgeMeshDescriptor</span><span class="p">,</span>
+                                              <span class="n">MpasVertexMeshDescriptor</span><span class="p">))</span> <span class="ow">and</span> \
+                <span class="n">renormalize</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># we also want to make sure cells that receive no data are</span>
+            <span class="c1"># marked with fill values, even if the source MPAS data</span>
+            <span class="c1"># doesn&#39;t have a fill value</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;--add_fill_value&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">variableList</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;-v&#39;</span><span class="p">,</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">variableList</span><span class="p">)])</span>
+
+        <span class="k">if</span> <span class="n">renormalize</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">regridArgs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;--renormalize=</span><span class="si">{</span><span class="n">renormalize</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sourceDescriptor</span><span class="p">,</span> <span class="n">LatLonGridDescriptor</span><span class="p">):</span>
+            <span class="n">regridArgs</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+                <span class="p">[</span><span class="sa">f</span><span class="s1">&#39;--rgr lat_nm=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">sourceDescriptor</span><span class="o">.</span><span class="n">latVarName</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
+                 <span class="sa">f</span><span class="s1">&#39;--rgr lon_nm=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">sourceDescriptor</span><span class="o">.</span><span class="n">lonVarName</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sourceDescriptor</span><span class="p">,</span> <span class="n">ProjectionGridDescriptor</span><span class="p">):</span>
+            <span class="n">regridArgs</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+                <span class="p">[</span><span class="sa">f</span><span class="s1">&#39;--rgr lat_nm=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">sourceDescriptor</span><span class="o">.</span><span class="n">yVarName</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
+                 <span class="sa">f</span><span class="s1">&#39;--rgr lon_nm=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">sourceDescriptor</span><span class="o">.</span><span class="n">xVarName</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">destinationDescriptor</span><span class="p">,</span> <span class="n">LatLonGridDescriptor</span><span class="p">):</span>
+            <span class="n">regridArgs</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+                <span class="p">[</span><span class="sa">f</span><span class="s1">&#39;--rgr lat_nm_out=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">destinationDescriptor</span><span class="o">.</span><span class="n">latVarName</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
+                 <span class="sa">f</span><span class="s1">&#39;--rgr lon_nm_out=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">destinationDescriptor</span><span class="o">.</span><span class="n">lonVarName</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
+                 <span class="sa">f</span><span class="s1">&#39;--rgr lat_dmn_nm=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">destinationDescriptor</span><span class="o">.</span><span class="n">latVarName</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
+                 <span class="sa">f</span><span class="s1">&#39;--rgr lon_dmn_nm=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">destinationDescriptor</span><span class="o">.</span><span class="n">lonVarName</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">destinationDescriptor</span><span class="p">,</span> <span class="n">ProjectionGridDescriptor</span><span class="p">):</span>
+            <span class="n">regridArgs</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+                <span class="p">[</span><span class="sa">f</span><span class="s1">&#39;--rgr lat_dmn_nm=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">destinationDescriptor</span><span class="o">.</span><span class="n">yVarName</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
+                 <span class="sa">f</span><span class="s1">&#39;--rgr lon_dmn_nm=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">destinationDescriptor</span><span class="o">.</span><span class="n">xVarName</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;--rgr lat_nm_out=lat&#39;</span><span class="p">,</span> <span class="s1">&#39;--rgr lon_nm_out=lon&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">destinationDescriptor</span><span class="p">,</span> <span class="n">PointCollectionDescriptor</span><span class="p">):</span>
+            <span class="n">regridArgs</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;--rgr lat_nm_out=lat&#39;</span><span class="p">,</span> <span class="s1">&#39;--rgr lon_nm_out=lon&#39;</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">regridArgs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;-R&#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">regridArgs</span><span class="p">)])</span>
+
+        <span class="c1"># set an environment variable to make sure we&#39;re not using czender&#39;s</span>
+        <span class="c1"># local version of NCO instead of one we have intentionally loaded</span>
+        <span class="n">env</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">env</span><span class="p">[</span><span class="s1">&#39;NCO_PATH_OVERRIDE&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;No&#39;</span>
+
+        <span class="n">args</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">inFileName</span><span class="p">,</span> <span class="n">outFileName</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="n">logger</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># make sure any output is flushed before we add output from the</span>
+            <span class="c1"># subprocess</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+
+            <span class="n">_print_running</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">fn</span><span class="o">=</span><span class="nb">print</span><span class="p">)</span>
+            <span class="n">subprocess</span><span class="o">.</span><span class="n">check_call</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">env</span><span class="o">=</span><span class="n">env</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">_print_running</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">fn</span><span class="o">=</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">handler</span> <span class="ow">in</span> <span class="n">logger</span><span class="o">.</span><span class="n">handlers</span><span class="p">:</span>
+                <span class="n">handler</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+
+            <span class="n">process</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+                                       <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">env</span><span class="o">=</span><span class="n">env</span><span class="p">)</span>
+            <span class="n">stdout</span><span class="p">,</span> <span class="n">stderr</span> <span class="o">=</span> <span class="n">process</span><span class="o">.</span><span class="n">communicate</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="n">stdout</span><span class="p">:</span>
+                <span class="n">stdout</span> <span class="o">=</span> <span class="n">stdout</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">stdout</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">):</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">stderr</span><span class="p">:</span>
+                <span class="n">stderr</span> <span class="o">=</span> <span class="n">stderr</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">stderr</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">):</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">process</span><span class="o">.</span><span class="n">returncode</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">CalledProcessError</span><span class="p">(</span><span class="n">process</span><span class="o">.</span><span class="n">returncode</span><span class="p">,</span>
+                                                    <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">args</span><span class="p">))</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">remap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ds</span><span class="p">,</span> <span class="n">renormalizationThreshold</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Given a source data set, returns a remapped version of the data set,</span>
+<span class="sd">        possibly masked and renormalized.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        ds : ``xarray.Dataset`` or ``xarray.DataArray``</span>
+<span class="sd">            The dimention(s) along ``self.sourceDimNames`` must match</span>
+<span class="sd">            ``self.src_grid_dims`` read from the mapping file.</span>
+
+<span class="sd">        renormalizationThreshold : float, optional</span>
+<span class="sd">            The minimum weight of a denstination cell after remapping, below</span>
+<span class="sd">            which it is masked out, or ``None`` for no renormalization and</span>
+<span class="sd">            masking.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        remappedDs : `xarray.Dataset`` or ``xarray.DataArray``</span>
+<span class="sd">            Returns a remapped data set (or data array) where dimensions other</span>
+<span class="sd">            than ``self.sourceDimNames`` are the same as in ``ds`` and the</span>
+<span class="sd">            dimension(s) given by ``self.sourceDimNames`` have been replaced by</span>
+<span class="sd">            ``self.destinationDimNames``.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If the size of ``self.sourceDimNames`` in ``ds`` do not match the</span>
+<span class="sd">            source dimensions read in from the mapping file</span>
+<span class="sd">            (``self.src_grid_dims``).</span>
+<span class="sd">        TypeError</span>
+<span class="sd">            If ds is not an ``xarray.Dataset`` or ``xarray.DataArray`` object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Authors</span>
+        <span class="c1"># -------</span>
+        <span class="c1"># Xylar Asay-Davis</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mappingFileName</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># No remapping is needed</span>
+            <span class="k">return</span> <span class="n">ds</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_load_mapping</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">dim</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sourceDescriptor</span><span class="o">.</span><span class="n">dims</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">src_grid_dims</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">!=</span> <span class="n">ds</span><span class="o">.</span><span class="n">sizes</span><span class="p">[</span><span class="n">dim</span><span class="p">]:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s1">&#39;data set and remapping source dimension </span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s1"> don</span><span class="se">\&#39;</span><span class="s1">t &#39;</span>
+                    <span class="sa">f</span><span class="s1">&#39;have the same size: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">src_grid_dims</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="si">}</span><span class="s1"> != &#39;</span>
+                    <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">ds</span><span class="o">.</span><span class="n">sizes</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">):</span>
+            <span class="n">remappedDs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_remap_data_array</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">renormalizationThreshold</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">):</span>
+            <span class="n">drop</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">ds</span><span class="o">.</span><span class="n">data_vars</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_drop</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="n">var</span><span class="p">]):</span>
+                    <span class="n">drop</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
+            <span class="n">remappedDs</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">drop_vars</span><span class="p">(</span><span class="n">drop</span><span class="p">)</span>
+            <span class="n">remappedDs</span> <span class="o">=</span> <span class="n">remappedDs</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_remap_data_array</span><span class="p">,</span>
+                                        <span class="n">keep_attrs</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                        <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">renormalizationThreshold</span><span class="p">,))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;ds not an xarray Dataset or DataArray.&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Update history attribute of netCDF file</span>
+        <span class="k">if</span> <span class="s1">&#39;history&#39;</span> <span class="ow">in</span> <span class="n">remappedDs</span><span class="o">.</span><span class="n">attrs</span><span class="p">:</span>
+            <span class="n">newhist</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">remappedDs</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;history&#39;</span><span class="p">],</span>
+                                 <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[:])])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">newhist</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[:]</span>
+        <span class="n">remappedDs</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;history&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">newhist</span>
+
+        <span class="n">remappedDs</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;meshName&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">destinationDescriptor</span><span class="o">.</span><span class="n">meshName</span>
+
+        <span class="k">return</span> <span class="n">remappedDs</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load_mapping</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Load weights and indices from a mapping file, if this has not already</span>
+<span class="sd">        been done</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Authors</span>
+        <span class="c1"># -------</span>
+        <span class="c1"># Xylar Asay-Davis</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mappingLoaded</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="n">dsMapping</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">open_dataset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mappingFileName</span><span class="p">)</span>
+        <span class="n">n_a</span> <span class="o">=</span> <span class="n">dsMapping</span><span class="o">.</span><span class="n">sizes</span><span class="p">[</span><span class="s1">&#39;n_a&#39;</span><span class="p">]</span>
+        <span class="n">n_b</span> <span class="o">=</span> <span class="n">dsMapping</span><span class="o">.</span><span class="n">sizes</span><span class="p">[</span><span class="s1">&#39;n_b&#39;</span><span class="p">]</span>
+
+        <span class="n">nSourceDims</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sourceDescriptor</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span>
+        <span class="n">src_grid_rank</span> <span class="o">=</span> <span class="n">dsMapping</span><span class="o">.</span><span class="n">sizes</span><span class="p">[</span><span class="s1">&#39;src_grid_rank&#39;</span><span class="p">]</span>
+        <span class="n">nDestinationDims</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">destinationDescriptor</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span>
+        <span class="n">dst_grid_rank</span> <span class="o">=</span> <span class="n">dsMapping</span><span class="o">.</span><span class="n">sizes</span><span class="p">[</span><span class="s1">&#39;dst_grid_rank&#39;</span><span class="p">]</span>
+
+        <span class="c1"># check that the mapping file has the right number of dimensions</span>
+        <span class="k">if</span> <span class="n">nSourceDims</span> <span class="o">!=</span> <span class="n">src_grid_rank</span> <span class="ow">or</span> \
+                <span class="n">nDestinationDims</span> <span class="o">!=</span> <span class="n">dst_grid_rank</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;The number of source and/or destination dimensions does not &#39;</span>
+                <span class="sa">f</span><span class="s1">&#39;match the expected </span><span class="se">\n</span><span class="s1">&#39;</span>
+                <span class="sa">f</span><span class="s1">&#39;number of source and destination dimensions in the mapping &#39;</span>
+                <span class="sa">f</span><span class="s1">&#39;file. </span><span class="se">\n</span><span class="s1">&#39;</span>
+                <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">nSourceDims</span><span class="si">}</span><span class="s1"> != </span><span class="si">{</span><span class="n">src_grid_rank</span><span class="si">}</span><span class="s1"> and/or </span><span class="si">{</span><span class="n">nDestinationDims</span><span class="si">}</span><span class="s1"> &#39;</span>
+                <span class="sa">f</span><span class="s1">&#39;!= </span><span class="si">{</span><span class="n">dst_grid_rank</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="c1"># grid dimensions need to be reversed because they are in Fortran order</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">src_grid_dims</span> <span class="o">=</span> <span class="n">dsMapping</span><span class="p">[</span><span class="s1">&#39;src_grid_dims&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dst_grid_dims</span> <span class="o">=</span> <span class="n">dsMapping</span><span class="p">[</span><span class="s1">&#39;dst_grid_dims&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="c1"># now, check that each source and destination dimension is right</span>
+        <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sourceDescriptor</span><span class="o">.</span><span class="n">dims</span><span class="p">)):</span>
+            <span class="n">dim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sourceDescriptor</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+            <span class="n">dimSize</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sourceDescriptor</span><span class="o">.</span><span class="n">dimSize</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+            <span class="n">checkDimSize</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">src_grid_dims</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">dimSize</span> <span class="o">!=</span> <span class="n">checkDimSize</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s1">&#39;source mesh descriptor and remapping source dimension &#39;</span>
+                    <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s1"> don</span><span class="se">\&#39;</span><span class="s1">t have the same size: </span><span class="se">\n</span><span class="s1">&#39;</span>
+                    <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">dimSize</span><span class="si">}</span><span class="s1"> != </span><span class="si">{</span><span class="n">checkDimSize</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">destinationDescriptor</span><span class="o">.</span><span class="n">dims</span><span class="p">)):</span>
+            <span class="n">dim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">destinationDescriptor</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+            <span class="n">dimSize</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">destinationDescriptor</span><span class="o">.</span><span class="n">dimSize</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+            <span class="n">checkDimSize</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dst_grid_dims</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">dimSize</span> <span class="o">!=</span> <span class="n">checkDimSize</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s1">&#39;dest. mesh descriptor and remapping dest. dimension &#39;</span>
+                    <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">dim</span><span class="si">}</span><span class="s1"> don</span><span class="se">\&#39;</span><span class="s1">t have the same size: </span><span class="se">\n</span><span class="s1">&#39;</span>
+                    <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">dimSize</span><span class="si">}</span><span class="s1"> != </span><span class="si">{</span><span class="n">checkDimSize</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">frac_b</span> <span class="o">=</span> <span class="n">dsMapping</span><span class="p">[</span><span class="s1">&#39;frac_b&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+
+        <span class="n">col</span> <span class="o">=</span> <span class="n">dsMapping</span><span class="p">[</span><span class="s1">&#39;col&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="n">row</span> <span class="o">=</span> <span class="n">dsMapping</span><span class="p">[</span><span class="s1">&#39;row&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="n">S</span> <span class="o">=</span> <span class="n">dsMapping</span><span class="p">[</span><span class="s1">&#39;S&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">matrix</span> <span class="o">=</span> <span class="n">csr_matrix</span><span class="p">((</span><span class="n">S</span><span class="p">,</span> <span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">)),</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">n_b</span><span class="p">,</span> <span class="n">n_a</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">mappingLoaded</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check_drop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataArray</span><span class="p">):</span>
+        <span class="n">sourceDims</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sourceDescriptor</span><span class="o">.</span><span class="n">dims</span>
+
+        <span class="n">sourceDimsInArray</span> <span class="o">=</span> <span class="p">[</span><span class="n">dim</span> <span class="ow">in</span> <span class="n">dataArray</span><span class="o">.</span><span class="n">dims</span> <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">sourceDims</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">sourceDimsInArray</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span>
+                <span class="n">numpy</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">sourceDimsInArray</span><span class="p">))</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_remap_data_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataArray</span><span class="p">,</span> <span class="n">renormalizationThreshold</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Remap a single xarray data array</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Authors</span>
+        <span class="c1"># -------</span>
+        <span class="c1"># Xylar Asay-Davis</span>
+
+        <span class="n">sourceDims</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sourceDescriptor</span><span class="o">.</span><span class="n">dims</span>
+        <span class="n">destDims</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">destinationDescriptor</span><span class="o">.</span><span class="n">dims</span>
+
+        <span class="n">sourceDimsInArray</span> <span class="o">=</span> <span class="p">[</span><span class="n">dim</span> <span class="ow">in</span> <span class="n">dataArray</span><span class="o">.</span><span class="n">dims</span> <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">sourceDims</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">numpy</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">sourceDimsInArray</span><span class="p">):</span>
+            <span class="c1"># no remapping is needed</span>
+            <span class="k">return</span> <span class="n">dataArray</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">numpy</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">sourceDimsInArray</span><span class="p">):</span>
+            <span class="c1"># no remapping is possible so the variable array should have been</span>
+            <span class="c1"># dropped</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Data array with some (but not all) required &#39;</span>
+                             <span class="s1">&#39;source dims cannot be remapped</span><span class="se">\n</span><span class="s1">&#39;</span>
+                             <span class="s1">&#39;and should have been dropped.&#39;</span><span class="p">)</span>
+
+        <span class="c1"># make a list of dims and remapAxes</span>
+        <span class="n">dims</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">remapAxes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">destDimsAdded</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">dim</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dataArray</span><span class="o">.</span><span class="n">dims</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">sourceDims</span><span class="p">:</span>
+                <span class="n">remapAxes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">destDimsAdded</span><span class="p">:</span>
+                    <span class="n">dims</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">destDims</span><span class="p">)</span>
+                    <span class="n">destDimsAdded</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">dims</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dim</span><span class="p">)</span>
+
+        <span class="c1"># make a dict of coords</span>
+        <span class="n">coordDict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="c1"># copy unmodified coords</span>
+        <span class="k">for</span> <span class="n">coord</span> <span class="ow">in</span> <span class="n">dataArray</span><span class="o">.</span><span class="n">coords</span><span class="p">:</span>
+            <span class="n">sourceDimInCoord</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">any</span><span class="p">([</span><span class="n">dim</span> <span class="ow">in</span> <span class="n">dataArray</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">coord</span><span class="p">]</span><span class="o">.</span><span class="n">dims</span>
+                                          <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">sourceDims</span><span class="p">])</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">sourceDimInCoord</span><span class="p">:</span>
+                <span class="n">coordDict</span><span class="p">[</span><span class="n">coord</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;dims&#39;</span><span class="p">:</span> <span class="n">dataArray</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">coord</span><span class="p">]</span><span class="o">.</span><span class="n">dims</span><span class="p">,</span>
+                                    <span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="n">dataArray</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">coord</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">}</span>
+
+        <span class="c1"># add dest coords</span>
+        <span class="n">coordDict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">destinationDescriptor</span><span class="o">.</span><span class="n">coords</span><span class="p">)</span>
+
+        <span class="c1"># remap the values</span>
+        <span class="n">field</span> <span class="o">=</span> <span class="n">dataArray</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">field</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">field</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">masked_array</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="n">mask</span><span class="p">)</span>
+        <span class="n">remappedField</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_remap_numpy_array</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="n">remapAxes</span><span class="p">,</span>
+                                                <span class="n">renormalizationThreshold</span><span class="p">)</span>
+
+        <span class="n">arrayDict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;coords&#39;</span><span class="p">:</span> <span class="n">coordDict</span><span class="p">,</span>
+                     <span class="s1">&#39;attrs&#39;</span><span class="p">:</span> <span class="n">dataArray</span><span class="o">.</span><span class="n">attrs</span><span class="p">,</span>
+                     <span class="s1">&#39;dims&#39;</span><span class="p">:</span> <span class="n">dims</span><span class="p">,</span>
+                     <span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="n">remappedField</span><span class="p">,</span>
+                     <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">dataArray</span><span class="o">.</span><span class="n">name</span><span class="p">}</span>
+
+        <span class="c1"># make a new data array</span>
+        <span class="n">remappedArray</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">arrayDict</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">remappedArray</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_remap_numpy_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inField</span><span class="p">,</span> <span class="n">remapAxes</span><span class="p">,</span>
+                           <span class="n">renormalizationThreshold</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Remap a single numpy array</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Authors</span>
+        <span class="c1"># -------</span>
+        <span class="c1"># Xylar Asay-Davis</span>
+
+        <span class="c1"># permute the dimensions of inField so the axes to remap are first,</span>
+        <span class="c1"># then flatten the remapping and the extra dimensions separately for</span>
+        <span class="c1"># the matrix multiply</span>
+        <span class="n">extraAxes</span> <span class="o">=</span> <span class="p">[</span><span class="n">axis</span> <span class="k">for</span> <span class="n">axis</span> <span class="ow">in</span> <span class="n">numpy</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">inField</span><span class="o">.</span><span class="n">ndim</span><span class="p">)</span>
+                     <span class="k">if</span> <span class="n">axis</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">remapAxes</span><span class="p">]</span>
+
+        <span class="n">newShape</span> <span class="o">=</span> <span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">prod</span><span class="p">([</span><span class="n">inField</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="n">axis</span><span class="p">]</span> <span class="k">for</span> <span class="n">axis</span> <span class="ow">in</span> <span class="n">remapAxes</span><span class="p">])]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">extraAxes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">extraShape</span> <span class="o">=</span> <span class="p">[</span><span class="n">inField</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="n">axis</span><span class="p">]</span> <span class="k">for</span> <span class="n">axis</span> <span class="ow">in</span> <span class="n">extraAxes</span><span class="p">]</span>
+            <span class="n">newShape</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">extraShape</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">extraShape</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">newShape</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">permutedAxes</span> <span class="o">=</span> <span class="n">remapAxes</span> <span class="o">+</span> <span class="n">extraAxes</span>
+
+        <span class="c1"># permute axes so the remapped dimension(s) come first and &quot;flatten&quot;</span>
+        <span class="c1"># the remapping dimension</span>
+        <span class="n">inField</span> <span class="o">=</span> <span class="n">inField</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">permutedAxes</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">newShape</span><span class="p">)</span>
+
+        <span class="n">masked</span> <span class="o">=</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">inField</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">MaskedArray</span><span class="p">)</span> <span class="ow">and</span>
+                  <span class="n">renormalizationThreshold</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">masked</span><span class="p">:</span>
+            <span class="n">inMask</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">logical_not</span><span class="p">(</span><span class="n">inField</span><span class="o">.</span><span class="n">mask</span><span class="p">),</span> <span class="nb">float</span><span class="p">)</span>
+            <span class="n">outField</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">inMask</span> <span class="o">*</span> <span class="n">inField</span><span class="p">)</span>
+            <span class="n">outMask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">inMask</span><span class="p">)</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="n">outMask</span> <span class="o">&gt;</span> <span class="n">renormalizationThreshold</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">outField</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">inField</span><span class="p">)</span>
+            <span class="c1"># make frac_b match the shape of outField</span>
+            <span class="n">outMask</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frac_b</span><span class="p">,</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frac_b</span><span class="p">),</span> <span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span>
+                <span class="n">newShape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="n">outMask</span> <span class="o">&gt;</span> <span class="mf">0.</span>
+
+        <span class="c1"># normalize the result based on outMask</span>
+        <span class="n">outField</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">/=</span> <span class="n">outMask</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span>
+        <span class="n">outField</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">masked_array</span><span class="p">(</span><span class="n">outField</span><span class="p">,</span>
+                                         <span class="n">mask</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">logical_not</span><span class="p">(</span><span class="n">mask</span><span class="p">))</span>
+
+        <span class="n">destRemapDimCount</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dst_grid_dims</span><span class="p">)</span>
+        <span class="n">outDimCount</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">extraShape</span><span class="p">)</span> <span class="o">+</span> <span class="n">destRemapDimCount</span>
+
+        <span class="c1"># &quot;unflatten&quot; the remapped dimension(s)</span>
+        <span class="n">destShape</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dst_grid_dims</span><span class="p">)</span> <span class="o">+</span> <span class="n">extraShape</span>
+        <span class="n">outField</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">outField</span><span class="p">,</span> <span class="n">destShape</span><span class="p">)</span>
+
+        <span class="c1"># &quot;unpermute&quot; the axes to be in the expected order</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">amin</span><span class="p">(</span><span class="n">remapAxes</span><span class="p">)</span>
+        <span class="n">unpermuteAxes</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">destRemapDimCount</span><span class="p">,</span> <span class="n">outDimCount</span><span class="p">))</span>
+        <span class="n">unpermuteAxes</span> <span class="o">=</span> <span class="p">(</span><span class="n">unpermuteAxes</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">index</span><span class="p">]</span> <span class="o">+</span>
+                         <span class="nb">list</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">destRemapDimCount</span><span class="p">))</span> <span class="o">+</span>
+                         <span class="n">unpermuteAxes</span><span class="p">[</span><span class="n">index</span><span class="p">:])</span>
+        <span class="n">outField</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">outField</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="n">unpermuteAxes</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">outField</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_esmf_build_map</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="n">mpi_tasks</span><span class="p">,</span> <span class="n">tempdir</span><span class="p">,</span>
+                        <span class="n">parallel_exec</span><span class="p">,</span> <span class="n">include_logs</span><span class="p">,</span> <span class="n">expand_dist</span><span class="p">,</span>
+                        <span class="n">expand_factor</span><span class="p">,</span> <span class="n">additional_args</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">esmf_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                        <span class="n">extrap_method</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Use ``ESMF_RegridWeightGen`` to construct a mapping file used for</span>
+<span class="sd">        interpolation between the source and destination grids.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mappingFileName</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> \
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mappingFileName</span><span class="p">):</span>
+            <span class="c1"># a valid weight file already exists, so nothing to do</span>
+            <span class="k">return</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_descriptors</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="n">expand_factor</span><span class="p">,</span> <span class="n">expand_dist</span><span class="p">)</span>
+
+        <span class="n">rwg_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_rwg_path</span><span class="p">(</span><span class="n">esmf_path</span><span class="p">)</span>
+
+        <span class="c1"># Write source and destination SCRIP files in temporary locations</span>
+        <span class="k">if</span> <span class="n">tempdir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">tempobj</span> <span class="o">=</span> <span class="n">TemporaryDirectory</span><span class="p">()</span>
+            <span class="n">tempdir</span> <span class="o">=</span> <span class="n">tempobj</span><span class="o">.</span><span class="n">name</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">tempobj</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="n">src_filename</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">tempdir</span><span class="si">}</span><span class="s1">/src_mesh.nc&#39;</span>
+        <span class="n">dst_filename</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">tempdir</span><span class="si">}</span><span class="s1">/dst_mesh.nc&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">sourceDescriptor</span><span class="o">.</span><span class="n">to_scrip</span><span class="p">(</span><span class="n">src_filename</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">destinationDescriptor</span><span class="o">.</span><span class="n">to_scrip</span><span class="p">(</span><span class="n">dst_filename</span><span class="p">,</span>
+                                            <span class="n">expandDist</span><span class="o">=</span><span class="n">expand_dist</span><span class="p">,</span>
+                                            <span class="n">expandFactor</span><span class="o">=</span><span class="n">expand_factor</span><span class="p">)</span>
+
+        <span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="n">rwg_path</span><span class="p">,</span>
+                <span class="s1">&#39;--source&#39;</span><span class="p">,</span> <span class="n">src_filename</span><span class="p">,</span>
+                <span class="s1">&#39;--destination&#39;</span><span class="p">,</span> <span class="n">dst_filename</span><span class="p">,</span>
+                <span class="s1">&#39;--weight&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mappingFileName</span><span class="p">,</span>
+                <span class="s1">&#39;--method&#39;</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span>
+                <span class="s1">&#39;--netcdf4&#39;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">include_logs</span><span class="p">:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;--no_log&#39;</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="n">extrap_method</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;--extrap_method&#39;</span><span class="p">,</span> <span class="n">extrap_method</span><span class="p">])</span>
+
+        <span class="n">parallel_args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_parallel_args</span><span class="p">(</span><span class="n">parallel_exec</span><span class="p">,</span> <span class="n">mpi_tasks</span><span class="p">,</span>
+                                                <span class="n">conda_package</span><span class="o">=</span><span class="s1">&#39;esmf&#39;</span><span class="p">)</span>
+
+        <span class="n">regional_args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_esmf_regional_args</span><span class="p">()</span>
+
+        <span class="n">args</span> <span class="o">=</span> <span class="n">parallel_args</span> <span class="o">+</span> <span class="n">args</span> <span class="o">+</span> <span class="n">regional_args</span>
+
+        <span class="k">if</span> <span class="n">additional_args</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">additional_args</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">logger</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">_print_running</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">fn</span><span class="o">=</span><span class="nb">print</span><span class="p">)</span>
+            <span class="c1"># make sure any output is flushed before we add output from the</span>
+            <span class="c1"># subprocess</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+
+            <span class="c1"># throw out the standard output from ESMF_RegridWeightGen, as it&#39;s</span>
+            <span class="c1"># rather verbose but keep stderr</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">devnull</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">DEVNULL</span><span class="p">:</span>
+                <span class="n">subprocess</span><span class="o">.</span><span class="n">check_call</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">DEVNULL</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">_print_running</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">fn</span><span class="o">=</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">handler</span> <span class="ow">in</span> <span class="n">logger</span><span class="o">.</span><span class="n">handlers</span><span class="p">:</span>
+                <span class="n">handler</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+
+            <span class="n">process</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+                                       <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">)</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">stderr</span> <span class="o">=</span> <span class="n">process</span><span class="o">.</span><span class="n">communicate</span><span class="p">()</span>
+
+            <span class="c1"># throw out the standard output from ESMF_RegridWeightGen, as it&#39;s</span>
+            <span class="c1"># rather verbose but keep stderr</span>
+            <span class="k">if</span> <span class="n">stderr</span><span class="p">:</span>
+                <span class="n">stderr</span> <span class="o">=</span> <span class="n">stderr</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">stderr</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">):</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">process</span><span class="o">.</span><span class="n">returncode</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">CalledProcessError</span><span class="p">(</span><span class="n">process</span><span class="o">.</span><span class="n">returncode</span><span class="p">,</span>
+                                                    <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">args</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">tempobj</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">tempobj</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_descriptors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">expand_factor</span><span class="p">,</span> <span class="n">expand_dist</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">destinationDescriptor</span><span class="p">,</span>
+                      <span class="n">PointCollectionDescriptor</span><span class="p">)</span> <span class="ow">and</span> \
+                <span class="n">method</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;bilinear&#39;</span><span class="p">,</span> <span class="s1">&#39;neareststod&#39;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;method </span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s1"> not supported for destination &#39;</span>
+                             <span class="sa">f</span><span class="s1">&#39;grid of type PointCollectionDescriptor.&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">expand_factor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">expand_dist</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> \
+                <span class="n">method</span> <span class="o">!=</span> <span class="s1">&#39;conserve&#39;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;expandFactor and expandDist only have an impact &#39;</span>
+                             <span class="s1">&#39;with method=conserve&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_rwg_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">esmf_path</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="n">esmf_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># use the system build of ESMF</span>
+            <span class="n">rwg_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">esmf_path</span><span class="p">,</span> <span class="s1">&#39;bin&#39;</span><span class="p">,</span> <span class="s1">&#39;ESMF_RegridWeightGen&#39;</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">rwg_path</span> <span class="o">=</span> <span class="n">which</span><span class="p">(</span><span class="s1">&#39;ESMF_RegridWeightGen&#39;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">rwg_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="s1">&#39;ESMF_RegridWeightGen not found. Make sure esmf &#39;</span>
+                              <span class="s1">&#39;package is installed: </span><span class="se">\n</span><span class="s1">&#39;</span>
+                              <span class="s1">&#39;conda install esmf</span><span class="se">\n</span><span class="s1">&#39;</span>
+                              <span class="s1">&#39;Note: this presumes use of the conda-forge &#39;</span>
+                              <span class="s1">&#39;channel.&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">rwg_path</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_parallel_args</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parallel_exec</span><span class="p">,</span> <span class="n">mpi_tasks</span><span class="p">,</span> <span class="n">conda_package</span><span class="p">):</span>
+        <span class="n">parallel_args</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="n">parallel_exec</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># use the specified parallel executable</span>
+            <span class="n">parallel_args</span> <span class="o">=</span> <span class="n">parallel_exec</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="s1">&#39;srun&#39;</span> <span class="ow">in</span> <span class="n">parallel_exec</span><span class="p">:</span>
+                <span class="n">parallel_args</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;-n&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">mpi_tasks</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># presume mpirun syntax</span>
+                <span class="n">parallel_args</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;-np&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">mpi_tasks</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">])</span>
+
+        <span class="k">elif</span> <span class="s1">&#39;CONDA_PREFIX&#39;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span> <span class="ow">and</span> <span class="n">mpi_tasks</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="c1"># this is a conda environment, so we need to find out if the conda</span>
+            <span class="c1"># package needs mpirun or not</span>
+            <span class="n">conda_args</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;conda&#39;</span><span class="p">,</span> <span class="s1">&#39;list&#39;</span><span class="p">,</span> <span class="n">conda_package</span><span class="p">,</span> <span class="s1">&#39;--json&#39;</span><span class="p">]</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="n">check_output</span><span class="p">(</span><span class="n">conda_args</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+            <span class="n">build_string</span> <span class="o">=</span> <span class="n">output</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;build_string&#39;</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="s1">&#39;mpi_mpich&#39;</span> <span class="ow">in</span> <span class="n">build_string</span> <span class="ow">or</span> <span class="s1">&#39;mpi_openmpi&#39;</span> <span class="ow">in</span> <span class="n">build_string</span><span class="p">:</span>
+                <span class="c1"># conda package was installed with MPI, so we should use mpirun</span>
+                <span class="n">mpirun_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;CONDA_PREFIX&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">/bin/mpirun&#39;</span>
+                <span class="n">parallel_args</span> <span class="o">=</span> <span class="p">[</span><span class="n">mpirun_path</span><span class="p">,</span> <span class="s1">&#39;-np&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">mpi_tasks</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># conda package was installed without MPI, so we shouldn&#39;t try</span>
+                <span class="c1"># to use it</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Requesting </span><span class="si">{</span><span class="n">mpi_tasks</span><span class="si">}</span><span class="s1"> MPI tasks but the MPI &#39;</span>
+                              <span class="sa">f</span><span class="s1">&#39;version of </span><span class="si">{</span><span class="n">conda_package</span><span class="si">}</span><span class="s1"> is not installed&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">parallel_args</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_esmf_regional_args</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="n">regional_args</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sourceDescriptor</span><span class="o">.</span><span class="n">regional</span><span class="p">:</span>
+            <span class="n">regional_args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;--src_regional&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">destinationDescriptor</span><span class="o">.</span><span class="n">regional</span><span class="p">:</span>
+            <span class="n">regional_args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;--dst_regional&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sourceDescriptor</span><span class="o">.</span><span class="n">regional</span> <span class="ow">or</span> \
+                <span class="bp">self</span><span class="o">.</span><span class="n">destinationDescriptor</span><span class="o">.</span><span class="n">regional</span><span class="p">:</span>
+            <span class="n">regional_args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;--ignore_unmapped&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">regional_args</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_print_running</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">fn</span><span class="p">):</span>
+    <span class="n">print_args</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s1">&#39; &#39;</span> <span class="ow">in</span> <span class="n">arg</span><span class="p">:</span>
+            <span class="n">arg</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;&quot;</span><span class="si">{</span><span class="n">arg</span><span class="si">}</span><span class="s1">&quot;&#39;</span>
+        <span class="n">print_args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+    <span class="n">fn</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;running: </span><span class="si">{</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">print_args</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright This software is open source software available under the BSD-3license. Copyright (c) 2025.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+<div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    <span class="fa fa-book"> Other Versions</span>
+    v: 0.0.3
+    <span class="fa fa-caret-down"></span>
+  </span>
+  <div class="rst-other-versions">
+    <dl>
+      <dt>Tags</dt>
+      <dd><a href="../../../0.0.10/index.html">0.0.10</a></dd>
+      <dd><a href="../../../0.0.11/index.html">0.0.11</a></dd>
+      <dd><a href="../../../0.0.12/index.html">0.0.12</a></dd>
+      <dd><a href="../../../0.0.13/index.html">0.0.13</a></dd>
+      <dd><a href="../../../0.0.14/index.html">0.0.14</a></dd>
+      <dd><a href="../../../0.0.15/index.html">0.0.15</a></dd>
+      <dd><a href="../../../0.0.16/index.html">0.0.16</a></dd>
+      <dd><a href="../../../0.0.2/index.html">0.0.2</a></dd>
+      <dd><a href="remapper.html">0.0.3</a></dd>
+      <dd><a href="../../../0.0.4/index.html">0.0.4</a></dd>
+      <dd><a href="../../../0.0.5/index.html">0.0.5</a></dd>
+      <dd><a href="../../../0.0.6/index.html">0.0.6</a></dd>
+      <dd><a href="../../../0.0.7/index.html">0.0.7</a></dd>
+      <dd><a href="../../../0.0.8/index.html">0.0.8</a></dd>
+      <dd><a href="../../../0.0.9/index.html">0.0.9</a></dd>
+      <dd><a href="../../../1.0.0/index.html">1.0.0</a></dd>
+      <dd><a href="../../../1.0.1/index.html">1.0.1</a></dd>
+      <dd><a href="../../../1.1.0/index.html">1.1.0</a></dd>
+      <dd><a href="../../../1.2.0/index.html">1.2.0</a></dd>
+      <dd><a href="../../../1.3.0/index.html">1.3.0</a></dd>
+    </dl>
+    <dl>
+      <dt>Branches</dt>
+      <dd><a href="../../../main/index.html">main</a></dd>
+    </dl>
+  </div>
+</div>
+<script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
