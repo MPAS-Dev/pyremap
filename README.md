@@ -6,7 +6,7 @@ Python remapping tools for climate and earth system models.
 
 ## Documentation
 
-[http://mpas-dev.github.io/pyremap/stable/](http://mpas-dev.github.io/pyremap/stable/)
+[http://mpas-dev.github.io/pyremap/main/](http://mpas-dev.github.io/pyremap/main/)
 
 ## Installation
 
