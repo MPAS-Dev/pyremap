@@ -10,33 +10,17 @@
 # https://raw.githubusercontent.com/MPAS-Dev/pyremap/main/LICENSE
 """
 Unit test infrastructure, adapted from approach of xarray.
-
-Phillip J. Wolfram, Xylar Asay-Davis
-04/06/2017
 """
 
 import os
+import unittest
 import warnings
 from contextlib import contextmanager
-from distutils import dir_util
+from shutil import copytree, ignore_patterns
 
+import numpy as np
 import xarray
 from pytest import fixture
-
-try:
-    import unittest2 as unittest
-except ImportError:
-    import unittest
-
-try:
-    import numpy as np
-    has_numpy = True
-except ImportError:
-    has_numpy = False
-
-
-def requires_numpy(test):
-    return test if has_numpy else unittest.skip('requires numpy')(test)
 
 
 # Adapted from
@@ -52,7 +36,8 @@ def loaddatadir(request, tmpdir):
     test_dir, _ = os.path.splitext(filename)
 
     if os.path.isdir(test_dir):
-        dir_util.copy_tree(test_dir, str(tmpdir))
+        copytree(test_dir, str(tmpdir), dirs_exist_ok=True,
+                 ignore=ignore_patterns('__pycache__'))
 
     request.cls.datadir = tmpdir
 
@@ -67,15 +52,12 @@ class TestCase(unittest.TestCase):
     def assertGreaterThan(self, a1, a2):
         assert a1 >= a2
 
-    @requires_numpy
     def assertArrayEqual(self, a1, a2):
         np.testing.assert_array_equal(a1, a2)
 
-    @requires_numpy
     def assertApproxEqual(self, a1, a2, rtol=1e-5, atol=1e-8):
         assert np.isclose(a1, a2, rtol=rtol, atol=atol)
 
-    @requires_numpy
     def assertArrayApproxEqual(self, a1, a2, rtol=1e-5, atol=1e-8):
         close = np.isclose(a1, a2, rtol=rtol, atol=atol)
         oneIsNaN = np.logical_or(np.isnan(a1), np.isnan(a2))

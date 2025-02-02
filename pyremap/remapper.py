@@ -14,7 +14,7 @@ import os
 import subprocess
 import sys
 import warnings
-from distutils.spawn import find_executable
+from shutil import which
 from subprocess import check_output
 from tempfile import TemporaryDirectory
 from warnings import warn
@@ -309,7 +309,7 @@ class Remapper(object):
             raise TypeError('Source grid is a point collection, which is not'
                             'supported.')
 
-        if find_executable('ncremap') is None:
+        if which('ncremap') is None:
             raise OSError('ncremap not found. Make sure the latest nco '
                           'package is installed: \n'
                           'conda install nco\n'
@@ -814,7 +814,7 @@ class Remapper(object):
             rwg_path = os.path.join(esmf_path, 'bin', 'ESMF_RegridWeightGen')
 
         else:
-            rwg_path = find_executable('ESMF_RegridWeightGen')
+            rwg_path = which('ESMF_RegridWeightGen')
 
             if rwg_path is None:
                 raise OSError('ESMF_RegridWeightGen not found. Make sure esmf '
