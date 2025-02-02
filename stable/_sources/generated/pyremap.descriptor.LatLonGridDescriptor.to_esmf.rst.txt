@@ -1,6 +1,0 @@
-﻿pyremap.descriptor.LatLonGridDescriptor.to\_esmf
-================================================
-
-.. currentmodule:: pyremap.descriptor
-
-.. automethod:: LatLonGridDescriptor.to_esmf

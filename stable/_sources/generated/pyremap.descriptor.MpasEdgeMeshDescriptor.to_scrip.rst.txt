@@ -1,6 +1,0 @@
-﻿pyremap.descriptor.MpasEdgeMeshDescriptor.to\_scrip
-===================================================
-
-.. currentmodule:: pyremap.descriptor
-
-.. automethod:: MpasEdgeMeshDescriptor.to_scrip

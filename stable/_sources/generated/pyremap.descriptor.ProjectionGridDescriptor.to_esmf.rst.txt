@@ -1,6 +1,0 @@
-﻿pyremap.descriptor.ProjectionGridDescriptor.to\_esmf
-====================================================
-
-.. currentmodule:: pyremap.descriptor
-
-.. automethod:: ProjectionGridDescriptor.to_esmf

@@ -1,6 +1,0 @@
-﻿pyremap.descriptor.get\_lat\_lon\_descriptor
-============================================
-
-.. currentmodule:: pyremap.descriptor
-
-.. autofunction:: get_lat_lon_descriptor

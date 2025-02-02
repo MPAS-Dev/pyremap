@@ -1,6 +1,0 @@
-﻿pyremap.descriptor.LatLon2DGridDescriptor.read
-==============================================
-
-.. currentmodule:: pyremap.descriptor
-
-.. automethod:: LatLon2DGridDescriptor.read
