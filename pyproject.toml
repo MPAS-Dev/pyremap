@@ -55,7 +55,7 @@ build-backend = "setuptools.build_meta"
 exclude = ["ci*", "docs*", "licenses*", "examples*"]
 
 [tool.setuptools.dynamic]
-version = { attr = "pyremap.__version__" }
+version = { attr = "pyremap.version.__version__" }
 
 [project.urls]
 Documentation = "https://mpas-dev.github.io/pyremap/stable/"
