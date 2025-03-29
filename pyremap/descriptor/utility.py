@@ -11,6 +11,7 @@
 
 import sys
 
+import netCDF4
 import numpy as np
 import pyproj.enums
 from pyproj import Transformer
@@ -45,93 +46,44 @@ def interp_extrap_corners_2d(inField):
     return outField
 
 
-def create_scrip(outFile, grid_size, grid_corners, grid_rank, units,
-                 meshName):
+def expand_scrip(ds, expandDist, expandFactor):
     """
-    Given a SCRIP files, creates common variables and writes common values used
-    in various types of SCRIP files.
+    Expand the vertices of cells outward from the center of the cell
 
     Parameters
     ----------
-    outFile : file pointer
-        A SCRIP file opened in write mode
+    ds : xarray.Dataset
+        A dataset for a SCRIP file
 
-    grid_size : int
-        The number of elements in the grid or mesh
-
-    grid_corners : int
-        The number of corners in the grid or mesh
-
-    grid_rank : int
-        The dimensionality of the grid (1 for mesh, 2 for grid)
-
-    units : {'degrees', 'radians'}
-        The units for latitude and longitude
-
-    meshName : str
-        The name of the mesh
-    """
-    # Write to output file
-    # Dimensions
-    outFile.createDimension("grid_size", grid_size)
-    outFile.createDimension("grid_corners", grid_corners)
-    outFile.createDimension("grid_rank", grid_rank)
-
-    # Variables
-    grid_center_lat = outFile.createVariable('grid_center_lat', 'f8',
-                                             ('grid_size',))
-    grid_center_lat.units = units
-    grid_center_lon = outFile.createVariable('grid_center_lon', 'f8',
-                                             ('grid_size',))
-    grid_center_lon.units = units
-    grid_corner_lat = outFile.createVariable('grid_corner_lat', 'f8',
-                                             ('grid_size', 'grid_corners'))
-    grid_corner_lat.units = units
-    grid_corner_lon = outFile.createVariable('grid_corner_lon', 'f8',
-                                             ('grid_size', 'grid_corners'))
-    grid_corner_lon.units = units
-    grid_imask = outFile.createVariable('grid_imask', 'i4', ('grid_size',))
-    grid_imask.units = 'unitless'
-    outFile.createVariable('grid_dims', 'i4', ('grid_rank',))
-
-    outFile.meshName = meshName
-
-
-def expand_scrip(outFile, expandDist, expandFactor):
-    """
-    Given a SCRIP files, creates common variables and writes common values used
-    in various types of SCRIP files.
-
-    Parameters
-    ----------
-    outFile : file pointer
-        A SCRIP file opened in write mode
-
-    expandDist : float or numpy.ndarray
+    expandDist : float or np.ndarray
         A distance in meters to expand each grid cell outward from the
-        center.  If a ``numpy.ndarray``, one value per cell.
+        center.  If a ``np.ndarray``, one value per cell.
 
-    expandFactor : float or numpy.ndarray
+    expandFactor : float or np.ndarray
         A factor by which to expand each grid cell outward from the center.
-        If a ``numpy.ndarray``, one value per cell.
+        If a ``np.ndarray``, one value per cell.
     """
-    grid_center_lat = outFile.variables['grid_center_lat'][:]
-    grid_center_lon = outFile.variables['grid_center_lon'][:]
-    grid_corner_lat = outFile.variables['grid_corner_lat'][:]
-    grid_corner_lon = outFile.variables['grid_corner_lon'][:]
-    grid_size = len(outFile.dimensions['grid_size'])
-    grid_corners = len(outFile.dimensions['grid_corners'])
+    grid_center_lat = ds.grid_center_lat
+    grid_center_lon = ds.grid_center_lon
+    grid_corner_lat = ds.grid_corner_lat
+    grid_corner_lon = ds.grid_corner_lon
+    grid_size = ds.sizes['grid_size']
+    grid_corners = ds.sizes['grid_corners']
 
-    radians = 'rad' in outFile.variables['grid_center_lat'].units
+    radians = 'rad' in grid_center_lat.attrs['units']
 
     trans_lon_lat_to_xyz = Transformer.from_crs(4979, 4978, always_xy=True)
     x_center, y_center, z_center = trans_lon_lat_to_xyz.transform(
-        grid_center_lon, grid_center_lat, np.zeros(grid_size),
+        grid_center_lon.values,
+        grid_center_lat.values,
+        np.zeros(grid_size),
         radians=radians)
 
     x_corner, y_corner, z_corner = trans_lon_lat_to_xyz.transform(
-        grid_corner_lon, grid_corner_lat,
-        np.zeros((grid_size, grid_corners)), radians=radians)
+        grid_corner_lon.values,
+        grid_corner_lat.values,
+        np.zeros((grid_size, grid_corners)),
+        radians=radians)
 
     if expandFactor is None:
         expandFactor = 1.
@@ -150,11 +102,14 @@ def expand_scrip(outFile, expandDist, expandFactor):
         z_corner[:, index] = factor * dz + z_center
 
     grid_corner_lon, grid_corner_lat, _ = trans_lon_lat_to_xyz.transform(
-        x_corner, y_corner, z_corner, radians=radians,
+        x_corner,
+        y_corner,
+        z_corner,
+        radians=radians,
         direction=pyproj.enums.TransformDirection.INVERSE)
 
-    outFile.variables['grid_corner_lat'][:] = grid_corner_lat[:]
-    outFile.variables['grid_corner_lon'][:] = grid_corner_lon[:]
+    ds['grid_corner_lat'] = (('grid_size', 'grid_corners'), grid_corner_lat)
+    ds['grid_corner_lon'] = (('grid_size', 'grid_corners'), grid_corner_lon)
 
 
 def unwrap_corners(inField):
@@ -184,3 +139,53 @@ def add_history(ds=None):
             prev_hist = '\n'.join(prev_hist)
         history = '\n'.join([prev_hist, history])
     return history
+
+
+def write_netcdf(ds, filename, format, engine=None, fillvalues=None):
+    """
+    Write an xarray.Dataset to a file with NetCDF4 fill values.
+
+    Parameters
+    ----------
+    ds : xarray.Dataset
+        The dataset to save
+
+    filename : str
+        The path for the NetCDF file to write
+
+    format : {'NETCDF4', 'NETCDF4_CLASSIC', 'NETCDF3_64BIT', 'NETCDF3_CLASSIC'}
+        The NetCDF file format to use.  Default is
+        ``mpas_tools.io.default_format``, which can be modified but which
+        defaults to ``'NETCDF3_64BIT'``
+
+    engine : {'netcdf4', 'scipy', 'h5netcdf'}, optional
+        The library to use for NetCDF output.  The default is the same as
+        in :py:meth:`xarray.Dataset.to_netcdf` and depends on ``format``.
+        You can override the default by setting
+        ``mpas_tools.io.default_engine``
+
+    fillvalues : dict, optional
+        A dictionary of fill values for different NetCDF types.  Default is
+        ``mpas_tools.io.default_fills``, which can be modified but which
+        defaults to ``netCDF4.default_fillvals``
+    """
+
+    if fillvalues is None:
+        fillvalues = netCDF4.default_fillvals
+
+    encoding_dict = {}
+    variable_names = list(ds.data_vars.keys()) + list(ds.coords.keys())
+    for variable_name in variable_names:
+        is_numeric = np.issubdtype(ds[variable_name].dtype, np.number)
+        if is_numeric and np.any(np.isnan(ds[variable_name])):
+            dtype = ds[variable_name].dtype
+            for fill_type in fillvalues:
+                if dtype == np.dtype(fill_type):
+                    encoding_dict[variable_name] = \
+                        {'_FillValue': fillvalues[fill_type]}
+                    break
+        else:
+            encoding_dict[variable_name] = {'_FillValue': None}
+
+    ds.to_netcdf(
+        filename, encoding=encoding_dict, format=format, engine=engine)

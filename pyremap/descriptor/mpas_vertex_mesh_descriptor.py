@@ -9,12 +9,11 @@
 # distributed with this code, or at
 # https://raw.githubusercontent.com/MPAS-Dev/pyremap/main/LICENSE
 
-import netCDF4
 import numpy as np
 import xarray as xr
 
 from pyremap.descriptor.mesh_descriptor import MeshDescriptor
-from pyremap.descriptor.utility import add_history, create_scrip, expand_scrip
+from pyremap.descriptor.utility import add_history, expand_scrip, write_netcdf
 
 
 class MpasVertexMeshDescriptor(MeshDescriptor):
@@ -72,7 +71,7 @@ class MpasVertexMeshDescriptor(MeshDescriptor):
 
     def to_scrip(self, scripFileName, expandDist=None, expandFactor=None):
         """
-        Given an MPAS mesh file, create a SCRIP file based on the mesh.
+        Create a SCRIP file from the MPAS mesh.
 
         Parameters
         ----------
@@ -88,80 +87,95 @@ class MpasVertexMeshDescriptor(MeshDescriptor):
             If a ``numpy.ndarray``, one value per cell.
         """
 
-        inFile = netCDF4.Dataset(self.fileName, 'r')
-        outFile = netCDF4.Dataset(scripFileName, 'w', format=self.format)
+        ds_in = xr.open_dataset(self.fileName)
+        lat_cell = ds_in.latCell.values
+        lon_cell = ds_in.lonCell.values
+        lat_vertex = ds_in.latVertex.values
+        lon_vertex = ds_in.lonVertex.values
+        lat_edge = ds_in.latEdge.values
+        lon_edge = ds_in.lonEdge.values
+        cells_on_vertex = ds_in.cellsOnVertex.values - 1
+        edges_on_vertex = ds_in.edgesOnVertex.values - 1
+        kite_areas_on_vertex = ds_in.kiteAreasOnVertex.values
+        nvertices = ds_in.sizes['nVertices']
+        vertex_degree = ds_in.sizes['vertexDegree']
+        sphere_radius = ds_in.attrs['sphere_radius']
 
-        # Get info from input file
-        latCell = inFile.variables['latCell'][:]
-        lonCell = inFile.variables['lonCell'][:]
-        latVertex = inFile.variables['latVertex'][:]
-        lonVertex = inFile.variables['lonVertex'][:]
-        latEdge = inFile.variables['latEdge'][:]
-        lonEdge = inFile.variables['lonEdge'][:]
-        cellsOnVertex = inFile.variables['cellsOnVertex'][:]
-        edgesOnVertex = inFile.variables['edgesOnVertex'][:]
-        nVertices = len(inFile.dimensions['nVertices'])
-        vertexDegree = len(inFile.dimensions['vertexDegree'])
-        kiteAreasOnVertex = inFile.variables['kiteAreasOnVertex'][:]
-        sphereRadius = float(inFile.sphere_radius)
+        ds_out = xr.Dataset()
 
-        if vertexDegree != 3:
+        if vertex_degree != 3:
             raise ValueError(f'MpasVertexMeshDescriptor does not support '
-                             f'vertexDegree {vertexDegree}')
+                             f'vertexDegree {vertex_degree}')
 
-        create_scrip(outFile, grid_size=nVertices, grid_corners=6,
-                     grid_rank=1, units='radians', meshName=self.meshName)
+        valid_cells_on_vertex = np.zeros(nvertices, dtype=int)
+        vertex_area = np.zeros(nvertices)
+        for icell in range(vertex_degree):
+            mask = cells_on_vertex[:, icell] >= 0
+            valid_cells_on_vertex[mask] = valid_cells_on_vertex[mask] + 1
+            vertex_area[mask] = (
+                vertex_area[mask] + kite_areas_on_vertex[mask, icell]
+            )
 
-        validCellsOnVertex = np.zeros(nVertices, dtype=int)
-        vertexArea = np.zeros(nVertices)
-        for iCell in range(vertexDegree):
-            mask = cellsOnVertex[:, iCell] > 0
-            validCellsOnVertex[mask] = validCellsOnVertex[mask] + 1
-            vertexArea[mask] = (vertexArea[mask] +
-                                kiteAreasOnVertex[mask, iCell])
+        ds_out['grid_area'] = (
+            ('grid_size',),
+            vertex_area / (sphere_radius**2)
+        )
 
-        grid_area = outFile.createVariable('grid_area', 'f8', ('grid_size',))
-        grid_area.units = 'radian^2'
-        # SCRIP uses square radians
-        grid_area[:] = vertexArea[:] / (sphereRadius**2)
-
-        outFile.variables['grid_center_lat'][:] = latVertex[:]
-        outFile.variables['grid_center_lon'][:] = lonVertex[:]
-        outFile.variables['grid_dims'][:] = nVertices
-        outFile.variables['grid_imask'][:] = 1
+        ds_out['grid_center_lat'] = (('grid_size',), lat_vertex)
+        ds_out['grid_center_lon'] = (('grid_size',), lon_vertex)
 
         # grid corners:
-        grid_corner_lon = np.zeros((nVertices, 6))
-        grid_corner_lat = np.zeros((nVertices, 6))
+        grid_corner_lon = np.zeros((nvertices, 6))
+        grid_corner_lat = np.zeros((nvertices, 6))
 
         # start by filling the corners with the vertex lat and lon as the
         # fallback
-        for iCorner in range(6):
-            grid_corner_lon[:, iCorner] = lonVertex
-            grid_corner_lat[:, iCorner] = latVertex
+        for icorner in range(6):
+            grid_corner_lon[:, icorner] = lon_vertex
+            grid_corner_lat[:, icorner] = lat_vertex
 
         # if edges on vertex exist, replace even indices with their locations
-        for iEdge in range(3):
-            mask = edgesOnVertex[:, iEdge] > 0
-            edges = edgesOnVertex[mask, iEdge] - 1
-            grid_corner_lon[mask, 2 * iEdge] = lonEdge[edges]
-            grid_corner_lat[mask, 2 * iEdge] = latEdge[edges]
+        for iedge in range(3):
+            mask = edges_on_vertex[:, iedge] >= 0
+            edges = edges_on_vertex[mask, iedge]
+            grid_corner_lon[mask, 2 * iedge] = lon_edge[edges]
+            grid_corner_lat[mask, 2 * iedge] = lat_edge[edges]
 
         # similarly, if cells on vertex exist, replace odd indices with their
         # locations
-        for iCell in range(3):
-            mask = cellsOnVertex[:, iCell] > 0
-            cells = cellsOnVertex[mask, iCell] - 1
-            grid_corner_lon[mask, 2 * iCell + 1] = lonCell[cells]
-            grid_corner_lat[mask, 2 * iCell + 1] = latCell[cells]
+        for icell in range(3):
+            mask = cells_on_vertex[:, icell] >= 0
+            cells = cells_on_vertex[mask, icell]
+            grid_corner_lon[mask, 2 * icell + 1] = lon_cell[cells]
+            grid_corner_lat[mask, 2 * icell + 1] = lat_cell[cells]
 
-        outFile.variables['grid_corner_lat'][:] = grid_corner_lat[:]
-        outFile.variables['grid_corner_lon'][:] = grid_corner_lon[:]
+        ds_out['grid_corner_lat'] = (
+            ('grid_size', 'grid_corners'), grid_corner_lat
+        )
+        ds_out['grid_corner_lon'] = (
+            ('grid_size', 'grid_corners'), grid_corner_lon
+        )
+
+        ds_out['grid_dims'] = xr.DataArray(
+            [nvertices],
+            dims=('grid_rank',)
+        ).astype('int32')
+
+        ds_out['grid_imask'] = xr.DataArray(
+            np.ones(nvertices, dtype='int32'),
+            dims=('grid_size',)
+        )
 
         if expandDist is not None or expandFactor is not None:
-            expand_scrip(outFile, expandDist, expandFactor)
+            expand_scrip(ds_out, expandDist, expandFactor)
 
-        setattr(outFile, 'history', self.history)
+        ds_out.grid_center_lat.attrs['units'] = 'radians'
+        ds_out.grid_center_lon.attrs['units'] = 'radians'
+        ds_out.grid_corner_lat.attrs['units'] = 'radians'
+        ds_out.grid_corner_lon.attrs['units'] = 'radians'
+        ds_out.grid_imask.attrs['units'] = 'unitless'
+        ds_out.grid_area.attrs['units'] = 'radians^2'
 
-        inFile.close()
-        outFile.close()
+        ds_out.attrs['meshName'] = self.meshName
+        ds_out.attrs['history'] = self.history
+        write_netcdf(ds_out, scripFileName, format=self.format)

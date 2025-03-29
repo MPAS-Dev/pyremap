@@ -9,11 +9,11 @@
 # distributed with this code, or at
 # https://raw.githubusercontent.com/MPAS-Dev/pyremap/main/LICENSE
 
-import netCDF4
 import numpy as np
+import xarray as xr
 
 from pyremap.descriptor.mesh_descriptor import MeshDescriptor
-from pyremap.descriptor.utility import add_history, create_scrip
+from pyremap.descriptor.utility import add_history, write_netcdf
 
 
 class PointCollectionDescriptor(MeshDescriptor):
@@ -78,7 +78,7 @@ class PointCollectionDescriptor(MeshDescriptor):
 
     def to_scrip(self, scripFileName, expandDist=None, expandFactor=None):
         """
-        Given an MPAS mesh file, create a SCRIP file based on the mesh.
+        Write a SCRIP file for the point collection
 
         Parameters
         ----------
@@ -94,35 +94,53 @@ class PointCollectionDescriptor(MeshDescriptor):
             If a ``numpy.ndarray``, one value per cell.
         """
 
-        outFile = netCDF4.Dataset(scripFileName, 'w', format=self.format)
+        ds = xr.Dataset()
 
-        nPoints = len(self.lat)
+        ds['grid_center_lat'] = (('grid_size',), self.lat)
+        ds['grid_center_lon'] = (('grid_size',), self.lon)
 
-        create_scrip(outFile, grid_size=nPoints, grid_corners=4,
-                     grid_rank=1, units=self.units, meshName=self.meshName)
-
-        grid_area = outFile.createVariable('grid_area', 'f8', ('grid_size',))
-        grid_area.units = 'radian^2'
-        # SCRIP uses square radians
-        grid_area[:] = np.zeros(nPoints)
-
-        outFile.variables['grid_center_lat'][:] = self.lat
-        outFile.variables['grid_center_lon'][:] = self.lon
-        outFile.variables['grid_dims'][:] = nPoints
-        outFile.variables['grid_imask'][:] = 1
-
+        npoints = len(self.lat)
         # grid corners:
-        grid_corner_lon = np.zeros((nPoints, 4))
-        grid_corner_lat = np.zeros((nPoints, 4))
+        grid_corner_lon = np.zeros((npoints, 4))
+        grid_corner_lat = np.zeros((npoints, 4))
         # just repeat the center lat and lon
-        for iVertex in range(4):
-            grid_corner_lat[:, iVertex] = self.lat
-            grid_corner_lon[:, iVertex] = self.lon
+        for ivert in range(4):
+            grid_corner_lat[:, ivert] = self.lat
+            grid_corner_lon[:, ivert] = self.lon
 
-        outFile.variables['grid_corner_lat'][:] = grid_corner_lat[:]
-        outFile.variables['grid_corner_lon'][:] = grid_corner_lon[:]
+        ds['grid_corner_lat'] = (
+            ('grid_size', 'grid_corners'), grid_corner_lat
+        )
+        ds['grid_corner_lon'] = (
+            ('grid_size', 'grid_corners'), grid_corner_lon
+        )
 
-        # Update history attribute of netCDF file
-        setattr(outFile, 'history', self.history)
+        ds['grid_dims'] = xr.DataArray(
+            [npoints],
+            dims=('grid_rank',)
+        ).astype('int32')
 
-        outFile.close()
+        ds['grid_imask'] = xr.DataArray(
+            np.ones(npoints, dtype='int32'),
+            dims=('grid_size',)
+        )
+
+        ds['grid_area'] = xr.DataArray(
+            np.zeros(npoints),
+            dims=('grid_size',)
+        )
+
+        ds['grid_dims'] = (('grid_rank',), [npoints,])
+        ds['grid_imask'] = (
+            ('grid_size',), np.ones(npoints, dtype=int)
+        )
+
+        ds.grid_center_lat.attrs['units'] = self.units
+        ds.grid_center_lon.attrs['units'] = self.units
+        ds.grid_corner_lat.attrs['units'] = self.units
+        ds.grid_corner_lon.attrs['units'] = self.units
+        ds.grid_imask.attrs['units'] = 'unitless'
+
+        ds.attrs['meshName'] = self.meshName
+        ds.attrs['history'] = self.history
+        write_netcdf(ds, scripFileName, format=self.format)
