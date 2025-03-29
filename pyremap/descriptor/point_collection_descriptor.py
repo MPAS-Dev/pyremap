@@ -10,7 +10,7 @@
 # https://raw.githubusercontent.com/MPAS-Dev/pyremap/main/LICENSE
 
 import netCDF4
-import numpy
+import numpy as np
 
 from pyremap.descriptor.mesh_descriptor import MeshDescriptor
 from pyremap.descriptor.utility import add_history, create_scrip
@@ -104,7 +104,7 @@ class PointCollectionDescriptor(MeshDescriptor):
         grid_area = outFile.createVariable('grid_area', 'f8', ('grid_size',))
         grid_area.units = 'radian^2'
         # SCRIP uses square radians
-        grid_area[:] = numpy.zeros(nPoints)
+        grid_area[:] = np.zeros(nPoints)
 
         outFile.variables['grid_center_lat'][:] = self.lat
         outFile.variables['grid_center_lon'][:] = self.lon
@@ -112,8 +112,8 @@ class PointCollectionDescriptor(MeshDescriptor):
         outFile.variables['grid_imask'][:] = 1
 
         # grid corners:
-        grid_corner_lon = numpy.zeros((nPoints, 4))
-        grid_corner_lat = numpy.zeros((nPoints, 4))
+        grid_corner_lon = np.zeros((nPoints, 4))
+        grid_corner_lat = np.zeros((nPoints, 4))
         # just repeat the center lat and lon
         for iVertex in range(4):
             grid_corner_lat[:, iVertex] = self.lat

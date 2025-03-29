@@ -10,9 +10,9 @@
 # https://raw.githubusercontent.com/MPAS-Dev/pyremap/main/LICENSE
 
 import netCDF4
-import numpy
+import numpy as np
 import pyproj
-import xarray
+import xarray as xr
 
 from pyremap.descriptor.mesh_descriptor import MeshDescriptor
 from pyremap.descriptor.utility import (
@@ -114,7 +114,7 @@ class ProjectionGridDescriptor(MeshDescriptor):
         xVarName, yVarName : str, optional
             The name of the x and y (in meters) variables in the grid file
         """
-        ds = xarray.open_dataset(fileName)
+        ds = xr.open_dataset(fileName)
 
         if meshName is None:
             if 'meshName' not in ds.attrs:
@@ -124,8 +124,8 @@ class ProjectionGridDescriptor(MeshDescriptor):
         descriptor = cls(projection, meshName=meshName)
 
         # Get info from input file
-        descriptor.x = numpy.array(ds[xVarName].values, float)
-        descriptor.y = numpy.array(ds[yVarName].values, float)
+        descriptor.x = np.array(ds[xVarName].values, float)
+        descriptor.y = np.array(ds[yVarName].values, float)
 
         descriptor._set_coords(xVarName, yVarName, ds[xVarName].dims[0],
                                ds[yVarName].dims[0])
@@ -201,8 +201,8 @@ class ProjectionGridDescriptor(MeshDescriptor):
         create_scrip(outFile, grid_size=grid_size, grid_corners=4,
                      grid_rank=2, units='degrees', meshName=self.meshName)
 
-        (X, Y) = numpy.meshgrid(self.x, self.y)
-        (XCorner, YCorner) = numpy.meshgrid(self.xCorner, self.yCorner)
+        (X, Y) = np.meshgrid(self.x, self.y)
+        (XCorner, YCorner) = np.meshgrid(self.xCorner, self.yCorner)
 
         (Lat, Lon) = self.project_to_lat_lon(X, Y)
         (LatCorner, LonCorner) = self.project_to_lat_lon(XCorner, YCorner)
@@ -255,7 +255,7 @@ class ProjectionGridDescriptor(MeshDescriptor):
         """
         self.xVarName = xVarName
         self.yVarName = yVarName
-        (X, Y) = numpy.meshgrid(self.x, self.y)
+        (X, Y) = np.meshgrid(self.x, self.y)
         (Lat, Lon) = self.project_to_lat_lon(X, Y)
 
         self.coords = {xVarName: {'dims': xDimName,

@@ -12,8 +12,8 @@
 import warnings
 
 import netCDF4
-import numpy
-import xarray
+import numpy as np
+import xarray as xr
 
 from pyremap.descriptor.mesh_descriptor import MeshDescriptor
 from pyremap.descriptor.utility import add_history, create_scrip, expand_scrip
@@ -64,7 +64,7 @@ class MpasCellMeshDescriptor(MeshDescriptor):
 
         self.vertices = vertices
 
-        with xarray.open_dataset(fileName) as ds:
+        with xr.open_dataset(fileName) as ds:
 
             if meshName is None:
                 if 'meshName' not in ds.attrs:
@@ -147,12 +147,12 @@ class MpasCellMeshDescriptor(MeshDescriptor):
         outFile.variables['grid_imask'][:] = 1
 
         # grid corners:
-        grid_corner_lon = numpy.zeros((nCells, maxVertices))
-        grid_corner_lat = numpy.zeros((nCells, maxVertices))
+        grid_corner_lon = np.zeros((nCells, maxVertices))
+        grid_corner_lat = np.zeros((nCells, maxVertices))
         for iVertex in range(maxVertices):
-            cellIndices = numpy.arange(nCells)
+            cellIndices = np.arange(nCells)
             # repeat the last vertex wherever iVertex > nEdgesOnCell
-            localVertexIndices = numpy.minimum(nEdgesOnCell - 1, iVertex)
+            localVertexIndices = np.minimum(nEdgesOnCell - 1, iVertex)
             vertexIndices = verticesOnCell[cellIndices, localVertexIndices] - 1
             grid_corner_lat[cellIndices, iVertex] = latVertex[vertexIndices]
             grid_corner_lon[cellIndices, iVertex] = lonVertex[vertexIndices]
