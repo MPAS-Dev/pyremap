@@ -9,8 +9,6 @@
 # distributed with this code, or at
 # https://raw.githubusercontent.com/MPAS-Dev/pyremap/main/LICENSE
 
-import warnings
-
 import netCDF4
 import numpy as np
 import xarray as xr
@@ -25,17 +23,13 @@ class MpasCellMeshDescriptor(MeshDescriptor):
 
     Attributes
     ----------
-    vertices : bool
-        Whether the mapping is to or from vertices instead of corners
-        (for non-conservative remapping)
-
     fileName : str
         The path of the file containing the MPAS mesh
 
     history : str
         The history attribute written to SCRIP files
     """
-    def __init__(self, fileName, meshName=None, vertices=False):
+    def __init__(self, fileName, meshName=None):
         """
         Constructor stores the file name
 
@@ -49,20 +43,8 @@ class MpasCellMeshDescriptor(MeshDescriptor):
             ``'oRRS18to6'``).  If not provided, the data set in ``fileName``
             must have a global attribute ``meshName`` that will be used
             instead.
-
-        vertices : bool, optional
-            Whether the mapping is to or from vertices instead of corners
-            (for non-conservative remapping)
         """
         super().__init__()
-
-        if vertices:
-            warnings.warn('Creating a MpasCellMeshDescriptor with '
-                          'vertices=True is deprecated and will be removed in '
-                          'the next release. Use MpasVertexMeshDescriptor '
-                          'instead.', DeprecationWarning)
-
-        self.vertices = vertices
 
         with xr.open_dataset(fileName) as ds:
 
@@ -76,24 +58,20 @@ class MpasCellMeshDescriptor(MeshDescriptor):
             self.fileName = fileName
             self.regional = True
 
-            if vertices:
-                # build coords
-                self.coords = {'latVertex': {'dims': 'nVertices',
-                                             'data': ds.latVertex.values,
-                                             'attrs': {'units': 'radians'}},
-                               'lonVertex': {'dims': 'nVertices',
-                                             'data': ds.lonVertex.values,
-                                             'attrs': {'units': 'radians'}}}
-                self.dims = ['nVertices']
-            else:
-                # build coords
-                self.coords = {'latCell': {'dims': 'nCells',
-                                           'data': ds.latCell.values,
-                                           'attrs': {'units': 'radians'}},
-                               'lonCell': {'dims': 'nCells',
-                                           'data': ds.lonCell.values,
-                                           'attrs': {'units': 'radians'}}}
-                self.dims = ['nCells']
+            # build coords
+            self.coords = {
+                'latCell': {
+                    'dims': 'nCells',
+                    'data': ds.latCell.values,
+                    'attrs': {'units': 'radians'}
+                },
+                'lonCell': {
+                    'dims': 'nCells',
+                    'data': ds.lonCell.values,
+                    'attrs': {'units': 'radians'}
+                },
+            }
+            self.dims = ['nCells']
             self.dimSize = [ds.sizes[dim] for dim in self.dims]
 
             self.history = add_history(ds=ds)
@@ -115,9 +93,6 @@ class MpasCellMeshDescriptor(MeshDescriptor):
             A factor by which to expand each grid cell outward from the center.
             If a ``numpy.ndarray``, one value per cell.
         """
-        if self.vertices:
-            raise ValueError('A SCRIP file won\'t work for remapping vertices')
-
         inFile = netCDF4.Dataset(self.fileName, 'r')
         outFile = netCDF4.Dataset(scripFileName, 'w', format=self.format)
 
