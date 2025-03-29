@@ -11,7 +11,7 @@
 
 import sys
 
-import numpy
+import numpy as np
 import pyproj.enums
 from pyproj import Transformer
 
@@ -19,7 +19,7 @@ from pyproj import Transformer
 def interp_extrap_corner(inField):
     """Interpolate/extrapolate a 1D field from grid centers to grid corners"""
 
-    outField = numpy.zeros(len(inField) + 1)
+    outField = np.zeros(len(inField) + 1)
     outField[1:-1] = 0.5 * (inField[0:-1] + inField[1:])
     # extrapolate the ends
     outField[0] = 1.5 * inField[0] - 0.5 * inField[1]
@@ -30,13 +30,13 @@ def interp_extrap_corner(inField):
 def interp_extrap_corners_2d(inField):
     """Interpolate/extrapolate a 1D field from grid centers to grid corners"""
 
-    temp = numpy.zeros((inField.shape[0], inField.shape[1] + 1))
+    temp = np.zeros((inField.shape[0], inField.shape[1] + 1))
     temp[:, 1:-1] = 0.5 * (inField[:, 0:-1] + inField[:, 1:])
     # extrapolate the ends
     temp[:, 0] = 1.5 * inField[:, 0] - 0.5 * inField[:, 1]
     temp[:, -1] = 1.5 * inField[:, -1] - 0.5 * inField[:, -2]
 
-    outField = numpy.zeros((inField.shape[0] + 1, inField.shape[1] + 1))
+    outField = np.zeros((inField.shape[0] + 1, inField.shape[1] + 1))
     outField[1:-1, :] = 0.5 * (temp[0:-1, :] + temp[1:, :])
     # extrapolate the ends
     outField[0, :] = 1.5 * temp[0, :] - 0.5 * temp[1, :]
@@ -126,12 +126,12 @@ def expand_scrip(outFile, expandDist, expandFactor):
 
     trans_lon_lat_to_xyz = Transformer.from_crs(4979, 4978, always_xy=True)
     x_center, y_center, z_center = trans_lon_lat_to_xyz.transform(
-        grid_center_lon, grid_center_lat, numpy.zeros(grid_size),
+        grid_center_lon, grid_center_lat, np.zeros(grid_size),
         radians=radians)
 
     x_corner, y_corner, z_corner = trans_lon_lat_to_xyz.transform(
         grid_corner_lon, grid_corner_lat,
-        numpy.zeros((grid_size, grid_corners)), radians=radians)
+        np.zeros((grid_size, grid_corners)), radians=radians)
 
     if expandFactor is None:
         expandFactor = 1.
@@ -143,7 +143,7 @@ def expand_scrip(outFile, expandDist, expandFactor):
         dx = x_corner[:, index] - x_center
         dy = y_corner[:, index] - y_center
         dz = z_corner[:, index] - z_center
-        dist = numpy.sqrt(dx**2 + dy**2 + dz**2)
+        dist = np.sqrt(dx**2 + dy**2 + dz**2)
         factor = (expandFactor * dist + expandDist) / dist
         x_corner[:, index] = factor * dx + x_center
         y_corner[:, index] = factor * dy + y_center
@@ -159,8 +159,7 @@ def expand_scrip(outFile, expandDist, expandFactor):
 
 def unwrap_corners(inField):
     """Turn a 2D array of corners into an array of rectangular mesh elements"""
-    outField = numpy.zeros(((inField.shape[0] - 1) * (inField.shape[1] - 1),
-                            4))
+    outField = np.zeros(((inField.shape[0] - 1) * (inField.shape[1] - 1), 4))
     # corners are counterclockwise
     outField[:, 0] = inField[0:-1, 0:-1].flat
     outField[:, 1] = inField[0:-1, 1:].flat
@@ -172,7 +171,7 @@ def unwrap_corners(inField):
 
 def round_res(res):
     """Round the resolution to a reasonable number for grid names"""
-    rounded = numpy.round(res * 1000.) / 1000.
+    rounded = np.round(res * 1000.) / 1000.
     return '{}'.format(rounded)
 
 
@@ -181,7 +180,7 @@ def add_history(ds=None):
     history = ' '.join(sys.argv[:])
     if ds is not None and 'history' in ds.attrs:
         prev_hist = ds.attrs['history']
-        if isinstance(prev_hist, numpy.ndarray):
+        if isinstance(prev_hist, np.ndarray):
             prev_hist = '\n'.join(prev_hist)
         history = '\n'.join([prev_hist, history])
     return history

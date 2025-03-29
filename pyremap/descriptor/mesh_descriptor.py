@@ -81,16 +81,3 @@ class MeshDescriptor:
         """
         raise NotImplementedError(
             'to_scrip is not implemented for this descriptor')
-
-    def to_esmf(self, esmfFileName):
-        """
-        Subclasses should overload this method to write an ESMF mesh file based
-        on the mesh.
-
-        Parameters
-        ----------
-        esmfFileName : str
-            The path to which the ESMF mesh file should be written
-        """
-        raise NotImplementedError(
-            'to_esmf is not implemented for this descriptor')

@@ -10,8 +10,8 @@
 # https://raw.githubusercontent.com/MPAS-Dev/pyremap/main/LICENSE
 
 import netCDF4
-import numpy
-import xarray
+import numpy as np
+import xarray as xr
 
 from pyremap.descriptor.mesh_descriptor import MeshDescriptor
 from pyremap.descriptor.utility import (
@@ -98,7 +98,7 @@ class LatLon2DGridDescriptor(MeshDescriptor):
             Whether this is a regional or global grid
         """
         if ds is None:
-            ds = xarray.open_dataset(fileName)
+            ds = xr.open_dataset(fileName)
 
         descriptor = cls(meshName=meshName, regional=regional)
 
@@ -106,8 +106,8 @@ class LatLon2DGridDescriptor(MeshDescriptor):
             descriptor.meshName = ds.attrs['meshName']
 
         # Get info from input file
-        descriptor.lat = numpy.array(ds[latVarName].values, float)
-        descriptor.lon = numpy.array(ds[lonVarName].values, float)
+        descriptor.lat = np.array(ds[latVarName].values, float)
+        descriptor.lon = np.array(ds[lonVarName].values, float)
         if 'degree' in ds[latVarName].units:
             descriptor.units = 'degrees'
         else:

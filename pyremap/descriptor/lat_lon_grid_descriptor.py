@@ -10,8 +10,8 @@
 # https://raw.githubusercontent.com/MPAS-Dev/pyremap/main/LICENSE
 
 import netCDF4
-import numpy
-import xarray
+import numpy as np
+import xarray as xr
 
 from pyremap.descriptor.mesh_descriptor import MeshDescriptor
 from pyremap.descriptor.utility import (
@@ -56,8 +56,8 @@ def get_lat_lon_descriptor(dLon, dLat, lonMin=-180., lonMax=180., latMin=-90.,
     """
     nLat = int((latMax - latMin) / dLat) + 1
     nLon = int((lonMax - lonMin) / dLon) + 1
-    lat = numpy.linspace(latMin, latMax, nLat)
-    lon = numpy.linspace(lonMin, lonMax, nLon)
+    lat = np.linspace(latMin, latMax, nLat)
+    lon = np.linspace(lonMin, lonMax, nLon)
 
     descriptor = LatLonGridDescriptor.create(lat, lon, units='degrees')
 
@@ -135,7 +135,7 @@ class LatLonGridDescriptor(MeshDescriptor):
             latitude and longitude to see if they cover the globe.
         """
         if ds is None:
-            ds = xarray.open_dataset(fileName)
+            ds = xr.open_dataset(fileName)
 
         descriptor = cls(meshName=meshName, regional=regional)
 
@@ -143,8 +143,8 @@ class LatLonGridDescriptor(MeshDescriptor):
             descriptor.meshName = ds.attrs['meshName']
 
         # Get info from input file
-        descriptor.lat = numpy.array(ds[latVarName].values, float)
-        descriptor.lon = numpy.array(ds[lonVarName].values, float)
+        descriptor.lat = np.array(ds[latVarName].values, float)
+        descriptor.lon = np.array(ds[lonVarName].values, float)
         if 'degree' in ds[latVarName].units:
             descriptor.units = 'degrees'
         else:
@@ -226,8 +226,8 @@ class LatLonGridDescriptor(MeshDescriptor):
         create_scrip(outFile, grid_size=grid_size, grid_corners=4,
                      grid_rank=2, units=self.units, meshName=self.meshName)
 
-        (Lon, Lat) = numpy.meshgrid(self.lon, self.lat)
-        (LonCorner, LatCorner) = numpy.meshgrid(self.lonCorner, self.latCorner)
+        (Lon, Lat) = np.meshgrid(self.lon, self.lat)
+        (LonCorner, LatCorner) = np.meshgrid(self.lonCorner, self.latCorner)
 
         outFile.variables['grid_center_lat'][:] = Lat.flat
         outFile.variables['grid_center_lon'][:] = Lon.flat
@@ -243,68 +243,6 @@ class LatLonGridDescriptor(MeshDescriptor):
         setattr(outFile, 'history', self.history)
 
         outFile.close()
-
-    def to_esmf(self, esmfFileName):
-        """
-        Create an ESMF mesh file for the mesh
-
-        Parameters
-        ----------
-        esmfFileName : str
-            The path to which the ESMF mesh file should be written
-        """
-        nLat = len(self.lat)
-        nLon = len(self.lon)
-
-        (Lon, Lat) = numpy.meshgrid(self.lon, self.lat)
-        (LonCorner, LatCorner) = numpy.meshgrid(self.lonCorner, self.latCorner)
-        (XIndices, YIndices) = numpy.meshgrid(numpy.arange(nLon + 1),
-                                              numpy.arange(nLat + 1))
-
-        elementCount = nLon * nLat
-        nodeCount = (nLon + 1) * (nLat + 1)
-        coordDim = 2
-        maxNodePElement = 4
-
-        nodeCoords = numpy.zeros((nodeCount, coordDim))
-        nodeCoords[:, 0] = LonCorner.flat
-        nodeCoords[:, 1] = LatCorner.flat
-
-        centerCoords = numpy.zeros((elementCount, coordDim))
-        centerCoords[:, 0] = Lon.flat
-        centerCoords[:, 1] = Lat.flat
-
-        elementConn = numpy.zeros((elementCount, maxNodePElement), dtype=int)
-        elementConn[:, 0] = (XIndices[0:-1, 0:-1].ravel() +
-                             (nLon + 1) * YIndices[0:-1, 0:-1].ravel())
-        elementConn[:, 1] = (XIndices[0:-1, 1:].ravel() +
-                             (nLon + 1) * YIndices[0:-1, 1:].ravel())
-        elementConn[:, 2] = (XIndices[1:, 1:].ravel() +
-                             (nLon + 1) * YIndices[1:, 1:].ravel())
-        elementConn[:, 3] = (XIndices[1:, 0:-1].ravel() +
-                             (nLon + 1) * YIndices[1:, 0:-1].ravel())
-
-        ds_out = xarray.Dataset()
-        ds_out['nodeCoords'] = (('nodeCount', 'coordDim'), nodeCoords)
-        ds_out.nodeCoords.attrs['units'] = self.units
-        ds_out['centerCoords'] = \
-            (('elementCount', 'coordDim'), centerCoords)
-        ds_out.centerCoords.attrs['units'] = self.units
-        ds_out['elementConn'] = \
-            (('elementCount', 'maxNodePElement'), elementConn + 1)
-        ds_out.elementConn.attrs['start_index'] = 1
-        ds_out.elementConn.attrs['_FillValue'] = -1
-        ds_out['numElementConn'] = \
-            (('elementCount',), maxNodePElement * numpy.ones(elementCount,
-                                                             dtype=int))
-
-        ds_out['origGridDims'] = (('origGridRank',), [nLon, nLat])
-
-        ds_out.attrs['gridType'] = 'unstructured mesh'
-        ds_out.attrs['version'] = '0.9'
-
-        ds_out.to_netcdf(esmfFileName, format=self.format,
-                         engine=self.engine)
 
     def _set_coords(self, latVarName, lonVarName, latDimName,
                     lonDimName):
@@ -339,14 +277,14 @@ class LatLonGridDescriptor(MeshDescriptor):
         if self.regional is None:
             self.regional = False
             if units == 'degree':
-                if numpy.abs(lonRange - 360.) > 1e-10:
+                if np.abs(lonRange - 360.) > 1e-10:
                     self.regional = True
-                if numpy.abs(latRange - 180.) > 1e-10:
+                if np.abs(latRange - 180.) > 1e-10:
                     self.regional = True
             else:
-                if numpy.abs(lonRange - 2. * numpy.pi) > 1e-10:
+                if np.abs(lonRange - 2. * np.pi) > 1e-10:
                     self.regional = True
-                if numpy.abs(latRange - numpy.pi) > 1e-10:
+                if np.abs(latRange - np.pi) > 1e-10:
                     self.regional = True
         if self.meshName is None:
             self.meshName = '{}x{}{}'.format(round_res(abs(dLat)),

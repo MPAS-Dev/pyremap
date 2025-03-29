@@ -9,11 +9,9 @@
 # distributed with this code, or at
 # https://raw.githubusercontent.com/MPAS-Dev/pyremap/main/LICENSE
 
-import warnings
-
 import netCDF4
-import numpy
-import xarray
+import numpy as np
+import xarray as xr
 
 from pyremap.descriptor.mesh_descriptor import MeshDescriptor
 from pyremap.descriptor.utility import add_history, create_scrip, expand_scrip
@@ -25,17 +23,13 @@ class MpasCellMeshDescriptor(MeshDescriptor):
 
     Attributes
     ----------
-    vertices : bool
-        Whether the mapping is to or from vertices instead of corners
-        (for non-conservative remapping)
-
     fileName : str
         The path of the file containing the MPAS mesh
 
     history : str
         The history attribute written to SCRIP files
     """
-    def __init__(self, fileName, meshName=None, vertices=False):
+    def __init__(self, fileName, meshName=None):
         """
         Constructor stores the file name
 
@@ -49,22 +43,10 @@ class MpasCellMeshDescriptor(MeshDescriptor):
             ``'oRRS18to6'``).  If not provided, the data set in ``fileName``
             must have a global attribute ``meshName`` that will be used
             instead.
-
-        vertices : bool, optional
-            Whether the mapping is to or from vertices instead of corners
-            (for non-conservative remapping)
         """
         super().__init__()
 
-        if vertices:
-            warnings.warn('Creating a MpasCellMeshDescriptor with '
-                          'vertices=True is deprecated and will be removed in '
-                          'the next release. Use MpasVertexMeshDescriptor '
-                          'instead.', DeprecationWarning)
-
-        self.vertices = vertices
-
-        with xarray.open_dataset(fileName) as ds:
+        with xr.open_dataset(fileName) as ds:
 
             if meshName is None:
                 if 'meshName' not in ds.attrs:
@@ -76,24 +58,20 @@ class MpasCellMeshDescriptor(MeshDescriptor):
             self.fileName = fileName
             self.regional = True
 
-            if vertices:
-                # build coords
-                self.coords = {'latVertex': {'dims': 'nVertices',
-                                             'data': ds.latVertex.values,
-                                             'attrs': {'units': 'radians'}},
-                               'lonVertex': {'dims': 'nVertices',
-                                             'data': ds.lonVertex.values,
-                                             'attrs': {'units': 'radians'}}}
-                self.dims = ['nVertices']
-            else:
-                # build coords
-                self.coords = {'latCell': {'dims': 'nCells',
-                                           'data': ds.latCell.values,
-                                           'attrs': {'units': 'radians'}},
-                               'lonCell': {'dims': 'nCells',
-                                           'data': ds.lonCell.values,
-                                           'attrs': {'units': 'radians'}}}
-                self.dims = ['nCells']
+            # build coords
+            self.coords = {
+                'latCell': {
+                    'dims': 'nCells',
+                    'data': ds.latCell.values,
+                    'attrs': {'units': 'radians'}
+                },
+                'lonCell': {
+                    'dims': 'nCells',
+                    'data': ds.lonCell.values,
+                    'attrs': {'units': 'radians'}
+                },
+            }
+            self.dims = ['nCells']
             self.dimSize = [ds.sizes[dim] for dim in self.dims]
 
             self.history = add_history(ds=ds)
@@ -115,9 +93,6 @@ class MpasCellMeshDescriptor(MeshDescriptor):
             A factor by which to expand each grid cell outward from the center.
             If a ``numpy.ndarray``, one value per cell.
         """
-        if self.vertices:
-            raise ValueError('A SCRIP file won\'t work for remapping vertices')
-
         inFile = netCDF4.Dataset(self.fileName, 'r')
         outFile = netCDF4.Dataset(scripFileName, 'w', format=self.format)
 
@@ -147,12 +122,12 @@ class MpasCellMeshDescriptor(MeshDescriptor):
         outFile.variables['grid_imask'][:] = 1
 
         # grid corners:
-        grid_corner_lon = numpy.zeros((nCells, maxVertices))
-        grid_corner_lat = numpy.zeros((nCells, maxVertices))
+        grid_corner_lon = np.zeros((nCells, maxVertices))
+        grid_corner_lat = np.zeros((nCells, maxVertices))
         for iVertex in range(maxVertices):
-            cellIndices = numpy.arange(nCells)
+            cellIndices = np.arange(nCells)
             # repeat the last vertex wherever iVertex > nEdgesOnCell
-            localVertexIndices = numpy.minimum(nEdgesOnCell - 1, iVertex)
+            localVertexIndices = np.minimum(nEdgesOnCell - 1, iVertex)
             vertexIndices = verticesOnCell[cellIndices, localVertexIndices] - 1
             grid_corner_lat[cellIndices, iVertex] = latVertex[vertexIndices]
             grid_corner_lon[cellIndices, iVertex] = lonVertex[vertexIndices]
@@ -167,46 +142,3 @@ class MpasCellMeshDescriptor(MeshDescriptor):
 
         inFile.close()
         outFile.close()
-
-    def to_esmf(self, esmfFileName):
-        """
-        Create an ESMF mesh file for the mesh
-
-        Parameters
-        ----------
-        esmfFileName : str
-            The path to which the ESMF mesh file should be written
-        """
-        with xarray.open_dataset(self.fileName) as ds:
-
-            nodeCount = ds.sizes['nVertices']
-            elementCount = ds.sizes['nCells']
-            coordDim = 2
-
-            nodeCoords = numpy.zeros((nodeCount, coordDim))
-            nodeCoords[:, 0] = ds.lonVertex.values
-            nodeCoords[:, 1] = ds.latVertex.values
-            centerCoords = numpy.zeros((elementCount, coordDim))
-            centerCoords[:, 0] = ds.lonCell.values
-            centerCoords[:, 1] = ds.latCell.values
-
-            elementConn = ds.verticesOnCell.values
-            elementConn[elementConn == nodeCount + 1] = -1
-
-            ds_out = xarray.Dataset()
-            ds_out['nodeCoords'] = (('nodeCount', 'coordDim'), nodeCoords)
-            ds_out.nodeCoords.attrs['units'] = 'radians'
-            ds_out['centerCoords'] = \
-                (('elementCount', 'coordDim'), centerCoords)
-            ds_out.centerCoords.attrs['units'] = 'radians'
-            ds_out['elementConn'] = \
-                (('elementCount', 'maxNodePElement'), elementConn)
-            ds_out.elementConn.attrs['start_index'] = 1
-            ds_out.elementConn.attrs['_FillValue'] = -1
-            ds_out['numElementConn'] = \
-                (('elementCount',), ds.nEdgesOnCell.values)
-            ds_out.attrs['gridType'] = 'unstructured mesh'
-            ds_out.attrs['version'] = '0.9'
-
-            ds_out.to_netcdf(esmfFileName, format=self.format,
-                             engine=self.engine)

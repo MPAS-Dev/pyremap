@@ -26,7 +26,7 @@ import xarray
 
 from pyremap import (
     LatLonGridDescriptor,
-    MpasMeshDescriptor,
+    MpasCellMeshDescriptor,
     ProjectionGridDescriptor,
     Remapper,
 )
@@ -48,7 +48,8 @@ class TestInterp(TestCase):
     def get_mpas_descriptor(self):
         mpasMeshFileName = str(self.datadir.join('mpasMesh.nc'))
         timeSeriesFileName = str(self.datadir.join('timeSeries.0002-01-01.nc'))
-        descriptor = MpasMeshDescriptor(mpasMeshFileName, meshName='oQU240')
+        descriptor = MpasCellMeshDescriptor(
+            mpasMeshFileName, meshName='oQU240')
 
         return (descriptor, mpasMeshFileName, timeSeriesFileName)
 

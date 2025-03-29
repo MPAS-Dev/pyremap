@@ -10,8 +10,7 @@
 # https://raw.githubusercontent.com/MPAS-Dev/pyremap/main/LICENSE
 
 import netCDF4
-import numpy
-import xarray
+import numpy as np
 
 from pyremap.descriptor.mesh_descriptor import MeshDescriptor
 from pyremap.descriptor.utility import add_history, create_scrip
@@ -105,7 +104,7 @@ class PointCollectionDescriptor(MeshDescriptor):
         grid_area = outFile.createVariable('grid_area', 'f8', ('grid_size',))
         grid_area.units = 'radian^2'
         # SCRIP uses square radians
-        grid_area[:] = numpy.zeros(nPoints)
+        grid_area[:] = np.zeros(nPoints)
 
         outFile.variables['grid_center_lat'][:] = self.lat
         outFile.variables['grid_center_lon'][:] = self.lon
@@ -113,8 +112,8 @@ class PointCollectionDescriptor(MeshDescriptor):
         outFile.variables['grid_imask'][:] = 1
 
         # grid corners:
-        grid_corner_lon = numpy.zeros((nPoints, 4))
-        grid_corner_lat = numpy.zeros((nPoints, 4))
+        grid_corner_lon = np.zeros((nPoints, 4))
+        grid_corner_lat = np.zeros((nPoints, 4))
         # just repeat the center lat and lon
         for iVertex in range(4):
             grid_corner_lat[:, iVertex] = self.lat
@@ -127,54 +126,3 @@ class PointCollectionDescriptor(MeshDescriptor):
         setattr(outFile, 'history', self.history)
 
         outFile.close()
-
-    def to_esmf(self, esmfFileName):
-        """
-        Create an ESMF mesh file for the mesh
-
-        Parameters
-        ----------
-        esmfFileName : str
-            The path to which the ESMF mesh file should be written
-        """
-        nPoints = len(self.lat)
-
-        elementCount = nPoints
-        nodeCount = 3 * nPoints
-        coordDim = 2
-        maxNodePElement = 3
-
-        nodeCoords = numpy.zeros((nodeCount, coordDim))
-        # just repeat the center lat and lon
-        for iVertex in range(maxNodePElement):
-            nodeCoords[iVertex::maxNodePElement, 0] = self.lon
-            nodeCoords[iVertex::maxNodePElement, 1] = self.lat
-
-        centerCoords = numpy.zeros((elementCount, coordDim))
-        centerCoords[:, 0] = self.lon
-        centerCoords[:, 1] = self.lat
-
-        elementConn = numpy.zeros((elementCount, maxNodePElement), dtype=int)
-        elementConn[:, 0] = maxNodePElement * numpy.arange(nPoints)
-        elementConn[:, 1] = maxNodePElement * numpy.arange(nPoints) + 1
-        elementConn[:, 2] = maxNodePElement * numpy.arange(nPoints) + 2
-
-        ds_out = xarray.Dataset()
-        ds_out['nodeCoords'] = (('nodeCount', 'coordDim'), nodeCoords)
-        ds_out.nodeCoords.attrs['units'] = self.units
-        ds_out['centerCoords'] = \
-            (('elementCount', 'coordDim'), centerCoords)
-        ds_out.centerCoords.attrs['units'] = self.units
-        ds_out['elementConn'] = \
-            (('elementCount', 'maxNodePElement'), elementConn + 1)
-        ds_out.elementConn.attrs['start_index'] = 1
-        ds_out.elementConn.attrs['_FillValue'] = -1
-        ds_out['numElementConn'] = \
-            (('elementCount',), maxNodePElement * numpy.ones(elementCount,
-                                                             dtype=int))
-
-        ds_out.attrs['gridType'] = 'unstructured mesh'
-        ds_out.attrs['version'] = '0.9'
-
-        ds_out.to_netcdf(esmfFileName, format=self.format,
-                         engine=self.engine)
