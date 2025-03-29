@@ -40,7 +40,7 @@ jobs:
           conda create -n pyremap_dev --file dev-spec.txt \
             python=${{ env.PYTHON_VERSION }}
           conda activate pyremap_dev
-          python -m pip install -vv --no-deps --no-build-isolation -e .
+          python -m pip install -vv --no-deps --no-build-isolation .
 
       - name: Build Sphinx Docs
         run: |
