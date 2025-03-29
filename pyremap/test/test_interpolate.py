@@ -8,21 +8,18 @@
 # Additional copyright and license information can be found in the LICENSE file
 # distributed with this code, or at
 # https://raw.githubusercontent.com/MPAS-Dev/pyremap/main/LICENSE
-'''
+"""
 Unit test infrastructure for horizontal interpolation.
-
-Xylar Asay-Davis
-04/06/2017
-'''
+"""
 
 import os
 import shutil
 import tempfile
 
-import numpy
+import numpy as np
 import pyproj
 import pytest
-import xarray
+import xarray as xr
 
 from pyremap import (
     LatLonGridDescriptor,
@@ -45,25 +42,24 @@ class TestInterp(TestCase):
         # Remove the directory after the test
         shutil.rmtree(self.test_dir)
 
-    def get_mpas_descriptor(self):
+    def get_mpas_cell_descriptor(self):
         mpasMeshFileName = str(self.datadir.join('mpasMesh.nc'))
         timeSeriesFileName = str(self.datadir.join('timeSeries.0002-01-01.nc'))
         descriptor = MpasCellMeshDescriptor(
             mpasMeshFileName, meshName='oQU240')
 
-        return (descriptor, mpasMeshFileName, timeSeriesFileName)
+        return descriptor, mpasMeshFileName, timeSeriesFileName
 
     def get_latlon_file_descriptor(self):
         latLonGridFileName = str(self.datadir.join('SST_annual_1870-1900.nc'))
-        descriptor = LatLonGridDescriptor.read(latLonGridFileName,
-                                               latVarName='lat',
-                                               lonVarName='lon')
+        descriptor = LatLonGridDescriptor.read(
+            latLonGridFileName, latVarName='lat', lonVarName='lon')
 
-        return (descriptor, latLonGridFileName)
+        return descriptor, latLonGridFileName
 
     def get_latlon_array_descriptor(self):
-        lat = numpy.linspace(-90., 90., 91)
-        lon = numpy.linspace(-180., 180., 181)
+        lat = np.linspace(-90., 90., 91)
+        lon = np.linspace(-180., 180., 181)
 
         descriptor = LatLonGridDescriptor.create(lat, lon, units='degrees')
         return descriptor
@@ -81,18 +77,18 @@ class TestInterp(TestCase):
         res = 100e3
         nx = 2 * int(xMax / res) + 1
         ny = 2 * int(yMax / res) + 1
-        x = numpy.linspace(-xMax, xMax, nx)
-        y = numpy.linspace(-yMax, yMax, ny)
-        meshName = '{}km_Antarctic_stereo'.format(int(res * 1e-3))
-        descriptor = ProjectionGridDescriptor.create(projection, x, y,
-                                                     meshName)
+        x = np.linspace(-xMax, xMax, nx)
+        y = np.linspace(-yMax, yMax, ny)
+        meshName = f'{int(res * 1e-3)}km_Antarctic_stereo'
+        descriptor = ProjectionGridDescriptor.create(
+            projection, x, y, meshName)
         return descriptor
 
     def get_file_names(self, suffix):
-        weightFileName = '{}/weights_{}.nc'.format(self.test_dir, suffix)
-        outFileName = '{}/remapped_{}.nc'.format(self.test_dir, suffix)
-        refFileName = '{}/ref_{}.nc'.format(self.datadir, suffix)
-        return (weightFileName, outFileName, refFileName)
+        weightFileName = f'{self.test_dir}/weights_{suffix}.nc'
+        outFileName = f'{self.test_dir}/remapped_{suffix}.nc'
+        refFileName = f'{self.datadir}/ref_{suffix}.nc'
+        return weightFileName, outFileName, refFileName
 
     def build_remapper(self, sourceDescriptor, destinationDescriptor,
                        weightFileName):
@@ -100,69 +96,79 @@ class TestInterp(TestCase):
         remapper = Remapper(sourceDescriptor, destinationDescriptor,
                             weightFileName)
 
-        remapper.build_mapping_file(method='bilinear')
+        remapper.esmf_build_map(method='bilinear')
 
         assert os.path.exists(remapper.mappingFileName)
 
         return remapper
 
-    def check_remap(self, inFileName, outFileName, refFileName, remapper,
-                    remap_file=True):
+    def check_scrip(self, scripFileName, refFileName):
 
-        dsRef = xarray.open_dataset(refFileName)
-        for var in ['lat_bnds', 'lon_bnds', 'gw', 'area', 'nvertices']:
-            if var in dsRef:
-                dsRef = dsRef.drop_vars([var])
+        dsRef = xr.open_dataset(refFileName)
+        assert os.path.exists(scripFileName)
+        dsScrip = xr.open_dataset(scripFileName)
+        self.assertDatasetApproxEqual(dsScrip, dsRef)
+
+    def check_remap(
+            self,
+            inFileName,
+            outFileName,
+            refFileName,
+            remapper,
+            remap_file=True):
+
+        dsRef = xr.open_dataset(refFileName)
+        dropVars = ['lat_bnds', 'lon_bnds', 'gw', 'area', 'nvertices']
+        dsRef = dsRef.drop_vars([var for var in dropVars if var in dsRef])
         if remap_file:
             # first, test interpolation with ncremap
-            remapper.remap_file(inFileName=inFileName,
-                                outFileName=outFileName,
-                                replaceMpasFill=True)
+            remapper.remap_file(
+                inFileName=inFileName,
+                outFileName=outFileName,
+                replaceMpasFill=True)
 
             assert os.path.exists(outFileName)
-            dsRemapped = xarray.open_dataset(outFileName)
+            dsRemapped = xr.open_dataset(outFileName)
             # drop some extra vairables added by ncremap that aren't in the
             # reference data set
-            for var in ['lat_bnds', 'lon_bnds', 'gw', 'area', 'nvertices']:
-                if var in dsRemapped:
-                    dsRemapped = dsRemapped.drop_vars([var])
+            dsRemapped = dsRemapped.drop_vars(
+                [var for var in dropVars if var in dsRemapped]
+            )
             self.assertDatasetApproxEqual(dsRemapped, dsRef)
 
         # now, try in-memory remapping
-        ds = xarray.open_dataset(inFileName)
+        ds = xr.open_dataset(inFileName)
         dsRemapped = remapper.remap(ds, self.renormalizationThreshold)
         self.assertDatasetApproxEqual(dsRemapped, dsRef)
 
-    def test_mpas_to_latlon(self):
-        '''
+    def test_mpas_cell_to_latlon(self):
+        """
         test horizontal interpolation from an MPAS mesh to a destination
         lat/lon grid determined from a file containing 'lat' and 'lon' coords
-
-        Xylar Asay-Davis
-        04/06/2017
-        '''
+        """
 
         weightFileName, outFileName, refFileName = \
-            self.get_file_names(suffix='mpas_to_latlon')
+            self.get_file_names(suffix='mpas_cell_to_latlon')
 
-        sourceDescriptor, mpasMeshFileName, timeSeriesFileName = \
-            self.get_mpas_descriptor()
-        destinationDescriptor, latLonGridFileName = \
-            self.get_latlon_file_descriptor()
+        sourceDescriptor, _, timeSeriesFileName = \
+            self.get_mpas_cell_descriptor()
+        destinationDescriptor, _ = self.get_latlon_file_descriptor()
 
-        remapper = self.build_remapper(sourceDescriptor, destinationDescriptor,
-                                       weightFileName)
-        self.check_remap(timeSeriesFileName, outFileName, refFileName,
-                         remapper, remap_file=True)
+        remapper = self.build_remapper(
+            sourceDescriptor, destinationDescriptor, weightFileName)
+        self.check_remap(
+            timeSeriesFileName,
+            outFileName,
+            refFileName,
+            remapper,
+            remap_file=True
+        )
 
     def test_latlon_file_to_latlon_array(self):
-        '''
+        """
         test horizontal interpolation from a lat/lon grid to a destination
         lat/lon grid determined from config options 'lat' and 'lon'.
-
-        Xylar Asay-Davis
-        04/06/2017
-        '''
+        """
 
         weightFileName, outFileName, refFileName = \
             self.get_file_names(suffix='latlon_file_to_latlon_array')
@@ -171,43 +177,47 @@ class TestInterp(TestCase):
             self.get_latlon_file_descriptor()
         destinationDescriptor = self.get_latlon_array_descriptor()
 
-        remapper = self.build_remapper(sourceDescriptor, destinationDescriptor,
-                                       weightFileName)
-        self.check_remap(latLonGridFileName, outFileName, refFileName,
-                         remapper, remap_file=True)
+        remapper = self.build_remapper(
+            sourceDescriptor, destinationDescriptor, weightFileName)
+        self.check_remap(
+            latLonGridFileName,
+            outFileName,
+            refFileName,
+            remapper,
+            remap_file=True
+        )
 
-    def test_mpas_to_stereographic(self):
-        '''
+    def test_mpas_cell_to_stereographic(self):
+        """
         test horizontal interpolation from an MPAS mesh to a destination
         stereographic grid.
-
-        Xylar Asay-Davis
-        04/06/2017
-        '''
+        """
 
         weightFileName, outFileName, refFileName = \
-            self.get_file_names(suffix='mpas_to_stereographic')
+            self.get_file_names(suffix='mpas_cell_to_stereographic')
 
-        sourceDescriptor, mpasMeshFileName, timeSeriesFileName = \
-            self.get_mpas_descriptor()
+        sourceDescriptor, _, timeSeriesFileName = \
+            self.get_mpas_cell_descriptor()
         destinationDescriptor = self.get_stereographic_array_descriptor()
 
-        remapper = self.build_remapper(sourceDescriptor, destinationDescriptor,
-                                       weightFileName)
+        remapper = self.build_remapper(
+            sourceDescriptor, destinationDescriptor, weightFileName)
 
         # ncremap doesn't support stereographic grids so just check the
         # Remapper
-        self.check_remap(timeSeriesFileName, outFileName, refFileName,
-                         remapper, remap_file=True)
+        self.check_remap(
+            timeSeriesFileName,
+            outFileName,
+            refFileName,
+            remapper,
+            remap_file=True
+        )
 
     def test_latlon_to_stereographic(self):
-        '''
+        """
         test horizontal interpolation from a lat/lon grid to a destination
         stereographic grid.
-
-        Xylar Asay-Davis
-        04/06/2017
-        '''
+        """
 
         weightFileName, outFileName, refFileName = \
             self.get_file_names(suffix='latlon_to_stereographic')
@@ -216,23 +226,24 @@ class TestInterp(TestCase):
             self.get_latlon_file_descriptor()
         destinationDescriptor = self.get_stereographic_array_descriptor()
 
-        remapper = self.build_remapper(sourceDescriptor, destinationDescriptor,
-                                       weightFileName)
+        remapper = self.build_remapper(
+            sourceDescriptor, destinationDescriptor, weightFileName)
 
         # ncremap doesn't support stereographic grids so just check the
         # Remapper
-        self.check_remap(latLonGridFileName, outFileName, refFileName,
-                         remapper, remap_file=True)
+        self.check_remap(
+            latLonGridFileName,
+            outFileName,
+            refFileName,
+            remapper,
+            remap_file=True)
 
     def test_stereographic_array_to_latlon_array(self):
-        '''
+        """
         test horizontal interpolation from a stereographic grid to a
         destination lat/lon grid determined from config options 'lat' and
         'lon'.
-
-        Xylar Asay-Davis
-        04/06/2017
-        '''
+        """
 
         weightFileName, outFileName, refFileName = \
             self.get_file_names(suffix='stereographic_to_latlon')
@@ -244,7 +255,7 @@ class TestInterp(TestCase):
 
         # now, let's make a more complicated field with more dimensions to
         # check
-        inField = numpy.reshape(Lat, (1, Lat.shape[0], Lat.shape[1], 1))
+        inField = np.reshape(Lat, (1, Lat.shape[0], Lat.shape[1], 1))
         inField = inField.repeat(3, axis=0)
         inField = inField.repeat(2, axis=3)
 
@@ -254,7 +265,7 @@ class TestInterp(TestCase):
                                      {'dims': ('dim0', 'y', 'x', 'dim3'),
                                       'data': inField}}}
 
-        ds = xarray.Dataset.from_dict(datasetDict)
+        ds = xr.Dataset.from_dict(datasetDict)
         inFileName = '{}/unmapped_stereographic_array_to_latlon_' \
                      'array.nc'.format(self.test_dir)
         ds.to_netcdf(inFileName)
