@@ -4,10 +4,6 @@
     "url": "/main/"
   },
   {
-    "version": ".git",
-    "url": "/.git/"
-  },
-  {
     "version": "0.0.10",
     "url": "/0.0.10/"
   },
