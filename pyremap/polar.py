@@ -45,13 +45,13 @@ def get_antarctic_stereographic_projection():
     return projection
 
 
-def get_polar_descriptor_from_file(fileName, projection='antarctic'):
+def get_polar_descriptor_from_file(filename, projection='antarctic'):
     """
     Get a descriptor of a polar stereographic grid used for remapping
 
     Parameters
     ----------
-    fileName :  str
+    filename :  str
         A file containing x and y coordinates for the grid
 
     projection : {'arctic', 'antarctic', pyproj.Proj}
@@ -63,29 +63,29 @@ def get_polar_descriptor_from_file(fileName, projection='antarctic'):
     descriptor : ``ProjectionGridDescriptor`` object
         A descriptor of the polar grid
     """
-    dsIn = xarray.open_dataset(fileName)
-    x = dsIn.x.values
-    y = dsIn.y.values
+    ds_in = xarray.open_dataset(filename)
+    x = ds_in.x.values
+    y = ds_in.y.values
     dx = int((x[1] - x[0]) / 1000.)
-    Lx = int((x[-1] - x[0]) / 1000.)
-    Ly = int((y[-1] - y[0]) / 1000.)
+    lx = int((x[-1] - x[0]) / 1000.)
+    ly = int((y[-1] - y[0]) / 1000.)
 
-    meshName = '{}x{}km_{}km_Antarctic_stereo'.format(Lx, Ly, dx)
+    mesh_name = '{}x{}km_{}km_antarctic_stereo'.format(lx, ly, dx)
 
     projection = _get_projection(projection)
 
-    descriptor = ProjectionGridDescriptor.create(projection, x, y, meshName)
+    descriptor = ProjectionGridDescriptor.create(projection, x, y, mesh_name)
 
     return descriptor
 
 
-def get_polar_descriptor(Lx, Ly, dx, dy, projection='antarctic'):
+def get_polar_descriptor(lx, ly, dx, dy, projection='antarctic'):
     """
     Get a descriptor of a polar stereographic grid used for remapping
 
     Parameters
     ----------
-    Lx, Ly :  double
+    lx, ly :  double
         Size of the domain in x and y in km
 
     dx, dy : double
@@ -101,31 +101,30 @@ def get_polar_descriptor(Lx, Ly, dx, dy, projection='antarctic'):
         A descriptor of the Antarctic grid
     """
 
-    upperProj = projection[0].upper() + projection[1:]
+    upper_proj = projection[0].upper() + projection[1:]
 
-    meshName = '{}x{}km_{}km_{}_stereo'.format(Lx, Ly, dx, upperProj)
+    mesh_name = '{}x{}km_{}km_{}_stereo'.format(lx, ly, dx, upper_proj)
 
-    xMax = 0.5 * Lx * 1e3
-    nx = int(Lx / dx) + 1
-    x = numpy.linspace(-xMax, xMax, nx)
+    x_max = 0.5 * lx * 1e3
+    nx = int(lx / dx) + 1
+    x = numpy.linspace(-x_max, x_max, nx)
 
-    yMax = 0.5 * Ly * 1e3
-    ny = int(Ly / dy) + 1
-    y = numpy.linspace(-yMax, yMax, ny)
+    y_max = 0.5 * ly * 1e3
+    ny = int(ly / dy) + 1
+    y = numpy.linspace(-y_max, y_max, ny)
 
     projection = _get_projection(projection)
 
-    descriptor = ProjectionGridDescriptor.create(projection, x, y, meshName)
+    descriptor = ProjectionGridDescriptor.create(projection, x, y, mesh_name)
 
     return descriptor
 
 
 def to_polar(points):
-
     projection = get_antarctic_stereographic_projection()
-    latLonProjection = pyproj.Proj(proj='latlong', datum='WGS84')
+    lat_lon_projection = pyproj.Proj(proj='latlong', datum='WGS84')
 
-    transformer = pyproj.Transformer.from_proj(latLonProjection, projection)
+    transformer = pyproj.Transformer.from_proj(lat_lon_projection, projection)
     x, y = transformer.transform(points[:, 0], points[:, 1], radians=False)
     points[:, 0] = x
     points[:, 1] = y
@@ -133,11 +132,10 @@ def to_polar(points):
 
 
 def from_polar(points):
-
     projection = get_antarctic_stereographic_projection()
-    latLonProjection = pyproj.Proj(proj='latlong', datum='WGS84')
+    lat_lon_projection = pyproj.Proj(proj='latlong', datum='WGS84')
 
-    transformer = pyproj.Transformer.from_proj(projection, latLonProjection)
+    transformer = pyproj.Transformer.from_proj(projection, lat_lon_projection)
     lon, lat = transformer.transform(points[:, 0], points[:, 1], radians=False)
     points[:, 0] = lon
     points[:, 1] = lat
