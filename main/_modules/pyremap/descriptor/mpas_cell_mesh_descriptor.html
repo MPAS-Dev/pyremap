@@ -84,12 +84,11 @@
 <span class="c1"># distributed with this code, or at</span>
 <span class="c1"># https://raw.githubusercontent.com/MPAS-Dev/pyremap/main/LICENSE</span>
 
-<span class="kn">import</span><span class="w"> </span><span class="nn">netCDF4</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyremap.descriptor.mesh_descriptor</span><span class="w"> </span><span class="kn">import</span> <span class="n">MeshDescriptor</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pyremap.descriptor.utility</span><span class="w"> </span><span class="kn">import</span> <span class="n">add_history</span><span class="p">,</span> <span class="n">create_scrip</span><span class="p">,</span> <span class="n">expand_scrip</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyremap.descriptor.utility</span><span class="w"> </span><span class="kn">import</span> <span class="n">add_history</span><span class="p">,</span> <span class="n">expand_scrip</span><span class="p">,</span> <span class="n">write_netcdf</span>
 
 
 <div class="viewcode-block" id="MpasCellMeshDescriptor">
@@ -160,7 +159,7 @@
 <a class="viewcode-back" href="../../../generated/pyremap.descriptor.MpasCellMeshDescriptor.to_scrip.html#pyremap.descriptor.MpasCellMeshDescriptor.to_scrip">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">to_scrip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scripFileName</span><span class="p">,</span> <span class="n">expandDist</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">expandFactor</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Given an MPAS mesh file, create a SCRIP file based on the mesh.</span>
+<span class="sd">        Create a SCRIP file from the MPAS mesh.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -175,55 +174,71 @@
 <span class="sd">            A factor by which to expand each grid cell outward from the center.</span>
 <span class="sd">            If a ``numpy.ndarray``, one value per cell.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">inFile</span> <span class="o">=</span> <span class="n">netCDF4</span><span class="o">.</span><span class="n">Dataset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fileName</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
-        <span class="n">outFile</span> <span class="o">=</span> <span class="n">netCDF4</span><span class="o">.</span><span class="n">Dataset</span><span class="p">(</span><span class="n">scripFileName</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">format</span><span class="p">)</span>
 
-        <span class="c1"># Get info from input file</span>
-        <span class="n">latCell</span> <span class="o">=</span> <span class="n">inFile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s1">&#39;latCell&#39;</span><span class="p">][:]</span>
-        <span class="n">lonCell</span> <span class="o">=</span> <span class="n">inFile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s1">&#39;lonCell&#39;</span><span class="p">][:]</span>
-        <span class="n">latVertex</span> <span class="o">=</span> <span class="n">inFile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s1">&#39;latVertex&#39;</span><span class="p">][:]</span>
-        <span class="n">lonVertex</span> <span class="o">=</span> <span class="n">inFile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s1">&#39;lonVertex&#39;</span><span class="p">][:]</span>
-        <span class="n">verticesOnCell</span> <span class="o">=</span> <span class="n">inFile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s1">&#39;verticesOnCell&#39;</span><span class="p">][:]</span>
-        <span class="n">nEdgesOnCell</span> <span class="o">=</span> <span class="n">inFile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s1">&#39;nEdgesOnCell&#39;</span><span class="p">][:]</span>
-        <span class="n">nCells</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">inFile</span><span class="o">.</span><span class="n">dimensions</span><span class="p">[</span><span class="s1">&#39;nCells&#39;</span><span class="p">])</span>
-        <span class="n">maxVertices</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">inFile</span><span class="o">.</span><span class="n">dimensions</span><span class="p">[</span><span class="s1">&#39;maxEdges&#39;</span><span class="p">])</span>
-        <span class="n">areaCell</span> <span class="o">=</span> <span class="n">inFile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s1">&#39;areaCell&#39;</span><span class="p">][:]</span>
-        <span class="n">sphereRadius</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">inFile</span><span class="o">.</span><span class="n">sphere_radius</span><span class="p">)</span>
+        <span class="n">ds_in</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">open_dataset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fileName</span><span class="p">)</span>
+        <span class="n">lat_cell</span> <span class="o">=</span> <span class="n">ds_in</span><span class="o">.</span><span class="n">latCell</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">lon_cell</span> <span class="o">=</span> <span class="n">ds_in</span><span class="o">.</span><span class="n">lonCell</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">lat_vertex</span> <span class="o">=</span> <span class="n">ds_in</span><span class="o">.</span><span class="n">latVertex</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">lon_vertex</span> <span class="o">=</span> <span class="n">ds_in</span><span class="o">.</span><span class="n">lonVertex</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">vertices_on_cell</span> <span class="o">=</span> <span class="n">ds_in</span><span class="o">.</span><span class="n">verticesOnCell</span><span class="o">.</span><span class="n">values</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="n">nedges_on_cell</span> <span class="o">=</span> <span class="n">ds_in</span><span class="o">.</span><span class="n">nEdgesOnCell</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">area_cell</span> <span class="o">=</span> <span class="n">ds_in</span><span class="o">.</span><span class="n">areaCell</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">sphere_radius</span> <span class="o">=</span> <span class="n">ds_in</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;sphere_radius&#39;</span><span class="p">]</span>
 
-        <span class="n">create_scrip</span><span class="p">(</span><span class="n">outFile</span><span class="p">,</span> <span class="n">grid_size</span><span class="o">=</span><span class="n">nCells</span><span class="p">,</span> <span class="n">grid_corners</span><span class="o">=</span><span class="n">maxVertices</span><span class="p">,</span>
-                     <span class="n">grid_rank</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s1">&#39;radians&#39;</span><span class="p">,</span> <span class="n">meshName</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">meshName</span><span class="p">)</span>
+        <span class="n">ncells</span> <span class="o">=</span> <span class="n">ds_in</span><span class="o">.</span><span class="n">sizes</span><span class="p">[</span><span class="s1">&#39;nCells&#39;</span><span class="p">]</span>
+        <span class="n">max_vertices</span> <span class="o">=</span> <span class="n">ds_in</span><span class="o">.</span><span class="n">sizes</span><span class="p">[</span><span class="s1">&#39;maxEdges&#39;</span><span class="p">]</span>
 
-        <span class="n">grid_area</span> <span class="o">=</span> <span class="n">outFile</span><span class="o">.</span><span class="n">createVariable</span><span class="p">(</span><span class="s1">&#39;grid_area&#39;</span><span class="p">,</span> <span class="s1">&#39;f8&#39;</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;grid_size&#39;</span><span class="p">,))</span>
-        <span class="n">grid_area</span><span class="o">.</span><span class="n">units</span> <span class="o">=</span> <span class="s1">&#39;radian^2&#39;</span>
-        <span class="c1"># SCRIP uses square radians</span>
-        <span class="n">grid_area</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">areaCell</span><span class="p">[:]</span> <span class="o">/</span> <span class="p">(</span><span class="n">sphereRadius</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">ds_out</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">()</span>
 
-        <span class="n">outFile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s1">&#39;grid_center_lat&#39;</span><span class="p">][:]</span> <span class="o">=</span> <span class="n">latCell</span><span class="p">[:]</span>
-        <span class="n">outFile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s1">&#39;grid_center_lon&#39;</span><span class="p">][:]</span> <span class="o">=</span> <span class="n">lonCell</span><span class="p">[:]</span>
-        <span class="n">outFile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s1">&#39;grid_dims&#39;</span><span class="p">][:]</span> <span class="o">=</span> <span class="n">nCells</span>
-        <span class="n">outFile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s1">&#39;grid_imask&#39;</span><span class="p">][:]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">ds_out</span><span class="p">[</span><span class="s1">&#39;grid_area&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="p">(</span><span class="s1">&#39;grid_size&#39;</span><span class="p">,),</span>
+            <span class="n">area_cell</span> <span class="o">/</span> <span class="p">(</span><span class="n">sphere_radius</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="n">ds_out</span><span class="p">[</span><span class="s1">&#39;grid_center_lat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">((</span><span class="s1">&#39;grid_size&#39;</span><span class="p">,),</span> <span class="n">lat_cell</span><span class="p">)</span>
+        <span class="n">ds_out</span><span class="p">[</span><span class="s1">&#39;grid_center_lon&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">((</span><span class="s1">&#39;grid_size&#39;</span><span class="p">,),</span> <span class="n">lon_cell</span><span class="p">)</span>
 
         <span class="c1"># grid corners:</span>
-        <span class="n">grid_corner_lon</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">nCells</span><span class="p">,</span> <span class="n">maxVertices</span><span class="p">))</span>
-        <span class="n">grid_corner_lat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">nCells</span><span class="p">,</span> <span class="n">maxVertices</span><span class="p">))</span>
-        <span class="k">for</span> <span class="n">iVertex</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">maxVertices</span><span class="p">):</span>
-            <span class="n">cellIndices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">nCells</span><span class="p">)</span>
+        <span class="n">grid_corner_lon</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">ncells</span><span class="p">,</span> <span class="n">max_vertices</span><span class="p">))</span>
+        <span class="n">grid_corner_lat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">ncells</span><span class="p">,</span> <span class="n">max_vertices</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">ivert</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_vertices</span><span class="p">):</span>
+            <span class="n">cell_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">ncells</span><span class="p">)</span>
             <span class="c1"># repeat the last vertex wherever iVertex &gt; nEdgesOnCell</span>
-            <span class="n">localVertexIndices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">nEdgesOnCell</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">iVertex</span><span class="p">)</span>
-            <span class="n">vertexIndices</span> <span class="o">=</span> <span class="n">verticesOnCell</span><span class="p">[</span><span class="n">cellIndices</span><span class="p">,</span> <span class="n">localVertexIndices</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span>
-            <span class="n">grid_corner_lat</span><span class="p">[</span><span class="n">cellIndices</span><span class="p">,</span> <span class="n">iVertex</span><span class="p">]</span> <span class="o">=</span> <span class="n">latVertex</span><span class="p">[</span><span class="n">vertexIndices</span><span class="p">]</span>
-            <span class="n">grid_corner_lon</span><span class="p">[</span><span class="n">cellIndices</span><span class="p">,</span> <span class="n">iVertex</span><span class="p">]</span> <span class="o">=</span> <span class="n">lonVertex</span><span class="p">[</span><span class="n">vertexIndices</span><span class="p">]</span>
+            <span class="n">local_vert_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">nedges_on_cell</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">ivert</span><span class="p">)</span>
+            <span class="n">vert_indices</span> <span class="o">=</span> <span class="n">vertices_on_cell</span><span class="p">[</span><span class="n">cell_indices</span><span class="p">,</span> <span class="n">local_vert_indices</span><span class="p">]</span>
+            <span class="n">grid_corner_lat</span><span class="p">[</span><span class="n">cell_indices</span><span class="p">,</span> <span class="n">ivert</span><span class="p">]</span> <span class="o">=</span> <span class="n">lat_vertex</span><span class="p">[</span><span class="n">vert_indices</span><span class="p">]</span>
+            <span class="n">grid_corner_lon</span><span class="p">[</span><span class="n">cell_indices</span><span class="p">,</span> <span class="n">ivert</span><span class="p">]</span> <span class="o">=</span> <span class="n">lon_vertex</span><span class="p">[</span><span class="n">vert_indices</span><span class="p">]</span>
 
-        <span class="n">outFile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s1">&#39;grid_corner_lat&#39;</span><span class="p">][:]</span> <span class="o">=</span> <span class="n">grid_corner_lat</span><span class="p">[:]</span>
-        <span class="n">outFile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s1">&#39;grid_corner_lon&#39;</span><span class="p">][:]</span> <span class="o">=</span> <span class="n">grid_corner_lon</span><span class="p">[:]</span>
+        <span class="n">ds_out</span><span class="p">[</span><span class="s1">&#39;grid_corner_lat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="p">(</span><span class="s1">&#39;grid_size&#39;</span><span class="p">,</span> <span class="s1">&#39;grid_corners&#39;</span><span class="p">),</span> <span class="n">grid_corner_lat</span>
+        <span class="p">)</span>
+        <span class="n">ds_out</span><span class="p">[</span><span class="s1">&#39;grid_corner_lon&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="p">(</span><span class="s1">&#39;grid_size&#39;</span><span class="p">,</span> <span class="s1">&#39;grid_corners&#39;</span><span class="p">),</span> <span class="n">grid_corner_lon</span>
+        <span class="p">)</span>
+
+        <span class="n">ds_out</span><span class="p">[</span><span class="s1">&#39;grid_dims&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">ncells</span><span class="p">],</span>
+            <span class="n">dims</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;grid_rank&#39;</span><span class="p">,)</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;int32&#39;</span><span class="p">)</span>
+
+        <span class="n">ds_out</span><span class="p">[</span><span class="s1">&#39;grid_imask&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">ncells</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;int32&#39;</span><span class="p">),</span>
+            <span class="n">dims</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;grid_size&#39;</span><span class="p">,)</span>
+        <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">expandDist</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">expandFactor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">expand_scrip</span><span class="p">(</span><span class="n">outFile</span><span class="p">,</span> <span class="n">expandDist</span><span class="p">,</span> <span class="n">expandFactor</span><span class="p">)</span>
+            <span class="n">expand_scrip</span><span class="p">(</span><span class="n">ds_out</span><span class="p">,</span> <span class="n">expandDist</span><span class="p">,</span> <span class="n">expandFactor</span><span class="p">)</span>
 
-        <span class="nb">setattr</span><span class="p">(</span><span class="n">outFile</span><span class="p">,</span> <span class="s1">&#39;history&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">history</span><span class="p">)</span>
+        <span class="n">ds_out</span><span class="o">.</span><span class="n">grid_center_lat</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;units&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;radians&#39;</span>
+        <span class="n">ds_out</span><span class="o">.</span><span class="n">grid_center_lon</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;units&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;radians&#39;</span>
+        <span class="n">ds_out</span><span class="o">.</span><span class="n">grid_corner_lat</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;units&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;radians&#39;</span>
+        <span class="n">ds_out</span><span class="o">.</span><span class="n">grid_corner_lon</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;units&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;radians&#39;</span>
+        <span class="n">ds_out</span><span class="o">.</span><span class="n">grid_imask</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;units&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;unitless&#39;</span>
+        <span class="n">ds_out</span><span class="o">.</span><span class="n">grid_area</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;units&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;radians^2&#39;</span>
 
-        <span class="n">inFile</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-        <span class="n">outFile</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+        <span class="n">ds_out</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;meshName&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">meshName</span>
+        <span class="n">ds_out</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;history&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">history</span>
+        <span class="n">write_netcdf</span><span class="p">(</span><span class="n">ds_out</span><span class="p">,</span> <span class="n">scripFileName</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">format</span><span class="p">)</span></div>
 </div>
 
 </pre></div>
