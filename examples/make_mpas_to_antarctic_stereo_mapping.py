@@ -19,45 +19,46 @@ Modify the grid name, the path to the MPAS grid file and the output grid
 resolution.
 """
 
-import xarray
+import xarray as xr
 
-from pyremap import MpasCellMeshDescriptor, Remapper, get_polar_descriptor
+from pyremap import Remapper, get_polar_descriptor
 
 
 # replace with the MPAS mesh name
-inGridName = 'oQU240'
+src_mesh_name = 'oQU240'
 
 # replace with the path to the desired mesh or restart file
 # As an example, use:
 # https://web.lcrc.anl.gov/public/e3sm/inputdata/ocn/mpas-o/oQU240/ocean.QU.240km.151209.nc
-inGridFileName = 'ocean.QU.240km.151209.nc'
+src_mesh_filename = 'ocean.QU.240km.151209.nc'
 
-inDescriptor = MpasCellMeshDescriptor(inGridFileName, inGridName)
+# Configure the remapper to build the mapping file using 4 MPI tasks and
+# bilinear remapping
+remapper = Remapper(ntasks=4, method='bilinear')
+
+remapper.src_from_mpas(filename=src_mesh_filename, mesh_name=src_mesh_name)
 
 # modify the size and resolution of the Antarctic grid as desired
-outDescriptor = get_polar_descriptor(Lx=6000., Ly=5000., dx=10., dy=10.,
-                                     projection='antarctic')
-outGridName = outDescriptor.meshName
+remapper.dst_descriptor = get_polar_descriptor(
+    lx=6000., ly=5000., dx=10., dy=10., projection='antarctic')
 
-mappingFileName = f'map_{inGridName}_to_{outGridName}_bilinear.nc'
+dst_grid_name = remapper.dst_descriptor.mesh_name
 
-remapper = Remapper(inDescriptor, outDescriptor, mappingFileName)
-
-# conservative remapping with 4 MPI tasks (using mpirun)
-remapper.esmf_build_map(method='bilinear', mpi_tasks=4)
+# build the mapping file
+remapper.build_map()
 
 # select the SST at the initial time as an example data set
-srcFileName = f'temp_{inGridName}.nc'
-ds = xarray.open_dataset(inGridFileName)
-dsOut = xarray.Dataset()
-dsOut['temperature'] = ds['temperature'].isel(nVertLevels=0, Time=0)
-dsOut.to_netcdf(srcFileName)
+src_filename = f'temp_{src_mesh_name}.nc'
+ds = xr.open_dataset(src_mesh_filename)
+ds_out = xr.Dataset()
+ds_out['temperature'] = ds['temperature'].isel(nVertLevels=0, Time=0)
+ds_out.to_netcdf(src_filename)
 
 # do remapping with ncremap
-outFileName = f'temp_{outGridName}_file.nc'
-remapper.remap_file(srcFileName, outFileName)
+out_filename = f'temp_{dst_grid_name}_file.nc'
+remapper.ncremap(src_filename, out_filename)
 
 # do remapping again, this time with python remapping
-outFileName = f'temp_{outGridName}_array.nc'
-dsOut = remapper.remap(dsOut)
-dsOut.to_netcdf(outFileName)
+out_filename = f'temp_{dst_grid_name}_array.nc'
+ds_out = remapper.remap_numpy(ds_out)
+ds_out.to_netcdf(out_filename)
