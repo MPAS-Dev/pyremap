@@ -1,0 +1,6 @@
+﻿pyremap.remapper.Remapper.ncremap
+=================================
+
+.. currentmodule:: pyremap.remapper
+
+.. automethod:: Remapper.ncremap

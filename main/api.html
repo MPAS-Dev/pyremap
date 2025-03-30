@@ -75,7 +75,16 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#remapping">Remapping</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="generated/pyremap.remapper.Remapper.html">pyremap.remapper.Remapper</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pyremap.remapper.Remapper.src_from_lon_lat.html">pyremap.remapper.Remapper.src_from_lon_lat</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pyremap.remapper.Remapper.src_from_mpas.html">pyremap.remapper.Remapper.src_from_mpas</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pyremap.remapper.Remapper.src_from_proj.html">pyremap.remapper.Remapper.src_from_proj</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pyremap.remapper.Remapper.dst_from_lon_lat.html">pyremap.remapper.Remapper.dst_from_lon_lat</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pyremap.remapper.Remapper.dst_from_mpas.html">pyremap.remapper.Remapper.dst_from_mpas</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pyremap.remapper.Remapper.dst_from_points.html">pyremap.remapper.Remapper.dst_from_points</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pyremap.remapper.Remapper.dst_from_proj.html">pyremap.remapper.Remapper.dst_from_proj</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pyremap.remapper.Remapper.build_map.html">pyremap.remapper.Remapper.build_map</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pyremap.remapper.Remapper.ncremap.html">pyremap.remapper.Remapper.ncremap</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/pyremap.remapper.Remapper.remap_numpy.html">pyremap.remapper.Remapper.remap_numpy</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#polar-projections">Polar projections</a><ul>
@@ -107,7 +116,7 @@
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
       <li class="breadcrumb-item active">API reference</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="_sources/api.rst.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/api.md.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -115,7 +124,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="api-reference">
+  <section class="tex2jax_ignore mathjax_ignore" id="api-reference">
 <h1>API reference<a class="headerlink" href="#api-reference" title="Link to this heading"></a></h1>
 <p>This page provides an auto-generated summary of the pyremap API.</p>
 <section id="mesh-descriptors">
@@ -195,8 +204,35 @@
 <h2>Remapping<a class="headerlink" href="#remapping" title="Link to this heading"></a></h2>
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/pyremap.remapper.Remapper.html#pyremap.remapper.Remapper" title="pyremap.remapper.Remapper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Remapper</span></code></a>([ntasks, map_filename, method, use_tmp])</p></td>
-<td><p>A class for remapping fields using a given mapping file.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pyremap.remapper.Remapper.src_from_lon_lat.html#pyremap.remapper.Remapper.src_from_lon_lat" title="pyremap.remapper.Remapper.src_from_lon_lat"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Remapper.src_from_lon_lat</span></code></a>(filename[, ...])</p></td>
+<td><p>Set the source grid from a file with a longitude-latitude grid.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pyremap.remapper.Remapper.src_from_mpas.html#pyremap.remapper.Remapper.src_from_mpas" title="pyremap.remapper.Remapper.src_from_mpas"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Remapper.src_from_mpas</span></code></a>(filename, mesh_name)</p></td>
+<td><p>Set the source grid from an MPAS mesh file</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pyremap.remapper.Remapper.src_from_proj.html#pyremap.remapper.Remapper.src_from_proj" title="pyremap.remapper.Remapper.src_from_proj"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Remapper.src_from_proj</span></code></a>(filename, mesh_name)</p></td>
+<td><p>Set the source grid from a file with a projection grid.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pyremap.remapper.Remapper.dst_from_lon_lat.html#pyremap.remapper.Remapper.dst_from_lon_lat" title="pyremap.remapper.Remapper.dst_from_lon_lat"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Remapper.dst_from_lon_lat</span></code></a>(filename[, ...])</p></td>
+<td><p>Set the destination grid from a file with a longitude-latitude grid.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pyremap.remapper.Remapper.dst_from_mpas.html#pyremap.remapper.Remapper.dst_from_mpas" title="pyremap.remapper.Remapper.dst_from_mpas"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Remapper.dst_from_mpas</span></code></a>(filename, mesh_name)</p></td>
+<td><p>Set the destination grid from an MPAS mesh file</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pyremap.remapper.Remapper.dst_from_points.html#pyremap.remapper.Remapper.dst_from_points" title="pyremap.remapper.Remapper.dst_from_points"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Remapper.dst_from_points</span></code></a>(filename, mesh_name)</p></td>
+<td><p>Set the destination grid from a file with a collection of points.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pyremap.remapper.Remapper.dst_from_proj.html#pyremap.remapper.Remapper.dst_from_proj" title="pyremap.remapper.Remapper.dst_from_proj"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Remapper.dst_from_proj</span></code></a>(filename, mesh_name)</p></td>
+<td><p>Set the destination grid from a file with a projection grid.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pyremap.remapper.Remapper.build_map.html#pyremap.remapper.Remapper.build_map" title="pyremap.remapper.Remapper.build_map"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Remapper.build_map</span></code></a>()</p></td>
+<td><p>Make the mapping file</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/pyremap.remapper.Remapper.ncremap.html#pyremap.remapper.Remapper.ncremap" title="pyremap.remapper.Remapper.ncremap"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Remapper.ncremap</span></code></a>(in_filename, out_filename)</p></td>
+<td><p>Given a source file defining either an MPAS mesh or a lat-lon grid and a destination file or set of arrays defining a lat-lon grid, constructs a mapping file used for interpolation between the source and destination grids.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/pyremap.remapper.Remapper.remap_numpy.html#pyremap.remapper.Remapper.remap_numpy" title="pyremap.remapper.Remapper.remap_numpy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Remapper.remap_numpy</span></code></a>(ds[, ...])</p></td>
+<td><p>Given a source data set, returns a remapped version of the data set, possibly masked and renormalized.</p></td>
 </tr>
 </tbody>
 </table>

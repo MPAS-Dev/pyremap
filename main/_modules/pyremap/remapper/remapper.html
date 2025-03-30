@@ -81,8 +81,6 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyremap.remapper.setup</span><span class="w"> </span><span class="kn">import</span> <span class="n">_setup_remapper</span>
 
 
-<div class="viewcode-block" id="Remapper">
-<a class="viewcode-back" href="../../../generated/pyremap.remapper.Remapper.html#pyremap.remapper.Remapper">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Remapper</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A class for remapping fields using a given mapping file.  The weights and</span>
@@ -150,8 +148,6 @@
 <span class="sd">        ``mpirun``.</span>
 <span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
 
-<div class="viewcode-block" id="Remapper.__init__">
-<a class="viewcode-back" href="../../../generated/pyremap.remapper.Remapper.html#pyremap.remapper.Remapper.__init__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">ntasks</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
@@ -197,9 +193,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">moab_path</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">parallel_exec</span> <span class="o">=</span> <span class="s1">&#39;mpirun&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_ds_map</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_matrix</span> <span class="o">=</span> <span class="kc">None</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_matrix</span> <span class="o">=</span> <span class="kc">None</span>
 
-
+<div class="viewcode-block" id="Remapper.src_from_lon_lat">
+<a class="viewcode-back" href="../../../generated/pyremap.remapper.Remapper.src_from_lon_lat.html#pyremap.remapper.Remapper.src_from_lon_lat">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">src_from_lon_lat</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">mesh_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lon_var</span><span class="o">=</span><span class="s1">&#39;lon&#39;</span><span class="p">,</span> <span class="n">lat_var</span><span class="o">=</span><span class="s1">&#39;lat&#39;</span>
     <span class="p">):</span>
@@ -229,8 +226,11 @@
         <span class="n">src</span><span class="p">[</span><span class="s1">&#39;lat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lat_var</span>
         <span class="k">if</span> <span class="n">mesh_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">src</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mesh_name</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">src_grid_info</span> <span class="o">=</span> <span class="n">src</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">src_grid_info</span> <span class="o">=</span> <span class="n">src</span></div>
 
+
+<div class="viewcode-block" id="Remapper.dst_from_lon_lat">
+<a class="viewcode-back" href="../../../generated/pyremap.remapper.Remapper.dst_from_lon_lat.html#pyremap.remapper.Remapper.dst_from_lon_lat">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">dst_from_lon_lat</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">mesh_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lon_var</span><span class="o">=</span><span class="s1">&#39;lon&#39;</span><span class="p">,</span> <span class="n">lat_var</span><span class="o">=</span><span class="s1">&#39;lat&#39;</span>
     <span class="p">):</span>
@@ -260,7 +260,8 @@
         <span class="n">dst</span><span class="p">[</span><span class="s1">&#39;lat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lat_var</span>
         <span class="k">if</span> <span class="n">mesh_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">dst</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mesh_name</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dst_grid_info</span> <span class="o">=</span> <span class="n">dst</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dst_grid_info</span> <span class="o">=</span> <span class="n">dst</span></div>
+
 
     <span class="k">def</span><span class="w"> </span><span class="nf">dst_global_lon_lat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dlon</span><span class="p">,</span> <span class="n">dlat</span><span class="p">,</span> <span class="n">lon_min</span><span class="o">=-</span><span class="mf">180.0</span><span class="p">,</span> <span class="n">mesh_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -292,6 +293,8 @@
             <span class="n">dst</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mesh_name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dst_grid_info</span> <span class="o">=</span> <span class="n">dst</span>
 
+<div class="viewcode-block" id="Remapper.src_from_proj">
+<a class="viewcode-back" href="../../../generated/pyremap.remapper.Remapper.src_from_proj.html#pyremap.remapper.Remapper.src_from_proj">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">src_from_proj</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">filename</span><span class="p">,</span>
@@ -338,8 +341,11 @@
             <span class="n">src</span><span class="p">[</span><span class="s1">&#39;proj_str&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">proj_str</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Must provide one of &quot;proj_attr&quot; or &quot;proj_str&quot;.&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">src_grid_info</span> <span class="o">=</span> <span class="n">src</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">src_grid_info</span> <span class="o">=</span> <span class="n">src</span></div>
 
+
+<div class="viewcode-block" id="Remapper.dst_from_proj">
+<a class="viewcode-back" href="../../../generated/pyremap.remapper.Remapper.dst_from_proj.html#pyremap.remapper.Remapper.dst_from_proj">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">dst_from_proj</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">filename</span><span class="p">,</span>
@@ -386,8 +392,11 @@
             <span class="n">dst</span><span class="p">[</span><span class="s1">&#39;proj_str&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">proj_str</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Must provide one of &quot;proj_attr&quot; or &quot;proj_str&quot;.&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dst_grid_info</span> <span class="o">=</span> <span class="n">dst</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dst_grid_info</span> <span class="o">=</span> <span class="n">dst</span></div>
 
+
+<div class="viewcode-block" id="Remapper.dst_from_points">
+<a class="viewcode-back" href="../../../generated/pyremap.remapper.Remapper.dst_from_points.html#pyremap.remapper.Remapper.dst_from_points">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">dst_from_points</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">mesh_name</span><span class="p">,</span> <span class="n">lon_var</span><span class="o">=</span><span class="s1">&#39;lon&#39;</span><span class="p">,</span> <span class="n">lat_var</span><span class="o">=</span><span class="s1">&#39;lat&#39;</span>
     <span class="p">):</span>
@@ -414,8 +423,11 @@
         <span class="n">dst</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mesh_name</span>
         <span class="n">dst</span><span class="p">[</span><span class="s1">&#39;lon&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lon_var</span>
         <span class="n">dst</span><span class="p">[</span><span class="s1">&#39;lat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lat_var</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dst_grid_info</span> <span class="o">=</span> <span class="n">dst</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dst_grid_info</span> <span class="o">=</span> <span class="n">dst</span></div>
 
+
+<div class="viewcode-block" id="Remapper.src_from_mpas">
+<a class="viewcode-back" href="../../../generated/pyremap.remapper.Remapper.src_from_mpas.html#pyremap.remapper.Remapper.src_from_mpas">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">src_from_mpas</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">mesh_name</span><span class="p">,</span> <span class="n">mesh_type</span><span class="o">=</span><span class="s1">&#39;cell&#39;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Set the source grid from an MPAS mesh file</span>
@@ -436,8 +448,11 @@
         <span class="n">src</span><span class="p">[</span><span class="s1">&#39;filename&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">filename</span>
         <span class="n">src</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mesh_name</span>
         <span class="n">src</span><span class="p">[</span><span class="s1">&#39;mpas_mesh_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mesh_type</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">src_grid_info</span> <span class="o">=</span> <span class="n">src</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">src_grid_info</span> <span class="o">=</span> <span class="n">src</span></div>
 
+
+<div class="viewcode-block" id="Remapper.dst_from_mpas">
+<a class="viewcode-back" href="../../../generated/pyremap.remapper.Remapper.dst_from_mpas.html#pyremap.remapper.Remapper.dst_from_mpas">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">dst_from_mpas</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">mesh_name</span><span class="p">,</span> <span class="n">mesh_type</span><span class="o">=</span><span class="s1">&#39;cell&#39;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Set the destination grid from an MPAS mesh file</span>
@@ -458,14 +473,20 @@
         <span class="n">dst</span><span class="p">[</span><span class="s1">&#39;filename&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">filename</span>
         <span class="n">dst</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mesh_name</span>
         <span class="n">dst</span><span class="p">[</span><span class="s1">&#39;mpas_mesh_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mesh_type</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dst_grid_info</span> <span class="o">=</span> <span class="n">dst</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dst_grid_info</span> <span class="o">=</span> <span class="n">dst</span></div>
 
+
+<div class="viewcode-block" id="Remapper.build_map">
+<a class="viewcode-back" href="../../../generated/pyremap.remapper.Remapper.build_map.html#pyremap.remapper.Remapper.build_map">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">build_map</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Make the mapping file</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">_build_map</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">_build_map</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 
+
+<div class="viewcode-block" id="Remapper.ncremap">
+<a class="viewcode-back" href="../../../generated/pyremap.remapper.Remapper.ncremap.html#pyremap.remapper.Remapper.ncremap">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">ncremap</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">in_filename</span><span class="p">,</span>
@@ -537,8 +558,11 @@
             <span class="n">logger</span><span class="p">,</span>
             <span class="n">replace_mpas_fill</span><span class="p">,</span>
             <span class="n">parallel_exec</span>
-        <span class="p">)</span>
+        <span class="p">)</span></div>
 
+
+<div class="viewcode-block" id="Remapper.remap_numpy">
+<a class="viewcode-back" href="../../../generated/pyremap.remapper.Remapper.remap_numpy.html#pyremap.remapper.Remapper.remap_numpy">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">remap_numpy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ds</span><span class="p">,</span> <span class="n">renormalization_threshold</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Given a source data set, returns a remapped version of the data set,</span>
