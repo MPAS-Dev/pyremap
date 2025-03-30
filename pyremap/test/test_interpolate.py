@@ -147,7 +147,7 @@ class TestInterp(TestCase):
         remapper = Remapper(sourceDescriptor, destinationDescriptor,
                             weightFileName)
 
-        remapper.esmf_build_map(method='bilinear')
+        remapper.esmf_build_map(method='bilinear', include_logs=True)
 
         assert os.path.exists(remapper.mappingFileName)
 

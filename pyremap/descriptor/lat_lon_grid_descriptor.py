@@ -9,18 +9,17 @@
 # distributed with this code, or at
 # https://raw.githubusercontent.com/MPAS-Dev/pyremap/main/LICENSE
 
-import netCDF4
 import numpy as np
 import xarray as xr
 
 from pyremap.descriptor.mesh_descriptor import MeshDescriptor
 from pyremap.descriptor.utility import (
     add_history,
-    create_scrip,
     expand_scrip,
     interp_extrap_corner,
     round_res,
     unwrap_corners,
+    write_netcdf,
 )
 
 
@@ -51,7 +50,7 @@ def get_lat_lon_descriptor(dLon, dLat, lonMin=-180., lonMax=180., latMin=-90.,
 
     Returns
     -------
-    descriptor : xarray.LatLonGridDescriptor object
+    descriptor : pyremap.LatLonGridDescriptor object
         A descriptor of the lat/lon grid
     """
     nLat = int((latMax - latMin) / dLat) + 1
@@ -216,33 +215,43 @@ class LatLonGridDescriptor(MeshDescriptor):
             A factor by which to expand each grid cell outward from the center.
             If a ``numpy.ndarray``, one value per cell.
         """
-        outFile = netCDF4.Dataset(scripFileName, 'w', format=self.format)
+        ds = xr.Dataset()
 
-        nLat = len(self.lat)
-        nLon = len(self.lon)
+        (center_lon, center_lat) = np.meshgrid(self.lon, self.lat)
+        (corner_lon, corner_lat) = np.meshgrid(
+            self.lonCorner, self.latCorner)
 
-        grid_size = nLat * nLon
+        ds['grid_center_lat'] = (('grid_size',), center_lat.flat)
+        ds['grid_center_lon'] = (('grid_size',), center_lon.flat)
+        ds['grid_corner_lat'] = (
+            ('grid_size', 'grid_corners'), unwrap_corners(corner_lat)
+        )
+        ds['grid_corner_lon'] = (
+            ('grid_size', 'grid_corners'), unwrap_corners(corner_lon)
+        )
 
-        create_scrip(outFile, grid_size=grid_size, grid_corners=4,
-                     grid_rank=2, units=self.units, meshName=self.meshName)
+        ds['grid_dims'] = xr.DataArray(
+            [len(self.lon), len(self.lat)],
+            dims=('grid_rank',)
+        ).astype('int32')
 
-        (Lon, Lat) = np.meshgrid(self.lon, self.lat)
-        (LonCorner, LatCorner) = np.meshgrid(self.lonCorner, self.latCorner)
-
-        outFile.variables['grid_center_lat'][:] = Lat.flat
-        outFile.variables['grid_center_lon'][:] = Lon.flat
-        outFile.variables['grid_dims'][:] = [nLon, nLat]
-        outFile.variables['grid_imask'][:] = 1
-
-        outFile.variables['grid_corner_lat'][:] = unwrap_corners(LatCorner)
-        outFile.variables['grid_corner_lon'][:] = unwrap_corners(LonCorner)
+        ds['grid_imask'] = xr.DataArray(
+            np.ones(ds.sizes['grid_size'], dtype='int32'),
+            dims=('grid_size',)
+        )
 
         if expandDist is not None or expandFactor is not None:
-            expand_scrip(outFile, expandDist, expandFactor)
+            expand_scrip(ds, expandDist, expandFactor)
 
-        setattr(outFile, 'history', self.history)
+        ds.grid_center_lat.attrs['units'] = self.units
+        ds.grid_center_lon.attrs['units'] = self.units
+        ds.grid_corner_lat.attrs['units'] = self.units
+        ds.grid_corner_lon.attrs['units'] = self.units
+        ds.grid_imask.attrs['units'] = 'unitless'
 
-        outFile.close()
+        ds.attrs['meshName'] = self.meshName
+        ds.attrs['history'] = self.history
+        write_netcdf(ds, scripFileName, format=self.format)
 
     def _set_coords(self, latVarName, lonVarName, latDimName,
                     lonDimName):

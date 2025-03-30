@@ -89,3 +89,7 @@ ENV/
 
 # pycharm
 .idea
+
+
+# ESMF logs
+PET*.Log

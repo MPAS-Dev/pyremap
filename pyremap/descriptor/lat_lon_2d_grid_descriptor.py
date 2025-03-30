@@ -9,18 +9,17 @@
 # distributed with this code, or at
 # https://raw.githubusercontent.com/MPAS-Dev/pyremap/main/LICENSE
 
-import netCDF4
 import numpy as np
 import xarray as xr
 
 from pyremap.descriptor.mesh_descriptor import MeshDescriptor
 from pyremap.descriptor.utility import (
     add_history,
-    create_scrip,
     expand_scrip,
     interp_extrap_corners_2d,
     round_res,
     unwrap_corners,
+    write_netcdf,
 )
 
 
@@ -140,31 +139,41 @@ class LatLon2DGridDescriptor(MeshDescriptor):
             A factor by which to expand each grid cell outward from the center.
             If a ``numpy.ndarray``, one value per cell.
         """
-        outFile = netCDF4.Dataset(scripFileName, 'w', format=self.format)
+        ds = xr.Dataset()
 
-        nLat, nLon = self.lat.shape
+        ds['grid_center_lat'] = (('grid_size',), self.lat.flat)
+        ds['grid_center_lon'] = (('grid_size',), self.lon.flat)
+        ds['grid_corner_lat'] = (
+            ('grid_size', 'grid_corners'), unwrap_corners(self.latCorner)
+        )
+        ds['grid_corner_lon'] = (
+            ('grid_size', 'grid_corners'), unwrap_corners(self.lonCorner)
+        )
 
-        grid_size = nLat * nLon
+        nlat, nlon = self.lat.shape
 
-        create_scrip(outFile, grid_size=grid_size, grid_corners=4,
-                     grid_rank=2, units=self.units, meshName=self.meshName)
+        ds['grid_dims'] = xr.DataArray(
+            [nlon, nlat],
+            dims=('grid_rank',)
+        ).astype('int32')
 
-        outFile.variables['grid_center_lat'][:] = self.lat.flat
-        outFile.variables['grid_center_lon'][:] = self.lon.flat
-        outFile.variables['grid_dims'][:] = [nLon, nLat]
-        outFile.variables['grid_imask'][:] = 1
-
-        outFile.variables['grid_corner_lat'][:] = \
-            unwrap_corners(self.latCorner)
-        outFile.variables['grid_corner_lon'][:] = \
-            unwrap_corners(self.lonCorner)
+        ds['grid_imask'] = xr.DataArray(
+            np.ones(ds.sizes['grid_size'], dtype='int32'),
+            dims=('grid_size',)
+        )
 
         if expandDist is not None or expandFactor is not None:
-            expand_scrip(outFile, expandDist, expandFactor)
+            expand_scrip(ds, expandDist, expandFactor)
 
-        setattr(outFile, 'history', self.history)
+        ds.grid_center_lat.attrs['units'] = self.units
+        ds.grid_center_lon.attrs['units'] = self.units
+        ds.grid_corner_lat.attrs['units'] = self.units
+        ds.grid_corner_lon.attrs['units'] = self.units
+        ds.grid_imask.attrs['units'] = 'unitless'
 
-        outFile.close()
+        ds.attrs['meshName'] = self.meshName
+        ds.attrs['history'] = self.history
+        write_netcdf(ds, scripFileName, format=self.format)
 
     def _set_coords(self, latVarName, lonVarName, latDimName,
                     lonDimName):
