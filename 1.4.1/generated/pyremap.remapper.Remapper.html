@@ -91,7 +91,7 @@
 <h1>pyremap.remapper.Remapper<a class="headerlink" href="#pyremap-remapper-remapper" title="Link to this heading"></a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyremap.remapper.Remapper">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyremap.remapper.</span></span><span class="sig-name descname"><span class="pre">Remapper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sourceDescriptor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">destinationDescriptor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mappingFileName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyremap/remapper.html#Remapper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyremap.remapper.Remapper" title="Link to this definition"></a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyremap.remapper.</span></span><span class="sig-name descname"><span class="pre">Remapper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sourceDescriptor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">destinationDescriptor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mappingFileName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyremap/remapper.html#Remapper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyremap.remapper.Remapper" title="Link to this definition"></a></dt>
 <dd><p>A class for remapping fields using a given mapping file.  The weights and
 indices from the mapping file can be loaded once and reused multiple times
 to map several fields between the same source and destination grids.</p>
@@ -166,31 +166,32 @@ if this is the case).</p></li>
       </div>
     </section>
   </div>
-  
-<div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
-  <span class="rst-current-version" data-toggle="rst-current-version">
-    <span class="fa fa-book"> Other Versions</span>
-    v: 1.4.1
-    <span class="fa fa-caret-down"></span>
-  </span>
-  <div class="rst-other-versions">
-    <dl>
-      <dt>Tags</dt>
-      <dd><a href="../../0.0.2/index.html">0.0.2</a></dd>
-      <dd><a href="../../0.0.3/index.html">0.0.3</a></dd>
-      <dd><a href="pyremap.remapper.Remapper.html">1.4.1</a></dd>
-    </dl>
-    <dl>
-      <dt>Branches</dt>
-      <dd><a href="../../main/index.html">main</a></dd>
-    </dl>
-  </div>
-</div>
-<script>
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+     
+
+    <!-- Inject version info -->
+    <meta name="doc-version" content="1.4.1">
+
+    <!-- Create switcher container -->
+    <script>
+      // Inject the switcher div into the top of the sidebar
+      const sidebar = document.querySelector('.wy-side-nav-search');
+      if (sidebar) {
+        const versionDiv = document.createElement('div');
+        versionDiv.id = 'version-switcher';
+        versionDiv.style.marginTop = '1em';
+        sidebar.appendChild(versionDiv);
+      }
+    </script>
+
+    <!-- Load version switcher JS -->
+    <script src="../shared/version-switcher.js"></script>
+
+
 
 </body>
 </html>
