@@ -48,7 +48,7 @@ jobs:
           conda activate pyremap_dev
           pip check
           cd docs
-          DOCS_VERSION=${{ github.ref_name }} make html
+          DOCS_VERSION=${{ github.ref_name }} make versioned-html
 
       - name: Copy Docs and Commit
         run: |
