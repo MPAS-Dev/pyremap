@@ -24,10 +24,10 @@ if 'main' in versions:
 
 for name in versions:
     path = os.path.join(base_dir, name)
-    if os.path.isdir(path) and name not in ('shared',):
+    if os.path.isdir(path) and name not in ('shared', '.git'):
         entries.append({
             'version': name,
-            'url': f'../{name}/' if local else f'/{name}/'
+            'url': f'../pyremap/{name}/' if local else f'/{name}/'
         })
 
 os.makedirs(shared_dir, exist_ok=True)
