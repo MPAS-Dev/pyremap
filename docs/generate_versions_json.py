@@ -18,7 +18,7 @@ shared_dir = os.path.join(base_dir, 'shared')
 
 entries = []
 
-versions = sorted(os.listdir(base_dir))
+versions = sorted(os.listdir(base_dir), reverse=True)
 if 'main' in versions:
     versions.insert(0, versions.pop(versions.index('main')))
 
