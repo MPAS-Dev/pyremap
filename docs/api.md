@@ -1,16 +1,15 @@
-#############
-API reference
-#############
+# API reference
 
 This page provides an auto-generated summary of the pyremap API.
 
-Mesh Descriptors
-================
+## Mesh Descriptors
 
+```{eval-rst}
 .. currentmodule:: pyremap.descriptor
 
 .. autosummary::
    :toctree: generated/
+
 
    interp_extrap_corner
    interp_extrap_corners_2d
@@ -41,22 +40,22 @@ Mesh Descriptors
    ProjectionGridDescriptor.read
    ProjectionGridDescriptor.create
    ProjectionGridDescriptor.to_scrip
+```
 
+## Remapping
 
-Remapping
-=========
-
+```{eval-rst}
 .. currentmodule:: pyremap.remapper
 
 .. autosummary::
    :toctree: generated/
 
    Remapper
+```
 
+## Polar projections
 
-Polar projections
-=================
-
+```{eval-rst}
 .. currentmodule:: pyremap.polar
 
 .. autosummary::
@@ -68,4 +67,4 @@ Polar projections
    get_polar_descriptor
    to_polar
    from_polar
-
+```

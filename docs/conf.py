@@ -25,6 +25,7 @@ from pyremap.docs.parse_quick_start import build_quick_start
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+    'myst_parser',
     'sphinx_rtd_theme',
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
@@ -34,7 +35,7 @@ extensions = [
     'sphinx.ext.napoleon'
 ]
 
-autosummary_generate = True
+autosummary_generate = ['api.md']
 
 # Otherwise, the Return parameter list looks different from the Parameters list
 napoleon_use_rtype = False
@@ -48,8 +49,6 @@ templates_path = ['_templates']
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
 #
-source_suffix = ['.rst']
-# source_suffix = '.rst'
 
 # The master toctree document.
 master_doc = 'index'
@@ -82,8 +81,7 @@ language = 'en'
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This patterns also effect to html_static_path and html_extra_path
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store',
-                    'design_docs/template.md']
+exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
@@ -91,6 +89,18 @@ pygments_style = 'sphinx'
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = False
 
+# -- MyST settings ---------------------------------------------------
+
+myst_enable_extensions = [
+    'colon_fence',
+    'deflist',
+    'dollarmath'
+]
+myst_number_code_blocks = ["typescript"]
+myst_heading_anchors = 2
+myst_footnote_transition = True
+myst_dmath_double_inline = True
+myst_enable_checkboxes = True
 
 # -- Options for HTML output ----------------------------------------------
 

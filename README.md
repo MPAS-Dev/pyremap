@@ -1,7 +1,5 @@
 # pyremap
 
-[![Build Status](https://dev.azure.com/MPAS-Dev/pyremap%20testing/_apis/build/status/MPAS-Dev.pyremap?branchName=main)](https://dev.azure.com/MPAS-Dev/pyremap%20testing/_build/latest?definitionId=1&branchName=main)
-
 Python remapping tools for climate and earth system models.
 
 ## Documentation
