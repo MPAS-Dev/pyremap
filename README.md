@@ -46,7 +46,7 @@ temp_0.5x0.5degree.nc
 
 Second, let's try the same but to an Antarctic stereographic grid:
 ```
-./make_mpas_to_Antarctic_stereo_mapping.py
+./make_mpas_to_antarctic_stereo_mapping.py
 ```
 Now, there's a new mapping file and example output file:
 ```
