@@ -14,7 +14,6 @@
    .. autosummary::
    
       ~PointCollectionDescriptor.__init__
-      ~PointCollectionDescriptor.to_esmf
       ~PointCollectionDescriptor.to_scrip
    
    

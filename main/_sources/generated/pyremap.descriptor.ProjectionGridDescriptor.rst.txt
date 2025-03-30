@@ -17,7 +17,6 @@
       ~ProjectionGridDescriptor.create
       ~ProjectionGridDescriptor.project_to_lat_lon
       ~ProjectionGridDescriptor.read
-      ~ProjectionGridDescriptor.to_esmf
       ~ProjectionGridDescriptor.to_scrip
    
    

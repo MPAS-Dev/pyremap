@@ -1,0 +1,23 @@
+﻿pyremap.descriptor.MpasVertexMeshDescriptor
+===========================================
+
+.. currentmodule:: pyremap.descriptor
+
+.. autoclass:: MpasVertexMeshDescriptor
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~MpasVertexMeshDescriptor.__init__
+      ~MpasVertexMeshDescriptor.to_scrip
+   
+   
+
+   
+   
+   

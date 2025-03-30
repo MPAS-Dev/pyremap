@@ -15,34 +15,33 @@ Mesh Descriptors
    interp_extrap_corner
    interp_extrap_corners_2d
 
-   MpasMeshDescriptor
-   MpasMeshDescriptor.to_scrip
-   MpasMeshDescriptor.to_esmf
-
-   MpasEdgeMeshDescriptor
-   MpasEdgeMeshDescriptor.to_scrip
-   MpasEdgeMeshDescriptor.to_esmf
-
    get_lat_lon_descriptor
    LatLonGridDescriptor
    LatLonGridDescriptor.read
    LatLonGridDescriptor.create
    LatLonGridDescriptor.to_scrip
-   LatLonGridDescriptor.to_esmf
 
    LatLon2DGridDescriptor
    LatLon2DGridDescriptor.read
    LatLon2DGridDescriptor.to_scrip
 
+   MpasCellMeshDescriptor
+   MpasCellMeshDescriptor.to_scrip
+
+   MpasEdgeMeshDescriptor
+   MpasEdgeMeshDescriptor.to_scrip
+
+   MpasVertexMeshDescriptor
+   MpasVertexMeshDescriptor.to_scrip
+
+   PointCollectionDescriptor
+   PointCollectionDescriptor.to_scrip
+
    ProjectionGridDescriptor
    ProjectionGridDescriptor.read
    ProjectionGridDescriptor.create
    ProjectionGridDescriptor.to_scrip
-   ProjectionGridDescriptor.to_esmf
 
-   PointCollectionDescriptor
-   PointCollectionDescriptor.to_scrip
-   PointCollectionDescriptor.to_esmf
 
 Remapping
 =========

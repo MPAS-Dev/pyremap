@@ -5,14 +5,14 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Overview: module code &mdash; pyremap 1.4.1 documentation</title>
+  <title>Overview: module code &mdash; pyremap main documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
 
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=350a9c04"></script>
+      <script src="../_static/documentation_options.js?v=a8da1a53"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -74,8 +74,9 @@
   <h1>All modules for which code is available</h1>
 <ul><li><a href="pyremap/descriptor/lat_lon_2d_grid_descriptor.html">pyremap.descriptor.lat_lon_2d_grid_descriptor</a></li>
 <li><a href="pyremap/descriptor/lat_lon_grid_descriptor.html">pyremap.descriptor.lat_lon_grid_descriptor</a></li>
+<li><a href="pyremap/descriptor/mpas_cell_mesh_descriptor.html">pyremap.descriptor.mpas_cell_mesh_descriptor</a></li>
 <li><a href="pyremap/descriptor/mpas_edge_mesh_descriptor.html">pyremap.descriptor.mpas_edge_mesh_descriptor</a></li>
-<li><a href="pyremap/descriptor/mpas_mesh_descriptor.html">pyremap.descriptor.mpas_mesh_descriptor</a></li>
+<li><a href="pyremap/descriptor/mpas_vertex_mesh_descriptor.html">pyremap.descriptor.mpas_vertex_mesh_descriptor</a></li>
 <li><a href="pyremap/descriptor/point_collection_descriptor.html">pyremap.descriptor.point_collection_descriptor</a></li>
 <li><a href="pyremap/descriptor/projection_grid_descriptor.html">pyremap.descriptor.projection_grid_descriptor</a></li>
 <li><a href="pyremap/descriptor/utility.html">pyremap.descriptor.utility</a></li>
@@ -103,31 +104,32 @@
       </div>
     </section>
   </div>
-  
-<div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
-  <span class="rst-current-version" data-toggle="rst-current-version">
-    <span class="fa fa-book"> Other Versions</span>
-    v: main
-    <span class="fa fa-caret-down"></span>
-  </span>
-  <div class="rst-other-versions">
-    <dl>
-      <dt>Tags</dt>
-      <dd><a href="../../0.0.2/index.html">0.0.2</a></dd>
-      <dd><a href="../../0.0.3/index.html">0.0.3</a></dd>
-      <dd><a href="../../1.4.1/index.html">1.4.1</a></dd>
-    </dl>
-    <dl>
-      <dt>Branches</dt>
-      <dd><a href="index.html">main</a></dd>
-    </dl>
-  </div>
-</div>
-<script>
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+     
+
+    <!-- Inject version info -->
+    <meta name="doc-version" content="main">
+
+    <!-- Create switcher container -->
+    <script>
+      // Inject the switcher div into the top of the sidebar
+      const sidebar = document.querySelector('.wy-side-nav-search');
+      if (sidebar) {
+        const versionDiv = document.createElement('div');
+        versionDiv.id = 'version-switcher';
+        versionDiv.style.marginTop = '1em';
+        sidebar.appendChild(versionDiv);
+      }
+    </script>
+
+    <!-- Load version switcher JS -->
+    <script src="../shared/version-switcher.js"></script>
+
+
 
 </body>
 </html>

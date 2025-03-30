@@ -1,6 +1,0 @@
-﻿pyremap.descriptor.MpasMeshDescriptor.to\_esmf
-==============================================
-
-.. currentmodule:: pyremap.descriptor
-
-.. automethod:: MpasMeshDescriptor.to_esmf

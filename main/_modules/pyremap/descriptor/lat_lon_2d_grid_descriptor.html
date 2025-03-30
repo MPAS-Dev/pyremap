@@ -5,14 +5,14 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pyremap.descriptor.lat_lon_2d_grid_descriptor &mdash; pyremap 1.4.1 documentation</title>
+  <title>pyremap.descriptor.lat_lon_2d_grid_descriptor &mdash; pyremap main documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
 
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=350a9c04"></script>
+      <script src="../../../_static/documentation_options.js?v=a8da1a53"></script>
       <script src="../../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -85,8 +85,8 @@
 <span class="c1"># https://raw.githubusercontent.com/MPAS-Dev/pyremap/main/LICENSE</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">netCDF4</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyremap.descriptor.mesh_descriptor</span><span class="w"> </span><span class="kn">import</span> <span class="n">MeshDescriptor</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyremap.descriptor.utility</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
@@ -180,7 +180,7 @@
 <span class="sd">            Whether this is a regional or global grid</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">ds</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">ds</span> <span class="o">=</span> <span class="n">xarray</span><span class="o">.</span><span class="n">open_dataset</span><span class="p">(</span><span class="n">fileName</span><span class="p">)</span>
+            <span class="n">ds</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">open_dataset</span><span class="p">(</span><span class="n">fileName</span><span class="p">)</span>
 
         <span class="n">descriptor</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">meshName</span><span class="o">=</span><span class="n">meshName</span><span class="p">,</span> <span class="n">regional</span><span class="o">=</span><span class="n">regional</span><span class="p">)</span>
 
@@ -188,8 +188,8 @@
             <span class="n">descriptor</span><span class="o">.</span><span class="n">meshName</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;meshName&#39;</span><span class="p">]</span>
 
         <span class="c1"># Get info from input file</span>
-        <span class="n">descriptor</span><span class="o">.</span><span class="n">lat</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="n">latVarName</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span>
-        <span class="n">descriptor</span><span class="o">.</span><span class="n">lon</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="n">lonVarName</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span>
+        <span class="n">descriptor</span><span class="o">.</span><span class="n">lat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="n">latVarName</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span>
+        <span class="n">descriptor</span><span class="o">.</span><span class="n">lon</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="n">lonVarName</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span>
         <span class="k">if</span> <span class="s1">&#39;degree&#39;</span> <span class="ow">in</span> <span class="n">ds</span><span class="p">[</span><span class="n">latVarName</span><span class="p">]</span><span class="o">.</span><span class="n">units</span><span class="p">:</span>
             <span class="n">descriptor</span><span class="o">.</span><span class="n">units</span> <span class="o">=</span> <span class="s1">&#39;degrees&#39;</span>
         <span class="k">else</span><span class="p">:</span>
@@ -305,31 +305,32 @@
       </div>
     </section>
   </div>
-  
-<div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
-  <span class="rst-current-version" data-toggle="rst-current-version">
-    <span class="fa fa-book"> Other Versions</span>
-    v: main
-    <span class="fa fa-caret-down"></span>
-  </span>
-  <div class="rst-other-versions">
-    <dl>
-      <dt>Tags</dt>
-      <dd><a href="../../../../0.0.2/index.html">0.0.2</a></dd>
-      <dd><a href="../../../../0.0.3/index.html">0.0.3</a></dd>
-      <dd><a href="../../../../1.4.1/index.html">1.4.1</a></dd>
-    </dl>
-    <dl>
-      <dt>Branches</dt>
-      <dd><a href="lat_lon_2d_grid_descriptor.html">main</a></dd>
-    </dl>
-  </div>
-</div>
-<script>
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+     
+
+    <!-- Inject version info -->
+    <meta name="doc-version" content="main">
+
+    <!-- Create switcher container -->
+    <script>
+      // Inject the switcher div into the top of the sidebar
+      const sidebar = document.querySelector('.wy-side-nav-search');
+      if (sidebar) {
+        const versionDiv = document.createElement('div');
+        versionDiv.id = 'version-switcher';
+        versionDiv.style.marginTop = '1em';
+        sidebar.appendChild(versionDiv);
+      }
+    </script>
+
+    <!-- Load version switcher JS -->
+    <script src="../shared/version-switcher.js"></script>
+
+
 
 </body>
 </html>

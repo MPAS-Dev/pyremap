@@ -5,14 +5,14 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pyremap.descriptor.point_collection_descriptor &mdash; pyremap 1.4.1 documentation</title>
+  <title>pyremap.descriptor.point_collection_descriptor &mdash; pyremap main documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
 
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=350a9c04"></script>
+      <script src="../../../_static/documentation_options.js?v=a8da1a53"></script>
       <script src="../../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -85,8 +85,7 @@
 <span class="c1"># https://raw.githubusercontent.com/MPAS-Dev/pyremap/main/LICENSE</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">netCDF4</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyremap.descriptor.mesh_descriptor</span><span class="w"> </span><span class="kn">import</span> <span class="n">MeshDescriptor</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyremap.descriptor.utility</span><span class="w"> </span><span class="kn">import</span> <span class="n">add_history</span><span class="p">,</span> <span class="n">create_scrip</span>
@@ -187,7 +186,7 @@
         <span class="n">grid_area</span> <span class="o">=</span> <span class="n">outFile</span><span class="o">.</span><span class="n">createVariable</span><span class="p">(</span><span class="s1">&#39;grid_area&#39;</span><span class="p">,</span> <span class="s1">&#39;f8&#39;</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;grid_size&#39;</span><span class="p">,))</span>
         <span class="n">grid_area</span><span class="o">.</span><span class="n">units</span> <span class="o">=</span> <span class="s1">&#39;radian^2&#39;</span>
         <span class="c1"># SCRIP uses square radians</span>
-        <span class="n">grid_area</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nPoints</span><span class="p">)</span>
+        <span class="n">grid_area</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nPoints</span><span class="p">)</span>
 
         <span class="n">outFile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s1">&#39;grid_center_lat&#39;</span><span class="p">][:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lat</span>
         <span class="n">outFile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s1">&#39;grid_center_lon&#39;</span><span class="p">][:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lon</span>
@@ -195,8 +194,8 @@
         <span class="n">outFile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s1">&#39;grid_imask&#39;</span><span class="p">][:]</span> <span class="o">=</span> <span class="mi">1</span>
 
         <span class="c1"># grid corners:</span>
-        <span class="n">grid_corner_lon</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">nPoints</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
-        <span class="n">grid_corner_lat</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">nPoints</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+        <span class="n">grid_corner_lon</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">nPoints</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+        <span class="n">grid_corner_lat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">nPoints</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
         <span class="c1"># just repeat the center lat and lon</span>
         <span class="k">for</span> <span class="n">iVertex</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">):</span>
             <span class="n">grid_corner_lat</span><span class="p">[:,</span> <span class="n">iVertex</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lat</span>
@@ -209,60 +208,6 @@
         <span class="nb">setattr</span><span class="p">(</span><span class="n">outFile</span><span class="p">,</span> <span class="s1">&#39;history&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">history</span><span class="p">)</span>
 
         <span class="n">outFile</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
-
-
-<div class="viewcode-block" id="PointCollectionDescriptor.to_esmf">
-<a class="viewcode-back" href="../../../generated/pyremap.descriptor.PointCollectionDescriptor.to_esmf.html#pyremap.descriptor.PointCollectionDescriptor.to_esmf">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">to_esmf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">esmfFileName</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Create an ESMF mesh file for the mesh</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        esmfFileName : str</span>
-<span class="sd">            The path to which the ESMF mesh file should be written</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">nPoints</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lat</span><span class="p">)</span>
-
-        <span class="n">elementCount</span> <span class="o">=</span> <span class="n">nPoints</span>
-        <span class="n">nodeCount</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">nPoints</span>
-        <span class="n">coordDim</span> <span class="o">=</span> <span class="mi">2</span>
-        <span class="n">maxNodePElement</span> <span class="o">=</span> <span class="mi">3</span>
-
-        <span class="n">nodeCoords</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">nodeCount</span><span class="p">,</span> <span class="n">coordDim</span><span class="p">))</span>
-        <span class="c1"># just repeat the center lat and lon</span>
-        <span class="k">for</span> <span class="n">iVertex</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">maxNodePElement</span><span class="p">):</span>
-            <span class="n">nodeCoords</span><span class="p">[</span><span class="n">iVertex</span><span class="p">::</span><span class="n">maxNodePElement</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lon</span>
-            <span class="n">nodeCoords</span><span class="p">[</span><span class="n">iVertex</span><span class="p">::</span><span class="n">maxNodePElement</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lat</span>
-
-        <span class="n">centerCoords</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">elementCount</span><span class="p">,</span> <span class="n">coordDim</span><span class="p">))</span>
-        <span class="n">centerCoords</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lon</span>
-        <span class="n">centerCoords</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lat</span>
-
-        <span class="n">elementConn</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">elementCount</span><span class="p">,</span> <span class="n">maxNodePElement</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
-        <span class="n">elementConn</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">maxNodePElement</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">nPoints</span><span class="p">)</span>
-        <span class="n">elementConn</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">maxNodePElement</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">nPoints</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
-        <span class="n">elementConn</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">maxNodePElement</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">nPoints</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span>
-
-        <span class="n">ds_out</span> <span class="o">=</span> <span class="n">xarray</span><span class="o">.</span><span class="n">Dataset</span><span class="p">()</span>
-        <span class="n">ds_out</span><span class="p">[</span><span class="s1">&#39;nodeCoords&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">((</span><span class="s1">&#39;nodeCount&#39;</span><span class="p">,</span> <span class="s1">&#39;coordDim&#39;</span><span class="p">),</span> <span class="n">nodeCoords</span><span class="p">)</span>
-        <span class="n">ds_out</span><span class="o">.</span><span class="n">nodeCoords</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;units&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">units</span>
-        <span class="n">ds_out</span><span class="p">[</span><span class="s1">&#39;centerCoords&#39;</span><span class="p">]</span> <span class="o">=</span> \
-            <span class="p">((</span><span class="s1">&#39;elementCount&#39;</span><span class="p">,</span> <span class="s1">&#39;coordDim&#39;</span><span class="p">),</span> <span class="n">centerCoords</span><span class="p">)</span>
-        <span class="n">ds_out</span><span class="o">.</span><span class="n">centerCoords</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;units&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">units</span>
-        <span class="n">ds_out</span><span class="p">[</span><span class="s1">&#39;elementConn&#39;</span><span class="p">]</span> <span class="o">=</span> \
-            <span class="p">((</span><span class="s1">&#39;elementCount&#39;</span><span class="p">,</span> <span class="s1">&#39;maxNodePElement&#39;</span><span class="p">),</span> <span class="n">elementConn</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="n">ds_out</span><span class="o">.</span><span class="n">elementConn</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;start_index&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-        <span class="n">ds_out</span><span class="o">.</span><span class="n">elementConn</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;_FillValue&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
-        <span class="n">ds_out</span><span class="p">[</span><span class="s1">&#39;numElementConn&#39;</span><span class="p">]</span> <span class="o">=</span> \
-            <span class="p">((</span><span class="s1">&#39;elementCount&#39;</span><span class="p">,),</span> <span class="n">maxNodePElement</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">elementCount</span><span class="p">,</span>
-                                                             <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">))</span>
-
-        <span class="n">ds_out</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;gridType&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;unstructured mesh&#39;</span>
-        <span class="n">ds_out</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;version&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;0.9&#39;</span>
-
-        <span class="n">ds_out</span><span class="o">.</span><span class="n">to_netcdf</span><span class="p">(</span><span class="n">esmfFileName</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">format</span><span class="p">,</span>
-                         <span class="n">engine</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">engine</span><span class="p">)</span></div>
 </div>
 
 </pre></div>
@@ -287,31 +232,32 @@
       </div>
     </section>
   </div>
-  
-<div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
-  <span class="rst-current-version" data-toggle="rst-current-version">
-    <span class="fa fa-book"> Other Versions</span>
-    v: main
-    <span class="fa fa-caret-down"></span>
-  </span>
-  <div class="rst-other-versions">
-    <dl>
-      <dt>Tags</dt>
-      <dd><a href="../../../../0.0.2/index.html">0.0.2</a></dd>
-      <dd><a href="../../../../0.0.3/index.html">0.0.3</a></dd>
-      <dd><a href="../../../../1.4.1/index.html">1.4.1</a></dd>
-    </dl>
-    <dl>
-      <dt>Branches</dt>
-      <dd><a href="point_collection_descriptor.html">main</a></dd>
-    </dl>
-  </div>
-</div>
-<script>
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+     
+
+    <!-- Inject version info -->
+    <meta name="doc-version" content="main">
+
+    <!-- Create switcher container -->
+    <script>
+      // Inject the switcher div into the top of the sidebar
+      const sidebar = document.querySelector('.wy-side-nav-search');
+      if (sidebar) {
+        const versionDiv = document.createElement('div');
+        versionDiv.id = 'version-switcher';
+        versionDiv.style.marginTop = '1em';
+        sidebar.appendChild(versionDiv);
+      }
+    </script>
+
+    <!-- Load version switcher JS -->
+    <script src="../shared/version-switcher.js"></script>
+
+
 
 </body>
 </html>

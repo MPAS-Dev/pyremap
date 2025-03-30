@@ -16,7 +16,6 @@
       ~LatLonGridDescriptor.__init__
       ~LatLonGridDescriptor.create
       ~LatLonGridDescriptor.read
-      ~LatLonGridDescriptor.to_esmf
       ~LatLonGridDescriptor.to_scrip
    
    

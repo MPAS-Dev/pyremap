@@ -6,21 +6,21 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pyremap.descriptor.MpasMeshDescriptor.to_esmf &mdash; pyremap 1.4.1 documentation</title>
+  <title>pyremap.descriptor.MpasCellMeshDescriptor.to_scrip &mdash; pyremap main documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
 
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=350a9c04"></script>
+      <script src="../_static/documentation_options.js?v=a8da1a53"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="pyremap.descriptor.MpasEdgeMeshDescriptor" href="pyremap.descriptor.MpasEdgeMeshDescriptor.html" />
-    <link rel="prev" title="pyremap.descriptor.MpasMeshDescriptor.to_scrip" href="pyremap.descriptor.MpasMeshDescriptor.to_scrip.html" />
+    <link rel="prev" title="pyremap.descriptor.MpasCellMeshDescriptor" href="pyremap.descriptor.MpasCellMeshDescriptor.html" />
     <link href="../_static/style.css" rel="stylesheet" type="text/css">
 
 </head>
@@ -52,32 +52,29 @@
 <li class="toctree-l2 current"><a class="reference internal" href="../api.html#mesh-descriptors">Mesh Descriptors</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.interp_extrap_corner.html">pyremap.descriptor.interp_extrap_corner</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.interp_extrap_corners_2d.html">pyremap.descriptor.interp_extrap_corners_2d</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.MpasMeshDescriptor.html">pyremap.descriptor.MpasMeshDescriptor</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.MpasMeshDescriptor.to_scrip.html">pyremap.descriptor.MpasMeshDescriptor.to_scrip</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">pyremap.descriptor.MpasMeshDescriptor.to_esmf</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#pyremap.descriptor.MpasMeshDescriptor.to_esmf"><code class="docutils literal notranslate"><span class="pre">MpasMeshDescriptor.to_esmf()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.MpasEdgeMeshDescriptor.html">pyremap.descriptor.MpasEdgeMeshDescriptor</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.MpasEdgeMeshDescriptor.to_scrip.html">pyremap.descriptor.MpasEdgeMeshDescriptor.to_scrip</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.MpasEdgeMeshDescriptor.to_esmf.html">pyremap.descriptor.MpasEdgeMeshDescriptor.to_esmf</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.get_lat_lon_descriptor.html">pyremap.descriptor.get_lat_lon_descriptor</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.LatLonGridDescriptor.html">pyremap.descriptor.LatLonGridDescriptor</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.LatLonGridDescriptor.read.html">pyremap.descriptor.LatLonGridDescriptor.read</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.LatLonGridDescriptor.create.html">pyremap.descriptor.LatLonGridDescriptor.create</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.LatLonGridDescriptor.to_scrip.html">pyremap.descriptor.LatLonGridDescriptor.to_scrip</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.LatLonGridDescriptor.to_esmf.html">pyremap.descriptor.LatLonGridDescriptor.to_esmf</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.LatLon2DGridDescriptor.html">pyremap.descriptor.LatLon2DGridDescriptor</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.LatLon2DGridDescriptor.read.html">pyremap.descriptor.LatLon2DGridDescriptor.read</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.LatLon2DGridDescriptor.to_scrip.html">pyremap.descriptor.LatLon2DGridDescriptor.to_scrip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.MpasCellMeshDescriptor.html">pyremap.descriptor.MpasCellMeshDescriptor</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">pyremap.descriptor.MpasCellMeshDescriptor.to_scrip</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pyremap.descriptor.MpasCellMeshDescriptor.to_scrip"><code class="docutils literal notranslate"><span class="pre">MpasCellMeshDescriptor.to_scrip()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.MpasEdgeMeshDescriptor.html">pyremap.descriptor.MpasEdgeMeshDescriptor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.MpasEdgeMeshDescriptor.to_scrip.html">pyremap.descriptor.MpasEdgeMeshDescriptor.to_scrip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.MpasVertexMeshDescriptor.html">pyremap.descriptor.MpasVertexMeshDescriptor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.MpasVertexMeshDescriptor.to_scrip.html">pyremap.descriptor.MpasVertexMeshDescriptor.to_scrip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.PointCollectionDescriptor.html">pyremap.descriptor.PointCollectionDescriptor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.PointCollectionDescriptor.to_scrip.html">pyremap.descriptor.PointCollectionDescriptor.to_scrip</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.ProjectionGridDescriptor.html">pyremap.descriptor.ProjectionGridDescriptor</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.ProjectionGridDescriptor.read.html">pyremap.descriptor.ProjectionGridDescriptor.read</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.ProjectionGridDescriptor.create.html">pyremap.descriptor.ProjectionGridDescriptor.create</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.ProjectionGridDescriptor.to_scrip.html">pyremap.descriptor.ProjectionGridDescriptor.to_scrip</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.ProjectionGridDescriptor.to_esmf.html">pyremap.descriptor.ProjectionGridDescriptor.to_esmf</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.PointCollectionDescriptor.html">pyremap.descriptor.PointCollectionDescriptor</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.PointCollectionDescriptor.to_scrip.html">pyremap.descriptor.PointCollectionDescriptor.to_scrip</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pyremap.descriptor.PointCollectionDescriptor.to_esmf.html">pyremap.descriptor.PointCollectionDescriptor.to_esmf</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../api.html#remapping">Remapping</a></li>
@@ -101,9 +98,9 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../api.html">API reference</a></li>
-      <li class="breadcrumb-item active">pyremap.descriptor.MpasMeshDescriptor.to_esmf</li>
+      <li class="breadcrumb-item active">pyremap.descriptor.MpasCellMeshDescriptor.to_scrip</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../_sources/generated/pyremap.descriptor.MpasMeshDescriptor.to_esmf.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/generated/pyremap.descriptor.MpasCellMeshDescriptor.to_scrip.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -111,15 +108,21 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="pyremap-descriptor-mpasmeshdescriptor-to-esmf">
-<h1>pyremap.descriptor.MpasMeshDescriptor.to_esmf<a class="headerlink" href="#pyremap-descriptor-mpasmeshdescriptor-to-esmf" title="Link to this heading"></a></h1>
+  <section id="pyremap-descriptor-mpascellmeshdescriptor-to-scrip">
+<h1>pyremap.descriptor.MpasCellMeshDescriptor.to_scrip<a class="headerlink" href="#pyremap-descriptor-mpascellmeshdescriptor-to-scrip" title="Link to this heading"></a></h1>
 <dl class="py method">
-<dt class="sig sig-object py" id="pyremap.descriptor.MpasMeshDescriptor.to_esmf">
-<span class="sig-prename descclassname"><span class="pre">MpasMeshDescriptor.</span></span><span class="sig-name descname"><span class="pre">to_esmf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">esmfFileName</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyremap.descriptor.MpasMeshDescriptor.to_esmf" title="Link to this definition"></a></dt>
-<dd><p>Create an ESMF mesh file for the mesh</p>
+<dt class="sig sig-object py" id="pyremap.descriptor.MpasCellMeshDescriptor.to_scrip">
+<span class="sig-prename descclassname"><span class="pre">MpasCellMeshDescriptor.</span></span><span class="sig-name descname"><span class="pre">to_scrip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scripFileName</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expandDist</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expandFactor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyremap/descriptor/mpas_cell_mesh_descriptor.html#MpasCellMeshDescriptor.to_scrip"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyremap.descriptor.MpasCellMeshDescriptor.to_scrip" title="Link to this definition"></a></dt>
+<dd><p>Given an MPAS mesh file, create a SCRIP file based on the mesh.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>esmfFileName</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – The path to which the ESMF mesh file should be written</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>scripFileName</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – The path to which the SCRIP file should be written</p></li>
+<li><p><strong>expandDist</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a><em> or </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><em>numpy.ndarray</em></a><em>, </em><em>optional</em>) – A distance in meters to expand each grid cell outward from the
+center.  If a <code class="docutils literal notranslate"><span class="pre">numpy.ndarray</span></code>, one value per cell.</p></li>
+<li><p><strong>expandFactor</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a><em> or </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><em>numpy.ndarray</em></a><em>, </em><em>optional</em>) – A factor by which to expand each grid cell outward from the center.
+If a <code class="docutils literal notranslate"><span class="pre">numpy.ndarray</span></code>, one value per cell.</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -130,7 +133,7 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="pyremap.descriptor.MpasMeshDescriptor.to_scrip.html" class="btn btn-neutral float-left" title="pyremap.descriptor.MpasMeshDescriptor.to_scrip" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="pyremap.descriptor.MpasCellMeshDescriptor.html" class="btn btn-neutral float-left" title="pyremap.descriptor.MpasCellMeshDescriptor" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="pyremap.descriptor.MpasEdgeMeshDescriptor.html" class="btn btn-neutral float-right" title="pyremap.descriptor.MpasEdgeMeshDescriptor" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
@@ -150,31 +153,32 @@
       </div>
     </section>
   </div>
-  
-<div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
-  <span class="rst-current-version" data-toggle="rst-current-version">
-    <span class="fa fa-book"> Other Versions</span>
-    v: main
-    <span class="fa fa-caret-down"></span>
-  </span>
-  <div class="rst-other-versions">
-    <dl>
-      <dt>Tags</dt>
-      <dd><a href="../../0.0.2/index.html">0.0.2</a></dd>
-      <dd><a href="../../0.0.3/index.html">0.0.3</a></dd>
-      <dd><a href="../../1.4.1/index.html">1.4.1</a></dd>
-    </dl>
-    <dl>
-      <dt>Branches</dt>
-      <dd><a href="pyremap.descriptor.MpasMeshDescriptor.to_esmf.html">main</a></dd>
-    </dl>
-  </div>
-</div>
-<script>
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+     
+
+    <!-- Inject version info -->
+    <meta name="doc-version" content="main">
+
+    <!-- Create switcher container -->
+    <script>
+      // Inject the switcher div into the top of the sidebar
+      const sidebar = document.querySelector('.wy-side-nav-search');
+      if (sidebar) {
+        const versionDiv = document.createElement('div');
+        versionDiv.id = 'version-switcher';
+        versionDiv.style.marginTop = '1em';
+        sidebar.appendChild(versionDiv);
+      }
+    </script>
+
+    <!-- Load version switcher JS -->
+    <script src="../shared/version-switcher.js"></script>
+
+
 
 </body>
 </html>
