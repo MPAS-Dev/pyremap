@@ -50,7 +50,20 @@ This page provides an auto-generated summary of the pyremap API.
 .. autosummary::
    :toctree: generated/
 
-   Remapper
+   Remapper.src_from_lon_lat
+   Remapper.src_from_mpas
+   Remapper.src_from_proj
+
+
+   Remapper.dst_from_lon_lat
+   Remapper.dst_from_mpas
+   Remapper.dst_from_points
+   Remapper.dst_from_proj
+
+   Remapper.build_map
+
+   Remapper.ncremap
+   Remapper.remap_numpy
 ```
 
 ## Polar projections
