@@ -22,29 +22,34 @@ from pyremap.descriptor.utility import (
 )
 
 
-def get_lat_lon_descriptor(dLon, dLat, lonMin=-180., lonMax=180., latMin=-90.,
-                           latMax=90.):
+def get_lat_lon_descriptor(
+        dlon,
+        dlat,
+        lon_min=-180.0,
+        lon_max=180.0,
+        lat_min=-90.0,
+        lat_max=90.0):
     """
     Get a descriptor of a lat-lon grid, used for remapping
 
     Parameters
     ----------
-    dLon :  float
+    dlon :  float
         Longitude resolution in degrees
 
-    dLat :  float
+    dlat :  float
         Latitude resolution in degrees
 
-    lonMin :  float, optional
+    lon_min :  float, optional
         Lower bound on longitude in degrees
 
-    lonMax :  float, optional
+    lon_max :  float, optional
         Upper bound on longitude in degrees
 
-    latMin :  float, optional
+    lat_min :  float, optional
         Lower bound on latitude in degrees
 
-    latMax :  float, optional
+    lat_max :  float, optional
         Upper bound on latitude in degrees
 
     Returns
@@ -52,10 +57,10 @@ def get_lat_lon_descriptor(dLon, dLat, lonMin=-180., lonMax=180., latMin=-90.,
     descriptor : pyremap.LatLonGridDescriptor object
         A descriptor of the lat/lon grid
     """
-    nLat = int((latMax - latMin) / dLat) + 1
-    nLon = int((lonMax - lonMin) / dLon) + 1
-    lat = np.linspace(latMin, latMax, nLat)
-    lon = np.linspace(lonMin, lonMax, nLon)
+    nlat = int((lat_max - lat_min) / dlat) + 1
+    nlon = int((lon_max - lon_min) / dlon) + 1
+    lat = np.linspace(lat_min, lat_max, nlat)
+    lon = np.linspace(lon_min, lon_max, nlon)
 
     descriptor = LatLonGridDescriptor.create(lat, lon, units='degrees')
 
@@ -74,20 +79,20 @@ class LatLonGridDescriptor(MeshDescriptor):
     lon : numpy.ndarray
         The longitude coordinate at grid-cell centers
 
-    latCorner : numpy.ndarray
+    lat_corner : numpy.ndarray
         The latitude coordinate at grid-cell corners
 
-    lonCorner : numpy.ndarray
+    lon_corner : numpy.ndarray
         The longitude coordinate at grid-cell corners
 
     history : str
         The history attribute written to SCRIP files
     """
-    def __init__(self, meshName=None, regional=None):
+    def __init__(self, mesh_name=None, regional=None):
         """
         Construct a mesh descriptor
 
-        meshName : str or None, optional
+        mesh_name : str or None, optional
             The name of the mesh or grid, used to give mapping files unique
             names
 
@@ -96,34 +101,34 @@ class LatLonGridDescriptor(MeshDescriptor):
             be determined automatically by checking the limits of the corner
             latitude and longitude to see if they cover the globe.
         """
-        super().__init__(meshName=meshName, regional=regional)
+        super().__init__(mesh_name=mesh_name, regional=regional)
         self.lat = None
         self.lon = None
         self.units = None
-        self.latCorner = None
-        self.lonCorner = None
+        self.lat_corner = None
+        self.lon_corner = None
         self.history = None
 
     @classmethod
-    def read(cls, fileName=None, ds=None, latVarName='lat',
-             lonVarName='lon', meshName=None, regional=None):
+    def read(cls, filename=None, ds=None, lat_var_name='lat',
+             lon_var_name='lon', mesh_name=None, regional=None):
         """
         Read the lat-lon grid from a file with the given lat/lon var names.
 
         Parameters
         ----------
-        fileName : str, optional
+        filename : str, optional
             The path of the file containing the lat-lon grid (if ``ds`` is not
             supplied directly)
 
         ds : xarray.Dataset, optional
             The path of the file containing the lat-lon grid (if supplied,
-            ``fileName`` will be ignored)
+            ``filename`` will be ignored)
 
-        latVarName, lonVarName : str, optional
+        lat_var_name, lon_var_name : str, optional
             The name of the latitude and longitude variables in the grid file
 
-        meshName : str or None, optional
+        mesh_name : str or None, optional
             The name of the mesh or grid, used to give mapping files unique
             names
 
@@ -133,51 +138,53 @@ class LatLonGridDescriptor(MeshDescriptor):
             latitude and longitude to see if they cover the globe.
         """
         if ds is None:
-            ds = xr.open_dataset(fileName)
+            ds = xr.open_dataset(filename)
 
-        descriptor = cls(meshName=meshName, regional=regional)
+        descriptor = cls(mesh_name=mesh_name, regional=regional)
 
-        if descriptor.meshName is None and 'meshName' in ds.attrs:
-            descriptor.meshName = ds.attrs['meshName']
-
+        descriptor.mesh_name_from_attr(ds)
         # Get info from input file
-        descriptor.lat = np.array(ds[latVarName].values, float)
-        descriptor.lon = np.array(ds[lonVarName].values, float)
-        if 'degree' in ds[latVarName].units:
+        descriptor.lat = np.array(ds[lat_var_name].values, float)
+        descriptor.lon = np.array(ds[lon_var_name].values, float)
+        if 'degree' in ds[lat_var_name].units:
             descriptor.units = 'degrees'
         else:
             descriptor.units = 'radians'
 
         # interp/extrap corners
-        descriptor.lonCorner = interp_extrap_corner(descriptor.lon)
-        descriptor.latCorner = interp_extrap_corner(descriptor.lat)
+        descriptor.lon_corner = interp_extrap_corner(descriptor.lon)
+        descriptor.lat_corner = interp_extrap_corner(descriptor.lat)
 
-        descriptor._set_coords(latVarName, lonVarName, ds[latVarName].dims[0],
-                               ds[lonVarName].dims[0])
+        descriptor._set_coords(
+            lat_var_name,
+            lon_var_name,
+            ds[lat_var_name].dims[0],
+            ds[lon_var_name].dims[0]
+        )
 
         descriptor.history = add_history(ds=ds)
         return descriptor
 
     @classmethod
-    def create(cls, latCorner, lonCorner, units='degrees', meshName=None,
+    def create(cls, lat_corner, lon_corner, units='degrees', mesh_name=None,
                regional=None):
         """
         Create the lat-lon grid with the given arrays and units.
 
         Parameters
         ----------
-        latCorner : numpy.ndarray
+        lat_corner : numpy.ndarray
             One dimensional array defining the latitude coordinates of grid
             corners.
 
-        lonCorner : numpy.ndarray
+        lon_corner : numpy.ndarray
             One dimensional array defining the longitude coordinates of grid
             corners.
 
         units : {'degrees', 'radians'}, optional
-            The units of `latCorner` and `lonCorner`
+            The units of `lat_corner` and `lon_corner`
 
-        meshName : str or None, optional
+        mesh_name : str or None, optional
             The name of the mesh or grid, used to give mapping files unique
             names
 
@@ -186,31 +193,31 @@ class LatLonGridDescriptor(MeshDescriptor):
             be determined automatically by checking the limits of the corner
             latitude and longitude to see if they cover the globe.
         """
-        descriptor = cls(meshName=meshName, regional=regional)
+        descriptor = cls(mesh_name=mesh_name, regional=regional)
 
-        descriptor.latCorner = latCorner
-        descriptor.lonCorner = lonCorner
-        descriptor.lon = 0.5 * (lonCorner[0:-1] + lonCorner[1:])
-        descriptor.lat = 0.5 * (latCorner[0:-1] + latCorner[1:])
+        descriptor.lat_corner = lat_corner
+        descriptor.lon_corner = lon_corner
+        descriptor.lon = 0.5 * (lon_corner[0:-1] + lon_corner[1:])
+        descriptor.lat = 0.5 * (lat_corner[0:-1] + lat_corner[1:])
         descriptor.units = units
         descriptor.history = add_history()
         descriptor._set_coords('lat', 'lon', 'lat', 'lon')
         return descriptor
 
-    def to_scrip(self, scripFileName, expandDist=None, expandFactor=None):
+    def to_scrip(self, scrip_filename, expand_dist=None, expand_factor=None):
         """
         Given a lat-lon grid file, create a SCRIP file based on the grid.
 
         Parameters
         ----------
-        scripFileName : str
+        scrip_filename : str
             The path to which the SCRIP file should be written
 
-        expandDist : float or numpy.ndarray, optional
+        expand_dist : float or numpy.ndarray, optional
             A distance in meters to expand each grid cell outward from the
             center.  If a ``numpy.ndarray``, one value per cell.
 
-        expandFactor : float or numpy.ndarray, optional
+        expand_factor : float or numpy.ndarray, optional
             A factor by which to expand each grid cell outward from the center.
             If a ``numpy.ndarray``, one value per cell.
         """
@@ -218,7 +225,7 @@ class LatLonGridDescriptor(MeshDescriptor):
 
         (center_lon, center_lat) = np.meshgrid(self.lon, self.lat)
         (corner_lon, corner_lat) = np.meshgrid(
-            self.lonCorner, self.latCorner)
+            self.lon_corner, self.lat_corner)
 
         ds['grid_center_lat'] = (('grid_size',), center_lat.flat)
         ds['grid_center_lon'] = (('grid_size',), center_lon.flat)
@@ -239,8 +246,8 @@ class LatLonGridDescriptor(MeshDescriptor):
             dims=('grid_size',)
         )
 
-        if expandDist is not None or expandFactor is not None:
-            expand_scrip(ds, expandDist, expandFactor)
+        if expand_dist is not None or expand_factor is not None:
+            expand_scrip(ds, expand_dist, expand_factor)
 
         ds.grid_center_lat.attrs['units'] = self.units
         ds.grid_center_lon.attrs['units'] = self.units
@@ -248,32 +255,32 @@ class LatLonGridDescriptor(MeshDescriptor):
         ds.grid_corner_lon.attrs['units'] = self.units
         ds.grid_imask.attrs['units'] = 'unitless'
 
-        ds.attrs['meshName'] = self.meshName
+        ds.attrs['mesh_name'] = self.mesh_name
         ds.attrs['history'] = self.history
-        self.write_netcdf(ds, scripFileName)
+        self.write_netcdf(ds, scrip_filename)
 
-    def _set_coords(self, latVarName, lonVarName, latDimName,
-                    lonDimName):
+    def _set_coords(self, lat_var_name, lon_var_name, lat_dim_name,
+                    lon_dim_name):
         """
         Set up a coords dict with lat and lon
         """
-        self.latVarName = latVarName
-        self.lonVarName = lonVarName
-        self.coords = {latVarName: {'dims': latDimName,
-                                    'data': self.lat,
-                                    'attrs': {'units': self.units}},
-                       lonVarName: {'dims': lonDimName,
-                                    'data': self.lon,
-                                    'attrs': {'units': self.units}}}
+        self.lat_var_name = lat_var_name
+        self.lon_var_name = lon_var_name
+        self.coords = {lat_var_name: {'dims': lat_dim_name,
+                                      'data': self.lat,
+                                      'attrs': {'units': self.units}},
+                       lon_var_name: {'dims': lon_dim_name,
+                                      'data': self.lon,
+                                      'attrs': {'units': self.units}}}
 
-        self.dims = [latDimName, lonDimName]
-        self.dimSize = [len(self.lat), len(self.lon)]
+        self.dims = [lat_dim_name, lon_dim_name]
+        self.dim_sizes = [len(self.lat), len(self.lon)]
 
         # set the name of the grid
-        dLat = self.lat[1] - self.lat[0]
-        dLon = self.lon[1] - self.lon[0]
-        lonRange = self.lonCorner[-1] - self.lonCorner[0]
-        latRange = self.latCorner[-1] - self.latCorner[0]
+        dlat = self.lat[1] - self.lat[0]
+        dlon = self.lon[1] - self.lon[0]
+        lon_range = self.lon_corner[-1] - self.lon_corner[0]
+        lat_range = self.lat_corner[-1] - self.lat_corner[0]
         if 'degree' in self.units:
             units = 'degree'
         elif 'rad' in self.units:
@@ -285,15 +292,15 @@ class LatLonGridDescriptor(MeshDescriptor):
         if self.regional is None:
             self.regional = False
             if units == 'degree':
-                if np.abs(lonRange - 360.) > 1e-10:
+                if np.abs(lon_range - 360.) > 1e-10:
                     self.regional = True
-                if np.abs(latRange - 180.) > 1e-10:
+                if np.abs(lat_range - 180.) > 1e-10:
                     self.regional = True
             else:
-                if np.abs(lonRange - 2. * np.pi) > 1e-10:
+                if np.abs(lon_range - 2. * np.pi) > 1e-10:
                     self.regional = True
-                if np.abs(latRange - np.pi) > 1e-10:
+                if np.abs(lat_range - np.pi) > 1e-10:
                     self.regional = True
-        if self.meshName is None:
-            self.meshName = '{}x{}{}'.format(round_res(abs(dLat)),
-                                             round_res(abs(dLon)), units)
+        if self.mesh_name is None:
+            self.mesh_name = '{}x{}{}'.format(round_res(abs(dlat)),
+                                              round_res(abs(dlon)), units)

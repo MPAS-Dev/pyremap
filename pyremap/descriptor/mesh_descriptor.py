@@ -18,7 +18,7 @@ class MeshDescriptor:
 
     Attributes
     ----------
-    meshName : str
+    mesh_name : str
         The name of the mesh or grid, used to give mapping files unique names.
 
     regional : bool
@@ -27,15 +27,14 @@ class MeshDescriptor:
     dims : list of str
         Dimension names in the mesh or grid
 
-    dimSizes : list of int
+    dim_sizes : list of int
         Size of each dimension in ``dims``
 
     coords : dict
         A dictionary that can be used to construct an xarray.DataArray for each
         coordinate in the mesh or grid
 
-    format : {'NETCDF4', 'NETCDF4_CLASSIC', 'NETCDF3_64BIT',
-              'NETCDF3_CLASSIC'}
+    format : {'NETCDF4', 'NETCDF4_CLASSIC', 'NETCDF3_64BIT', 'NETCDF3_CLASSIC', 'NETCDF3_64BIT_DATA'}
         The NetCDF file format to use.  Default is ``'NETCDF4'``
 
     engine : {'netcdf4', 'scipy', 'h5netcdf'}
@@ -45,12 +44,12 @@ class MeshDescriptor:
     logger : logging.Logger or None
         A logger for command-line output.  If None, the logger will be set to
         stdout/stderr.
-    """
-    def __init__(self, meshName=None, regional=None):
+    """  # noqa: E501
+    def __init__(self, mesh_name=None, regional=None):
         """
         Construct a mesh descriptor
 
-        meshName : str or None, optional
+        mesh_name : str or None, optional
             The name of the mesh or grid, used to give mapping files unique
             names.  If not provided here, it should be defined elsewhere by
             the subclass.
@@ -59,30 +58,30 @@ class MeshDescriptor:
             Whether this is a regional or global grid.  If not provided here,
             it should be defined elsewhere by the subclass.
         """
-        self.meshName = meshName
+        self.mesh_name = mesh_name
         self.regional = regional
         self.dims = None
-        self.dimSizes = None
+        self.dim_sizes = None
         self.coords = None
         self.format = 'NETCDF4'
         self.engine = None
         self.logger = None
 
-    def to_scrip(self, scripFileName, expandDist=None, expandFactor=None):
+    def to_scrip(self, scrip_filename, expand_dist=None, expand_factor=None):
         """
         Subclasses should overload this method to write a SCRIP file based on
         the mesh.
 
         Parameters
         ----------
-        scripFileName : str
+        scrip_filename : str
             The path to which the SCRIP file should be written
 
-        expandDist : float or numpy.ndarray, optional
+        expand_dist : float or numpy.ndarray, optional
             A distance in meters to expand each grid cell outward from the
             center.  If a ``numpy.ndarray``, one value per cell.
 
-        expandFactor : float or numpy.ndarray, optional
+        expand_factor : float or numpy.ndarray, optional
             A factor by which to expand each grid cell outward from the center.
             If a ``numpy.ndarray``, one value per cell.
         """
@@ -109,3 +108,18 @@ class MeshDescriptor:
             engine=self.engine,
             logger=self.logger
         )
+
+    def mesh_name_from_attr(self, ds):
+        """
+        Get the mesh name from the dataset attributes if not already set
+
+        Parameters
+        ----------
+        ds : xarray.Dataset
+            The dataset to get the mesh name from
+        """
+        if self.mesh_name is None:
+            if 'meshName' in ds.attrs:
+                self.mesh_name = ds.attrs['meshName']
+            elif 'mesh_name' in ds.attrs:
+                self.mesh_name = ds.attrs['mesh_name']

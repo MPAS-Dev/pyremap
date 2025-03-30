@@ -22,72 +22,70 @@ class MpasEdgeMeshDescriptor(MeshDescriptor):
 
     Attributes
     ----------
-    fileName : str
+    filename : str
         The path of the file containing the MPAS mesh
 
     history : str
         The history attribute written to SCRIP files
     """
-    def __init__(self, fileName, meshName=None):
+    def __init__(self, filename, mesh_name=None):
         """
         Constructor stores the file name
 
         Parameters
         ----------
-        fileName : str
+        filename : str
             The path of the file containing the MPAS mesh
 
-        meshName : str, optional
-            The name of the MPAS mesh (e.g. ``'oEC60to30'`` or
-            ``'oRRS18to6'``).  If not provided, the data set in ``fileName``
-            must have a global attribute ``meshName`` that will be used
+        mesh_name : str, optional
+            The name of the MPAS mesh (e.g. ``'oec60to30'`` or
+            ``'orrs18to6'``).  If not provided, the data set in ``filename``
+            must have a global attribute ``mesh_name`` that will be used
             instead.
         """
         super().__init__()
 
-        with xr.open_dataset(fileName) as ds:
+        with xr.open_dataset(filename) as ds:
 
-            if meshName is None:
-                if 'meshName' not in ds.attrs:
-                    raise ValueError('No meshName provided or found in file.')
-                self.meshName = ds.attrs['meshName']
-            else:
-                self.meshName = meshName
+            self.mesh_name = mesh_name
+            self.mesh_name_from_attr(ds)
+            if self.mesh_name is None:
+                raise ValueError('No mesh_name provided or found in file.')
 
-            self.fileName = fileName
+            self.filename = filename
             self.regional = True
 
             # build coords
-            self.coords = {'latEdge': {'dims': 'nEdges',
-                                       'data': ds.latEdge.values,
-                                       'attrs': {'units': 'radians'}},
-                           'lonEdge': {'dims': 'nEdges',
-                                       'data': ds.lonEdge.values,
-                                       'attrs': {'units': 'radians'}}}
+            self.coords = {'lat_edge': {'dims': 'nEdges',
+                                        'data': ds.latEdge.values,
+                                        'attrs': {'units': 'radians'}},
+                           'lon_edge': {'dims': 'nEdges',
+                                        'data': ds.lonEdge.values,
+                                        'attrs': {'units': 'radians'}}}
             self.dims = ['nEdges']
-            self.dimSize = [ds.sizes[dim] for dim in self.dims]
+            self.dim_sizes = [ds.sizes[dim] for dim in self.dims]
 
             self.history = add_history(ds=ds)
 
-    def to_scrip(self, scripFileName, expandDist=None, expandFactor=None):
+    def to_scrip(self, scrip_filename, expand_dist=None, expand_factor=None):
         """
         Create a SCRIP file from the MPAS mesh.
 
         Parameters
         ----------
-        scripFileName : str
+        scrip_filename : str
             The path to which the SCRIP file should be written
 
-        expandDist : float or numpy.ndarray, optional
+        expand_dist : float or numpy.ndarray, optional
             A distance in meters to expand each grid cell outward from the
             center.  If a ``numpy.ndarray``, one value per cell.
 
-        expandFactor : float or numpy.ndarray, optional
+        expand_factor : float or numpy.ndarray, optional
             A factor by which to expand each grid cell outward from the center.
             If a ``numpy.ndarray``, one value per cell.
         """
 
-        ds_in = xr.open_dataset(self.fileName)
+        ds_in = xr.open_dataset(self.filename)
         lat_cell = ds_in.latCell.values
         lon_cell = ds_in.lonCell.values
         lat_vertex = ds_in.latVertex.values
@@ -100,13 +98,13 @@ class MpasEdgeMeshDescriptor(MeshDescriptor):
         dv_edge = ds_in.dvEdge.values
         sphere_radius = ds_in.attrs['sphere_radius']
 
-        nedges = ds_in.sizes['nEdges']
+        n_edges = ds_in.sizes['nEdges']
 
         ds_out = xr.Dataset()
 
-        valid_cells_on_edge = np.zeros(nedges)
-        for icell in range(2):
-            mask = cells_on_edge[:, icell] >= 0
+        valid_cells_on_edge = np.zeros(n_edges)
+        for i_cell in range(2):
+            mask = cells_on_edge[:, i_cell] >= 0
             valid_cells_on_edge[mask] = valid_cells_on_edge[mask] + 1
 
         ds_out['grid_area'] = (
@@ -118,8 +116,8 @@ class MpasEdgeMeshDescriptor(MeshDescriptor):
         ds_out['grid_center_lon'] = (('grid_size',), lon_edge)
 
         # grid corners:
-        grid_corner_lon = np.zeros((nedges, 4))
-        grid_corner_lat = np.zeros((nedges, 4))
+        grid_corner_lon = np.zeros((n_edges, 4))
+        grid_corner_lat = np.zeros((n_edges, 4))
 
         # start by repeating vertices, since these always exist
         vertices = vertices_on_edge[:, 0]
@@ -151,17 +149,17 @@ class MpasEdgeMeshDescriptor(MeshDescriptor):
         )
 
         ds_out['grid_dims'] = xr.DataArray(
-            [nedges],
+            [n_edges],
             dims=('grid_rank',)
         ).astype('int32')
 
         ds_out['grid_imask'] = xr.DataArray(
-            np.ones(nedges, dtype='int32'),
+            np.ones(n_edges, dtype='int32'),
             dims=('grid_size',)
         )
 
-        if expandDist is not None or expandFactor is not None:
-            expand_scrip(ds_out, expandDist, expandFactor)
+        if expand_dist is not None or expand_factor is not None:
+            expand_scrip(ds_out, expand_dist, expand_factor)
 
         ds_out.grid_center_lat.attrs['units'] = 'radians'
         ds_out.grid_center_lon.attrs['units'] = 'radians'
@@ -170,6 +168,6 @@ class MpasEdgeMeshDescriptor(MeshDescriptor):
         ds_out.grid_imask.attrs['units'] = 'unitless'
         ds_out.grid_area.attrs['units'] = 'radians^2'
 
-        ds_out.attrs['meshName'] = self.meshName
+        ds_out.attrs['mesh_name'] = self.mesh_name
         ds_out.attrs['history'] = self.history
-        self.write_netcdf(ds_out, scripFileName)
+        self.write_netcdf(ds_out, scrip_filename)
