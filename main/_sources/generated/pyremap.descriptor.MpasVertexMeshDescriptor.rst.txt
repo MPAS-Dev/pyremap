@@ -14,7 +14,9 @@
    .. autosummary::
    
       ~MpasVertexMeshDescriptor.__init__
+      ~MpasVertexMeshDescriptor.mesh_name_from_attr
       ~MpasVertexMeshDescriptor.to_scrip
+      ~MpasVertexMeshDescriptor.write_netcdf
    
    
 

@@ -14,7 +14,9 @@
    .. autosummary::
    
       ~MpasEdgeMeshDescriptor.__init__
+      ~MpasEdgeMeshDescriptor.mesh_name_from_attr
       ~MpasEdgeMeshDescriptor.to_scrip
+      ~MpasEdgeMeshDescriptor.write_netcdf
    
    
 

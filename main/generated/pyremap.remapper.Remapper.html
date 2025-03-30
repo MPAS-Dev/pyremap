@@ -91,28 +91,54 @@
 <h1>pyremap.remapper.Remapper<a class="headerlink" href="#pyremap-remapper-remapper" title="Link to this heading"></a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyremap.remapper.Remapper">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyremap.remapper.</span></span><span class="sig-name descname"><span class="pre">Remapper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sourceDescriptor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">destinationDescriptor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mappingFileName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyremap/remapper.html#Remapper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyremap.remapper.Remapper" title="Link to this definition"></a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyremap.remapper.</span></span><span class="sig-name descname"><span class="pre">Remapper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ntasks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">map_filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bilinear'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_tmp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyremap/remapper/remapper.html#Remapper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyremap.remapper.Remapper" title="Link to this definition"></a></dt>
 <dd><p>A class for remapping fields using a given mapping file.  The weights and
 indices from the mapping file can be loaded once and reused multiple times
 to map several fields between the same source and destination grids.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ntasks</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – the target number of MPI tasks to use</p></li>
+<li><p><strong>src_grid_info</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><em>dict</em></a>) – Information about the source grid</p></li>
+<li><p><strong>dst_grid_info</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><em>dict</em></a>) – Information about the destination grid</p></li>
+<li><p><strong>method</strong> (<em>{'bilinear'</em><em>, </em><em>'neareststod'</em><em>, </em><em>'conserve'}</em>) – The method of interpolation used</p></li>
+<li><p><strong>map_filename</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em> or </em><em>None</em>) – The name of the output mapping file</p></li>
+<li><p><strong>use_tmp</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – If True, use a temporary directory for the SCRIP files.  If False, the
+SCRIP files will be created in the current working directory.</p></li>
+<li><p><strong>expand_dist</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a><em> or </em><em>None</em>) – The distance in meters over which to expand destination grid cells for
+smoothing</p></li>
+<li><p><strong>expand_factor</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a><em> or </em><em>None</em>) – The factor by which to expand destination grid cells for smoothing</p></li>
+<li><p><strong>src_scrip_filename</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – The name of the SCRIP file for the source mesh</p></li>
+<li><p><strong>dst_scrip_filename</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – The name of the SCRIP file for the destination mesh</p></li>
+<li><p><strong>format</strong> (<em>{'NETCDF4'</em><em>, </em><em>'NETCDF4_CLASSIC'</em><em>, </em><em>'NETCDF3_64BIT'</em><em>, </em><em>'NETCDF3_CLASSIC'</em><em>, </em><em>'NETCDF3_64BIT_DATA'}</em>) – The NetCDF file format to use for scrip files.  The default is
+<code class="docutils literal notranslate"><span class="pre">NETCDF3_64BIT_DATA</span></code> for compatibility with MOAB.</p></li>
+<li><p><strong>src_descriptor</strong> (<em>pyremap.descriptor.MeshDescriptor</em>) – The source mesh descriptor</p></li>
+<li><p><strong>dst_descriptor</strong> (<em>pyremap.descriptor.MeshDescriptor</em>) – The destination mesh descriptor</p></li>
+<li><p><strong>map_tool</strong> (<em>{'esmf'</em><em>, </em><em>'moab'}</em>) – The tool to use for building the mapping file.  The default is
+<code class="docutils literal notranslate"><span class="pre">esmf</span></code>.</p></li>
+<li><p><strong>esmf_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em> or </em><em>None</em>) – The path to the ESMF installation.  If None, <code class="docutils literal notranslate"><span class="pre">ESMF_RegridWeigthGen</span></code>
+must be in the PATH.</p></li>
+<li><p><strong>moab_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em> or </em><em>None</em>) – The path to the MOAB installation.  If None, <code class="docutils literal notranslate"><span class="pre">mptempest</span></code> and other
+MOAB tools must be in the PATH.</p></li>
+<li><p><strong>parallel_exec</strong> (<em>{'mpirun'</em><em>, </em><em>'srun'}</em>) – The command to use for running the mapping tool.  The default is
+<code class="docutils literal notranslate"><span class="pre">mpirun</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="pyremap.remapper.Remapper.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sourceDescriptor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">destinationDescriptor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mappingFileName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyremap/remapper.html#Remapper.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyremap.remapper.Remapper.__init__" title="Link to this definition"></a></dt>
-<dd><p>Create the remapper and read weights and indices from the given file
-for later used in remapping fields.</p>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ntasks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">map_filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bilinear'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_tmp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyremap/remapper/remapper.html#Remapper.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyremap.remapper.Remapper.__init__" title="Link to this definition"></a></dt>
+<dd><p>Create a new mapping object</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>sourceDescriptor</strong> (<code class="docutils literal notranslate"><span class="pre">shared.grid.MeshDescriptor</span></code>) – An object used to write a scrip file and to determine the type of
-the source mesh or grid.</p></li>
-<li><p><strong>destinationDescriptor</strong> (<code class="docutils literal notranslate"><span class="pre">shared.grid.MeshDescriptor</span></code>) – An object used to write a scrip files and to determine the type of
-the destination mesh or grid.</p></li>
-<li><p><strong>mappingFileName</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><em>optional</em>) – The path where the mapping file containing interpolation weights
-and indices will be written and/or read.  If <code class="docutils literal notranslate"><span class="pre">None</span></code>,
-no interpolation is performed and data sets are returned unchanged.
-This is useful if the source and destination grids are determined
-to be the same (though the Remapper does not attempt to determine
-if this is the case).</p></li>
+<li><p><strong>ntasks</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – the target number of MPI tasks to use</p></li>
+<li><p><strong>map_filename</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><em>optional</em>) – The name of the output mapping file,
+<code class="docutils literal notranslate"><span class="pre">map_{source_type}_{dest_type}_{method}.nc</span></code> by default</p></li>
+<li><p><strong>method</strong> (<em>{'bilinear'</em><em>, </em><em>'neareststod'</em><em>, </em><em>'conserve'}</em><em>, </em><em>optional</em>) – The method of interpolation used</p></li>
+<li><p><strong>use_tmp</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, use a temporary directory for the SCRIP files.  The
+default is False, which means the SCRIP files will be created in
+the current working directory.</p></li>
 </ul>
 </dd>
 </dl>
@@ -121,20 +147,41 @@ if this is the case).</p></li>
 <p class="rubric">Methods</p>
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyremap.remapper.Remapper.__init__" title="pyremap.remapper.Remapper.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(sourceDescriptor, destinationDescriptor)</p></td>
-<td><p>Create the remapper and read weights and indices from the given file for later used in remapping fields.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyremap.remapper.Remapper.__init__" title="pyremap.remapper.Remapper.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>([ntasks, map_filename, method, use_tmp])</p></td>
+<td><p>Create a new mapping object</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_mapping_file</span></code>([method, additionalArgs, ...])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_map</span></code>()</p></td>
+<td><p>Make the mapping file</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">dst_from_lon_lat</span></code>(filename[, mesh_name, ...])</p></td>
+<td><p>Set the destination grid from a file with a longitude-latitude grid.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">dst_from_mpas</span></code>(filename, mesh_name[, mesh_type])</p></td>
+<td><p>Set the destination grid from an MPAS mesh file</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">dst_from_points</span></code>(filename, mesh_name[, ...])</p></td>
+<td><p>Set the destination grid from a file with a collection of points.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">dst_from_proj</span></code>(filename, mesh_name[, x_var, ...])</p></td>
+<td><p>Set the destination grid from a file with a projection grid.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">dst_global_lon_lat</span></code>(dlon, dlat[, lon_min, ...])</p></td>
+<td><p>Set the destination grid from a file with a longitude-latitude grid.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ncremap</span></code>(in_filename, out_filename[, ...])</p></td>
 <td><p>Given a source file defining either an MPAS mesh or a lat-lon grid and a destination file or set of arrays defining a lat-lon grid, constructs a mapping file used for interpolation between the source and destination grids.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">esmf_build_map</span></code>([method, logger, mpi_tasks, ...])</p></td>
-<td><p>Use <code class="docutils literal notranslate"><span class="pre">ESMF_RegridWeightGen</span></code> to construct a mapping file used for interpolation between the source and destination grids.</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">remap</span></code>(ds[, renormalizationThreshold])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">remap_numpy</span></code>(ds[, renormalization_threshold])</p></td>
 <td><p>Given a source data set, returns a remapped version of the data set, possibly masked and renormalized.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">remap_file</span></code>(inFileName, outFileName[, ...])</p></td>
-<td><p>Given a source file defining either an MPAS mesh or a lat-lon grid and a destination file or set of arrays defining a lat-lon grid, constructs a mapping file used for interpolation between the source and destination grids.</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">src_from_lon_lat</span></code>(filename[, mesh_name, ...])</p></td>
+<td><p>Set the source grid from a file with a longitude-latitude grid.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">src_from_mpas</span></code>(filename, mesh_name[, mesh_type])</p></td>
+<td><p>Set the source grid from an MPAS mesh file</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">src_from_proj</span></code>(filename, mesh_name[, x_var, ...])</p></td>
+<td><p>Set the source grid from a file with a projection grid.</p></td>
 </tr>
 </tbody>
 </table>

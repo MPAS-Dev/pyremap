@@ -1,0 +1,618 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pyremap.remapper.remapper &mdash; pyremap main documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=a8da1a53"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link href="../../../_static/style.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            pyremap
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../quick_start.html">Quick Start</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">pyremap</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">pyremap.remapper.remapper</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pyremap.remapper.remapper</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyremap.remapper.build_map</span><span class="w"> </span><span class="kn">import</span> <span class="n">_build_map</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyremap.remapper.ncremap</span><span class="w"> </span><span class="kn">import</span> <span class="n">_ncremap</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyremap.remapper.remap_numpy</span><span class="w"> </span><span class="kn">import</span> <span class="n">_remap_numpy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyremap.remapper.setup</span><span class="w"> </span><span class="kn">import</span> <span class="n">_setup_remapper</span>
+
+
+<div class="viewcode-block" id="Remapper">
+<a class="viewcode-back" href="../../../generated/pyremap.remapper.Remapper.html#pyremap.remapper.Remapper">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Remapper</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class for remapping fields using a given mapping file.  The weights and</span>
+<span class="sd">    indices from the mapping file can be loaded once and reused multiple times</span>
+<span class="sd">    to map several fields between the same source and destination grids.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    ntasks : int</span>
+<span class="sd">        the target number of MPI tasks to use</span>
+
+<span class="sd">    src_grid_info : dict</span>
+<span class="sd">        Information about the source grid</span>
+
+<span class="sd">    dst_grid_info : dict</span>
+<span class="sd">        Information about the destination grid</span>
+
+<span class="sd">    method : {&#39;bilinear&#39;, &#39;neareststod&#39;, &#39;conserve&#39;}</span>
+<span class="sd">        The method of interpolation used</span>
+
+<span class="sd">    map_filename : str or None</span>
+<span class="sd">        The name of the output mapping file</span>
+
+<span class="sd">    use_tmp : bool</span>
+<span class="sd">        If True, use a temporary directory for the SCRIP files.  If False, the</span>
+<span class="sd">        SCRIP files will be created in the current working directory.</span>
+
+<span class="sd">    expand_dist : float or None</span>
+<span class="sd">        The distance in meters over which to expand destination grid cells for</span>
+<span class="sd">        smoothing</span>
+
+<span class="sd">    expand_factor : float or None</span>
+<span class="sd">        The factor by which to expand destination grid cells for smoothing</span>
+
+<span class="sd">    src_scrip_filename : str</span>
+<span class="sd">        The name of the SCRIP file for the source mesh</span>
+
+<span class="sd">    dst_scrip_filename : str</span>
+<span class="sd">        The name of the SCRIP file for the destination mesh</span>
+
+<span class="sd">    format : {&#39;NETCDF4&#39;, &#39;NETCDF4_CLASSIC&#39;, &#39;NETCDF3_64BIT&#39;, &#39;NETCDF3_CLASSIC&#39;, &#39;NETCDF3_64BIT_DATA&#39;}</span>
+<span class="sd">        The NetCDF file format to use for scrip files.  The default is</span>
+<span class="sd">        ``NETCDF3_64BIT_DATA`` for compatibility with MOAB.</span>
+
+<span class="sd">    src_descriptor: pyremap.descriptor.MeshDescriptor</span>
+<span class="sd">        The source mesh descriptor</span>
+
+<span class="sd">    dst_descriptor: pyremap.descriptor.MeshDescriptor</span>
+<span class="sd">        The destination mesh descriptor</span>
+
+<span class="sd">    map_tool : {&#39;esmf&#39;, &#39;moab&#39;}</span>
+<span class="sd">        The tool to use for building the mapping file.  The default is</span>
+<span class="sd">        ``esmf``.</span>
+
+<span class="sd">    esmf_path : str or None</span>
+<span class="sd">        The path to the ESMF installation.  If None, ``ESMF_RegridWeigthGen``</span>
+<span class="sd">        must be in the PATH.</span>
+
+<span class="sd">    moab_path : str or None</span>
+<span class="sd">        The path to the MOAB installation.  If None, ``mptempest`` and other</span>
+<span class="sd">        MOAB tools must be in the PATH.</span>
+
+<span class="sd">    parallel_exec : {&#39;mpirun&#39;, &#39;srun&#39;}</span>
+<span class="sd">        The command to use for running the mapping tool.  The default is</span>
+<span class="sd">        ``mpirun``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
+
+<div class="viewcode-block" id="Remapper.__init__">
+<a class="viewcode-back" href="../../../generated/pyremap.remapper.Remapper.html#pyremap.remapper.Remapper.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">ntasks</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">map_filename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">method</span><span class="o">=</span><span class="s1">&#39;bilinear&#39;</span><span class="p">,</span>
+        <span class="n">use_tmp</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a new mapping object</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        ntasks : int</span>
+<span class="sd">            the target number of MPI tasks to use</span>
+
+<span class="sd">        map_filename : str, optional</span>
+<span class="sd">            The name of the output mapping file,</span>
+<span class="sd">            ``map_{source_type}_{dest_type}_{method}.nc`` by default</span>
+
+<span class="sd">        method : {&#39;bilinear&#39;, &#39;neareststod&#39;, &#39;conserve&#39;}, optional</span>
+<span class="sd">            The method of interpolation used</span>
+
+<span class="sd">        use_tmp : bool, optional</span>
+<span class="sd">            If True, use a temporary directory for the SCRIP files.  The</span>
+<span class="sd">            default is False, which means the SCRIP files will be created in</span>
+<span class="sd">            the current working directory.</span>
+<span class="sd">        &quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ntasks</span> <span class="o">=</span> <span class="n">ntasks</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">src_grid_info</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dst_grid_info</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">map_filename</span> <span class="o">=</span> <span class="n">map_filename</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">=</span> <span class="n">method</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">use_tmp</span> <span class="o">=</span> <span class="n">use_tmp</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">expand_dist</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">expand_factor</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">src_scrip_filename</span> <span class="o">=</span> <span class="s1">&#39;src_mesh.nc&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dst_scrip_filename</span> <span class="o">=</span> <span class="s1">&#39;dst_mesh.nc&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">format</span> <span class="o">=</span> <span class="s1">&#39;NETCDF3_64BIT_DATA&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">src_descriptor</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dst_descriptor</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">map_tool</span> <span class="o">=</span> <span class="s1">&#39;esmf&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">esmf_path</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">moab_path</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parallel_exec</span> <span class="o">=</span> <span class="s1">&#39;mpirun&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ds_map</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_matrix</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">src_from_lon_lat</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">mesh_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lon_var</span><span class="o">=</span><span class="s1">&#39;lon&#39;</span><span class="p">,</span> <span class="n">lat_var</span><span class="o">=</span><span class="s1">&#39;lat&#39;</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the source grid from a file with a longitude-latitude grid.  The</span>
+<span class="sd">        latitude and longitude variables can be 1D or 2D.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        filename : str</span>
+<span class="sd">            A file containing the latitude-longitude grid</span>
+
+<span class="sd">        mesh_name : str, optional</span>
+<span class="sd">            The name of the lon-lat grid (defaults to resolution and units,</span>
+<span class="sd">            something like &quot;0.5x0.5degree&quot;)</span>
+
+<span class="sd">        lon_var : str, optional</span>
+<span class="sd">            The name of the longitude coordinate in the file</span>
+
+<span class="sd">        lat_var : str, optional</span>
+<span class="sd">            The name of the latitude coordinate in the file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">src</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="n">src</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;lon-lat&#39;</span>
+        <span class="n">src</span><span class="p">[</span><span class="s1">&#39;filename&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">filename</span>
+        <span class="n">src</span><span class="p">[</span><span class="s1">&#39;lon&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lon_var</span>
+        <span class="n">src</span><span class="p">[</span><span class="s1">&#39;lat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lat_var</span>
+        <span class="k">if</span> <span class="n">mesh_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">src</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mesh_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">src_grid_info</span> <span class="o">=</span> <span class="n">src</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">dst_from_lon_lat</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">mesh_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lon_var</span><span class="o">=</span><span class="s1">&#39;lon&#39;</span><span class="p">,</span> <span class="n">lat_var</span><span class="o">=</span><span class="s1">&#39;lat&#39;</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the destination grid from a file with a longitude-latitude grid.</span>
+<span class="sd">        The latitude and longitude variables can be 1D or 2D.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        filename : str</span>
+<span class="sd">            A file containing the latitude-longitude grid</span>
+
+<span class="sd">        mesh_name : str, optional</span>
+<span class="sd">            The name of the lon-lat grid (defaults to resolution and units,</span>
+<span class="sd">            something like &quot;0.5x0.5degree&quot;)</span>
+
+<span class="sd">        lon_var : str, optional</span>
+<span class="sd">            The name of the longitude coordinate in the file</span>
+
+<span class="sd">        lat_var : str, optional</span>
+<span class="sd">            The name of the latitude coordinate in the file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dst</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="n">dst</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;lon-lat&#39;</span>
+        <span class="n">dst</span><span class="p">[</span><span class="s1">&#39;filename&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">filename</span>
+        <span class="n">dst</span><span class="p">[</span><span class="s1">&#39;lon&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lon_var</span>
+        <span class="n">dst</span><span class="p">[</span><span class="s1">&#39;lat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lat_var</span>
+        <span class="k">if</span> <span class="n">mesh_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dst</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mesh_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dst_grid_info</span> <span class="o">=</span> <span class="n">dst</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">dst_global_lon_lat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dlon</span><span class="p">,</span> <span class="n">dlat</span><span class="p">,</span> <span class="n">lon_min</span><span class="o">=-</span><span class="mf">180.0</span><span class="p">,</span> <span class="n">mesh_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the destination grid from a file with a longitude-latitude grid.</span>
+<span class="sd">        The latitude and longitude variables can be 1D or 2D.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        dlon : float</span>
+<span class="sd">            The longitude resolution in degrees</span>
+
+<span class="sd">        dlat : float</span>
+<span class="sd">            The latitude resolution in degrees</span>
+
+<span class="sd">        lon_min : float, optional</span>
+<span class="sd">            The longitude for the left-hand edge of the global grid in degrees</span>
+
+<span class="sd">        mesh_name : str, optional</span>
+<span class="sd">            The name of the lon-lat grid (defaults to resolution and units,</span>
+<span class="sd">            something like &quot;0.5x0.5degree&quot;)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">dst</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="n">dst</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;lon-lat&#39;</span>
+        <span class="n">dst</span><span class="p">[</span><span class="s1">&#39;dlon&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dlon</span>
+        <span class="n">dst</span><span class="p">[</span><span class="s1">&#39;dlat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dlat</span>
+        <span class="n">dst</span><span class="p">[</span><span class="s1">&#39;lon_min&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lon_min</span>
+        <span class="k">if</span> <span class="n">mesh_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dst</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mesh_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dst_grid_info</span> <span class="o">=</span> <span class="n">dst</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">src_from_proj</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">filename</span><span class="p">,</span>
+        <span class="n">mesh_name</span><span class="p">,</span>
+        <span class="n">x_var</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span>
+        <span class="n">y_var</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">,</span>
+        <span class="n">proj_attr</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">proj_str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the source grid from a file with a projection grid.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        filename : str</span>
+<span class="sd">            A file containing the projection grid</span>
+
+<span class="sd">        mesh_name : str</span>
+<span class="sd">            The name of the projection grid</span>
+
+<span class="sd">        x_var : str, optional</span>
+<span class="sd">            The name of the x coordinate in the file</span>
+
+<span class="sd">        y_var : str, optional</span>
+<span class="sd">            The name of the y coordinate in the file</span>
+
+<span class="sd">        proj_attr : str, optional</span>
+<span class="sd">            The name of a global attribute in the file containing the proj</span>
+<span class="sd">            string for the projection</span>
+
+<span class="sd">        proj_str : str, optional</span>
+<span class="sd">            A proj string defining the projection, ignored if ``proj_attr``</span>
+<span class="sd">            is provided</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">src</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="n">src</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;proj&#39;</span>
+        <span class="n">src</span><span class="p">[</span><span class="s1">&#39;filename&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">filename</span>
+        <span class="n">src</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mesh_name</span>
+        <span class="n">src</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">x_var</span>
+        <span class="n">src</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">y_var</span>
+        <span class="k">if</span> <span class="n">proj_attr</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">src</span><span class="p">[</span><span class="s1">&#39;proj_attr&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">proj_attr</span>
+        <span class="k">elif</span> <span class="n">proj_str</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">src</span><span class="p">[</span><span class="s1">&#39;proj_str&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">proj_str</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Must provide one of &quot;proj_attr&quot; or &quot;proj_str&quot;.&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">src_grid_info</span> <span class="o">=</span> <span class="n">src</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">dst_from_proj</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">filename</span><span class="p">,</span>
+        <span class="n">mesh_name</span><span class="p">,</span>
+        <span class="n">x_var</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span>
+        <span class="n">y_var</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">,</span>
+        <span class="n">proj_attr</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">proj_str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the destination grid from a file with a projection grid.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        filename : str</span>
+<span class="sd">            A file containing the projection grid</span>
+
+<span class="sd">        mesh_name : str</span>
+<span class="sd">            The name of the projection grid</span>
+
+<span class="sd">        x_var : str, optional</span>
+<span class="sd">            The name of the x coordinate in the file</span>
+
+<span class="sd">        y_var : str, optional</span>
+<span class="sd">            The name of the y coordinate in the file</span>
+
+<span class="sd">        proj_attr : str, optional</span>
+<span class="sd">            The name of a global attribute in the file containing the proj</span>
+<span class="sd">            string for the projection</span>
+
+<span class="sd">        proj_str : str, optional</span>
+<span class="sd">            A proj string defining the projection, ignored if ``proj_attr``</span>
+<span class="sd">            is provided</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dst</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="n">dst</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;proj&#39;</span>
+        <span class="n">dst</span><span class="p">[</span><span class="s1">&#39;filename&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">filename</span>
+        <span class="n">dst</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mesh_name</span>
+        <span class="n">dst</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">x_var</span>
+        <span class="n">dst</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">y_var</span>
+        <span class="k">if</span> <span class="n">proj_attr</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dst</span><span class="p">[</span><span class="s1">&#39;proj_attr&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">proj_attr</span>
+        <span class="k">elif</span> <span class="n">proj_str</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dst</span><span class="p">[</span><span class="s1">&#39;proj_str&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">proj_str</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Must provide one of &quot;proj_attr&quot; or &quot;proj_str&quot;.&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dst_grid_info</span> <span class="o">=</span> <span class="n">dst</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">dst_from_points</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">mesh_name</span><span class="p">,</span> <span class="n">lon_var</span><span class="o">=</span><span class="s1">&#39;lon&#39;</span><span class="p">,</span> <span class="n">lat_var</span><span class="o">=</span><span class="s1">&#39;lat&#39;</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the destination grid from a file with a collection of points.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        filename : str</span>
+<span class="sd">            A file containing the latitude-longitude grid</span>
+
+<span class="sd">        mesh_name : str</span>
+<span class="sd">            The name of the point collection</span>
+
+<span class="sd">        lon_var : str, optional</span>
+<span class="sd">            The name of the longitude coordinate in the file</span>
+
+<span class="sd">        lat_var : str, optional</span>
+<span class="sd">            The name of the latitude coordinate in the file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dst</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="n">dst</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;points&#39;</span>
+        <span class="n">dst</span><span class="p">[</span><span class="s1">&#39;filename&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">filename</span>
+        <span class="n">dst</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mesh_name</span>
+        <span class="n">dst</span><span class="p">[</span><span class="s1">&#39;lon&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lon_var</span>
+        <span class="n">dst</span><span class="p">[</span><span class="s1">&#39;lat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lat_var</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dst_grid_info</span> <span class="o">=</span> <span class="n">dst</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">src_from_mpas</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">mesh_name</span><span class="p">,</span> <span class="n">mesh_type</span><span class="o">=</span><span class="s1">&#39;cell&#39;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the source grid from an MPAS mesh file</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        filename : str</span>
+<span class="sd">            A file containing the MPAS mesh</span>
+
+<span class="sd">        mesh_name : str</span>
+<span class="sd">            The name of the MPAS mesh</span>
+
+<span class="sd">        mesh_type : {&#39;cell&#39;, &#39;edge&#39;, &#39;vertex&#39;}, optional</span>
+<span class="sd">            Which type of MPAS mesh</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">src</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="n">src</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;mpas&#39;</span>
+        <span class="n">src</span><span class="p">[</span><span class="s1">&#39;filename&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">filename</span>
+        <span class="n">src</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mesh_name</span>
+        <span class="n">src</span><span class="p">[</span><span class="s1">&#39;mpas_mesh_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mesh_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">src_grid_info</span> <span class="o">=</span> <span class="n">src</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">dst_from_mpas</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">mesh_name</span><span class="p">,</span> <span class="n">mesh_type</span><span class="o">=</span><span class="s1">&#39;cell&#39;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the destination grid from an MPAS mesh file</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        filename : str</span>
+<span class="sd">            A file containing the MPAS mesh</span>
+
+<span class="sd">        mesh_name : str</span>
+<span class="sd">            The name of the MPAS mesh</span>
+
+<span class="sd">        mesh_type : {&#39;cell&#39;, &#39;edge&#39;, &#39;vertex&#39;}, optional</span>
+<span class="sd">            Which type of MPAS mesh</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dst</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="n">dst</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;mpas&#39;</span>
+        <span class="n">dst</span><span class="p">[</span><span class="s1">&#39;filename&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">filename</span>
+        <span class="n">dst</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mesh_name</span>
+        <span class="n">dst</span><span class="p">[</span><span class="s1">&#39;mpas_mesh_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mesh_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dst_grid_info</span> <span class="o">=</span> <span class="n">dst</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">build_map</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Make the mapping file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">_build_map</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">ncremap</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">in_filename</span><span class="p">,</span>
+            <span class="n">out_filename</span><span class="p">,</span>
+            <span class="n">variable_list</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">renormalize</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">logger</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">replace_mpas_fill</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">parallel_exec</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Given a source file defining either an MPAS mesh or a lat-lon grid and</span>
+<span class="sd">        a destination file or set of arrays defining a lat-lon grid, constructs</span>
+<span class="sd">        a mapping file used for interpolation between the source and</span>
+<span class="sd">        destination grids.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        in_filename : str</span>
+<span class="sd">            The path to the file containing a data set on the source grid</span>
+
+<span class="sd">        out_filename : str</span>
+<span class="sd">            The path where the data on the destination grid should be written</span>
+
+<span class="sd">        variable_list : list of str, optional</span>
+<span class="sd">            A list of variables to be mapped.  By default, all variables are</span>
+<span class="sd">            mapped</span>
+
+<span class="sd">        overwrite : bool, optional</span>
+<span class="sd">            Whether the destination file should be overwritten if it already</span>
+<span class="sd">            exists. If `False`, and the destination file is already present,</span>
+<span class="sd">            the function does nothing and returns immediately</span>
+
+<span class="sd">        renormalize : float, optional</span>
+<span class="sd">            A threshold to use to renormalize the data</span>
+
+<span class="sd">        logger : ``logging.Logger``, optional</span>
+<span class="sd">            A logger to which ncclimo output should be redirected</span>
+
+<span class="sd">        replace_mpas_fill : bool, optional</span>
+<span class="sd">            For MPAS meshes, whether add a ``_FillValue`` attribute (missing</span>
+<span class="sd">            from MPAS output).  If this has been handled before the call,</span>
+<span class="sd">            replacing the fill value again may cause errors.</span>
+
+<span class="sd">        parallel_exec : {&#39;srun&#39;}, optional</span>
+<span class="sd">            The name of the parallel executable to use to launch ncremap.</span>
+<span class="sd">            By default, none is used.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        OSError</span>
+<span class="sd">            If ``ncremap`` is not in the system path.</span>
+
+<span class="sd">        ValueError</span>
+<span class="sd">            If ``mapping_file_name`` is ``None`` (meaning no remapping is</span>
+<span class="sd">            needed).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">_setup_remapper</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">map_filename</span><span class="p">):</span>
+            <span class="n">_build_map</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="n">_ncremap</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">in_filename</span><span class="p">,</span>
+            <span class="n">out_filename</span><span class="p">,</span>
+            <span class="n">variable_list</span><span class="p">,</span>
+            <span class="n">overwrite</span><span class="p">,</span>
+            <span class="n">renormalize</span><span class="p">,</span>
+            <span class="n">logger</span><span class="p">,</span>
+            <span class="n">replace_mpas_fill</span><span class="p">,</span>
+            <span class="n">parallel_exec</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">remap_numpy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ds</span><span class="p">,</span> <span class="n">renormalization_threshold</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Given a source data set, returns a remapped version of the data set,</span>
+<span class="sd">        possibly masked and renormalized.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        ds : xarray.Dataset or xarray.DataArray</span>
+<span class="sd">            The dimention(s) along ``self.sourceDimNames`` must match</span>
+<span class="sd">            ``self.src_grid_dims`` read from the mapping file.</span>
+
+<span class="sd">        renormalization_threshold : float, optional</span>
+<span class="sd">            The minimum weight of a denstination cell after remapping, below</span>
+<span class="sd">            which it is masked out, or ``None`` for no renormalization and</span>
+<span class="sd">            masking.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ds_remap : xarray.Dataset or xarray.DataArray</span>
+<span class="sd">            Returns a remapped data set (or data array) where dimensions other</span>
+<span class="sd">            than ``self.src_descriptor.dims`` are the same as in ``ds`` and the</span>
+<span class="sd">            dimension(s) given by ``self.src_descriptor.dims`` have been</span>
+<span class="sd">            replaced by ``self.dst_descriptor.dims``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">_remap_numpy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ds</span><span class="p">,</span> <span class="n">renormalization_threshold</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright This software is open source software available under the BSD-3license. Copyright (c) 2025.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+     
+
+    <!-- Inject version info -->
+    <meta name="doc-version" content="main">
+
+    <!-- Create switcher container -->
+    <script>
+      // Inject the switcher div into the top of the sidebar
+      const sidebar = document.querySelector('.wy-side-nav-search');
+      if (sidebar) {
+        const versionDiv = document.createElement('div');
+        versionDiv.id = 'version-switcher';
+        versionDiv.style.marginTop = '1em';
+        sidebar.appendChild(versionDiv);
+      }
+    </script>
+
+    <!-- Load version switcher JS -->
+    <script src="../shared/version-switcher.js"></script>
+
+
+
+</body>
+</html>

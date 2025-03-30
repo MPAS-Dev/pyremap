@@ -14,8 +14,10 @@
    .. autosummary::
    
       ~LatLon2DGridDescriptor.__init__
+      ~LatLon2DGridDescriptor.mesh_name_from_attr
       ~LatLon2DGridDescriptor.read
       ~LatLon2DGridDescriptor.to_scrip
+      ~LatLon2DGridDescriptor.write_netcdf
    
    
 

@@ -88,7 +88,7 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyremap.descriptor.mesh_descriptor</span><span class="w"> </span><span class="kn">import</span> <span class="n">MeshDescriptor</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pyremap.descriptor.utility</span><span class="w"> </span><span class="kn">import</span> <span class="n">add_history</span><span class="p">,</span> <span class="n">write_netcdf</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyremap.descriptor.utility</span><span class="w"> </span><span class="kn">import</span> <span class="n">add_history</span>
 
 
 <div class="viewcode-block" id="PointCollectionDescriptor">
@@ -111,11 +111,10 @@
 <span class="sd">    history : str</span>
 <span class="sd">        The history attribute written to SCRIP files</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
 <div class="viewcode-block" id="PointCollectionDescriptor.__init__">
 <a class="viewcode-back" href="../../../generated/pyremap.descriptor.PointCollectionDescriptor.html#pyremap.descriptor.PointCollectionDescriptor.__init__">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lats</span><span class="p">,</span> <span class="n">lons</span><span class="p">,</span> <span class="n">collectionName</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s1">&#39;degrees&#39;</span><span class="p">,</span>
-                 <span class="n">outDimension</span><span class="o">=</span><span class="s1">&#39;nPoints&#39;</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lats</span><span class="p">,</span> <span class="n">lons</span><span class="p">,</span> <span class="n">collection_name</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s1">&#39;degrees&#39;</span><span class="p">,</span>
+                 <span class="n">out_dimension</span><span class="o">=</span><span class="s1">&#39;n_points&#39;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Constructor stores</span>
 
@@ -127,51 +126,51 @@
 <span class="sd">        lons : numpy.ndarray</span>
 <span class="sd">            The longitude of each point</span>
 
-<span class="sd">        collectionName : str</span>
+<span class="sd">        collection_name : str</span>
 <span class="sd">            A unique name for the collection of transects, used in the names</span>
 <span class="sd">            of files containing data mapped to these points.</span>
 
 <span class="sd">        units : {&#39;degrees&#39;, &#39;radians&#39;}, optional</span>
 <span class="sd">            The units of ``lats`` and ``lons``</span>
 
-<span class="sd">        outDimension : str, optional</span>
+<span class="sd">        out_dimension : str, optional</span>
 <span class="sd">            The name of the dimension corresponding to the points (i.e. the</span>
 <span class="sd">            &quot;horizontal&quot; dimension of the point collection)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">meshName</span><span class="o">=</span><span class="n">collectionName</span><span class="p">,</span> <span class="n">regional</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">mesh_name</span><span class="o">=</span><span class="n">collection_name</span><span class="p">,</span> <span class="n">regional</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">lat</span> <span class="o">=</span> <span class="n">lats</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lon</span> <span class="o">=</span> <span class="n">lons</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">units</span> <span class="o">=</span> <span class="n">units</span>
 
         <span class="c1"># build coords</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">coords</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;lat&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;dims&#39;</span><span class="p">:</span> <span class="n">outDimension</span><span class="p">,</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coords</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;lat&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;dims&#39;</span><span class="p">:</span> <span class="n">out_dimension</span><span class="p">,</span>
                                <span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">lat</span><span class="p">,</span>
                                <span class="s1">&#39;attrs&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="n">units</span><span class="p">}},</span>
-                       <span class="s1">&#39;lon&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;dims&#39;</span><span class="p">:</span> <span class="n">outDimension</span><span class="p">,</span>
+                       <span class="s1">&#39;lon&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;dims&#39;</span><span class="p">:</span> <span class="n">out_dimension</span><span class="p">,</span>
                                <span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">lon</span><span class="p">,</span>
                                <span class="s1">&#39;attrs&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="n">units</span><span class="p">}}}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dims</span> <span class="o">=</span> <span class="p">[</span><span class="n">outDimension</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dimSize</span> <span class="o">=</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lat</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dims</span> <span class="o">=</span> <span class="p">[</span><span class="n">out_dimension</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dim_sizes</span> <span class="o">=</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lat</span><span class="p">)]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">history</span> <span class="o">=</span> <span class="n">add_history</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="PointCollectionDescriptor.to_scrip">
 <a class="viewcode-back" href="../../../generated/pyremap.descriptor.PointCollectionDescriptor.to_scrip.html#pyremap.descriptor.PointCollectionDescriptor.to_scrip">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">to_scrip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scripFileName</span><span class="p">,</span> <span class="n">expandDist</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">expandFactor</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_scrip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scrip_filename</span><span class="p">,</span> <span class="n">expand_dist</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">expand_factor</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Write a SCRIP file for the point collection</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        scripFileName : str</span>
+<span class="sd">        scrip_filename : str</span>
 <span class="sd">            The path to which the SCRIP file should be written</span>
 
-<span class="sd">        expandDist : float or numpy.ndarray, optional</span>
+<span class="sd">        expand_dist : float or numpy.ndarray, optional</span>
 <span class="sd">            A distance in meters to expand each grid cell outward from the</span>
 <span class="sd">            center.  If a ``numpy.ndarray``, one value per cell.</span>
 
-<span class="sd">        expandFactor : float or numpy.ndarray, optional</span>
+<span class="sd">        expand_factor : float or numpy.ndarray, optional</span>
 <span class="sd">            A factor by which to expand each grid cell outward from the center.</span>
 <span class="sd">            If a ``numpy.ndarray``, one value per cell.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -223,9 +222,9 @@
         <span class="n">ds</span><span class="o">.</span><span class="n">grid_corner_lon</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;units&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">units</span>
         <span class="n">ds</span><span class="o">.</span><span class="n">grid_imask</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;units&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;unitless&#39;</span>
 
-        <span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;meshName&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">meshName</span>
+        <span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;mesh_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mesh_name</span>
         <span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;history&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">history</span>
-        <span class="n">write_netcdf</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">scripFileName</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">format</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write_netcdf</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">scrip_filename</span><span class="p">)</span></div>
 </div>
 
 </pre></div>

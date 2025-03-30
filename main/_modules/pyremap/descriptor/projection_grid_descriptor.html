@@ -94,7 +94,6 @@
     <span class="n">expand_scrip</span><span class="p">,</span>
     <span class="n">interp_extrap_corner</span><span class="p">,</span>
     <span class="n">unwrap_corners</span><span class="p">,</span>
-    <span class="n">write_netcdf</span><span class="p">,</span>
 <span class="p">)</span>
 
 
@@ -111,7 +110,7 @@
 <span class="sd">        The projection used to map from grid x-y space to latitude and</span>
 <span class="sd">        longitude</span>
 
-<span class="sd">    latLonProjection : pyproj.Proj</span>
+<span class="sd">    lat_lon_projection : pyproj.Proj</span>
 <span class="sd">        lat-lon projection used to transform from x-y to lat-lon space</span>
 
 <span class="sd">    x : numpy.ndarray</span>
@@ -120,27 +119,24 @@
 <span class="sd">    y : numpy.ndarray</span>
 <span class="sd">        The longitude coordinate at grid-cell centers</span>
 
-<span class="sd">    xCorner : numpy.ndarray</span>
+<span class="sd">    x_corner : numpy.ndarray</span>
 <span class="sd">        The latitude coordinate at grid-cell corners</span>
 
-<span class="sd">    yCorner : numpy.ndarray</span>
+<span class="sd">    y_corner : numpy.ndarray</span>
 <span class="sd">        The longitude coordinate at grid-cell corners</span>
 
 <span class="sd">    history : str</span>
 <span class="sd">        The history attribute written to SCRIP files</span>
 
-<span class="sd">    xVarName : str</span>
+<span class="sd">    x_var_name : str</span>
 <span class="sd">        The name of the x variable</span>
 
-<span class="sd">    yVarName : str</span>
+<span class="sd">    y_var_name : str</span>
 <span class="sd">        The name of the y variable</span>
-
-<span class="sd">    history : str</span>
-<span class="sd">        The history attribute written to SCRIP files</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 <div class="viewcode-block" id="ProjectionGridDescriptor.__init__">
 <a class="viewcode-back" href="../../../generated/pyremap.descriptor.ProjectionGridDescriptor.html#pyremap.descriptor.ProjectionGridDescriptor.__init__">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">projection</span><span class="p">,</span> <span class="n">meshName</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">projection</span><span class="p">,</span> <span class="n">mesh_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Constructor stores the projection</span>
 
@@ -150,29 +146,28 @@
 <span class="sd">            The projection used to map from grid x-y space to latitude and</span>
 <span class="sd">            longitude</span>
 
-<span class="sd">        meshName : str, optional</span>
+<span class="sd">        mesh_name : str, optional</span>
 <span class="sd">            The name of the grid (e.g. ``&#39;10km_Antarctic_stereo&#39;``)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">meshName</span><span class="o">=</span><span class="n">meshName</span><span class="p">,</span> <span class="n">regional</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">mesh_name</span><span class="o">=</span><span class="n">mesh_name</span><span class="p">,</span> <span class="n">regional</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">projection</span> <span class="o">=</span> <span class="n">projection</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">latLonProjection</span> <span class="o">=</span> <span class="n">pyproj</span><span class="o">.</span><span class="n">Proj</span><span class="p">(</span><span class="n">proj</span><span class="o">=</span><span class="s1">&#39;latlong&#39;</span><span class="p">,</span> <span class="n">datum</span><span class="o">=</span><span class="s1">&#39;WGS84&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lat_lon_projection</span> <span class="o">=</span> <span class="n">pyproj</span><span class="o">.</span><span class="n">Proj</span><span class="p">(</span><span class="n">proj</span><span class="o">=</span><span class="s1">&#39;latlong&#39;</span><span class="p">,</span> <span class="n">datum</span><span class="o">=</span><span class="s1">&#39;WGS84&#39;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">xCorner</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">yCorner</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x_corner</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_corner</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">history</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">xVarName</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">yVarName</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">history</span> <span class="o">=</span> <span class="kc">None</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x_var_name</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_var_name</span> <span class="o">=</span> <span class="kc">None</span></div>
 
 
 <div class="viewcode-block" id="ProjectionGridDescriptor.read">
 <a class="viewcode-back" href="../../../generated/pyremap.descriptor.ProjectionGridDescriptor.read.html#pyremap.descriptor.ProjectionGridDescriptor.read">[docs]</a>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">read</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">projection</span><span class="p">,</span> <span class="n">fileName</span><span class="p">,</span> <span class="n">meshName</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">xVarName</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span>
-             <span class="n">yVarName</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">read</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">projection</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">mesh_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">x_var_name</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span>
+             <span class="n">y_var_name</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Given a grid file with x and y coordinates defining the axes of the</span>
 <span class="sd">        logically rectangular grid, read in the x and y coordinates and</span>
@@ -184,36 +179,34 @@
 <span class="sd">            The projection used to map from grid x-y space to latitude and</span>
 <span class="sd">            longitude</span>
 
-<span class="sd">        fileName : str</span>
+<span class="sd">        filename : str</span>
 <span class="sd">            The path of the file containing the grid data</span>
 
-<span class="sd">        meshName : str, optional</span>
+<span class="sd">        mesh_name : str, optional</span>
 <span class="sd">            The name of the grid (e.g. ``&#39;10km_Antarctic_stereo&#39;``).  If not</span>
-<span class="sd">            provided, the data set in ``fileName`` must have a global</span>
-<span class="sd">            attribute ``meshName`` that will be used instead.</span>
+<span class="sd">            provided, the data set in ``filename`` must have a global</span>
+<span class="sd">            attribute ``mesh_name`` of ``meshName`` that will be used instead.</span>
 
-<span class="sd">        xVarName, yVarName : str, optional</span>
+<span class="sd">        x_var_name, y_var_name : str, optional</span>
 <span class="sd">            The name of the x and y (in meters) variables in the grid file</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">ds</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">open_dataset</span><span class="p">(</span><span class="n">fileName</span><span class="p">)</span>
+        <span class="n">ds</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">open_dataset</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">meshName</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="s1">&#39;meshName&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;No meshName provided or found in file.&#39;</span><span class="p">)</span>
-            <span class="n">meshName</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;meshName&#39;</span><span class="p">]</span>
-
-        <span class="n">descriptor</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">projection</span><span class="p">,</span> <span class="n">meshName</span><span class="o">=</span><span class="n">meshName</span><span class="p">)</span>
+        <span class="n">descriptor</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">projection</span><span class="p">,</span> <span class="n">mesh_name</span><span class="o">=</span><span class="n">mesh_name</span><span class="p">)</span>
+        <span class="n">descriptor</span><span class="o">.</span><span class="n">mesh_name_from_attr</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">descriptor</span><span class="o">.</span><span class="n">mesh_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;No mesh_name provided or found in file.&#39;</span><span class="p">)</span>
 
         <span class="c1"># Get info from input file</span>
-        <span class="n">descriptor</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="n">xVarName</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span>
-        <span class="n">descriptor</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="n">yVarName</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span>
+        <span class="n">descriptor</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="n">x_var_name</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span>
+        <span class="n">descriptor</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="n">y_var_name</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span>
 
-        <span class="n">descriptor</span><span class="o">.</span><span class="n">_set_coords</span><span class="p">(</span><span class="n">xVarName</span><span class="p">,</span> <span class="n">yVarName</span><span class="p">,</span> <span class="n">ds</span><span class="p">[</span><span class="n">xVarName</span><span class="p">]</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-                               <span class="n">ds</span><span class="p">[</span><span class="n">yVarName</span><span class="p">]</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">descriptor</span><span class="o">.</span><span class="n">_set_coords</span><span class="p">(</span><span class="n">x_var_name</span><span class="p">,</span> <span class="n">y_var_name</span><span class="p">,</span> <span class="n">ds</span><span class="p">[</span><span class="n">x_var_name</span><span class="p">]</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                               <span class="n">ds</span><span class="p">[</span><span class="n">y_var_name</span><span class="p">]</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 
         <span class="c1"># interp/extrap corners</span>
-        <span class="n">descriptor</span><span class="o">.</span><span class="n">xCorner</span> <span class="o">=</span> <span class="n">interp_extrap_corner</span><span class="p">(</span><span class="n">descriptor</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
-        <span class="n">descriptor</span><span class="o">.</span><span class="n">yCorner</span> <span class="o">=</span> <span class="n">interp_extrap_corner</span><span class="p">(</span><span class="n">descriptor</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+        <span class="n">descriptor</span><span class="o">.</span><span class="n">x_corner</span> <span class="o">=</span> <span class="n">interp_extrap_corner</span><span class="p">(</span><span class="n">descriptor</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">descriptor</span><span class="o">.</span><span class="n">y_corner</span> <span class="o">=</span> <span class="n">interp_extrap_corner</span><span class="p">(</span><span class="n">descriptor</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
 
         <span class="n">descriptor</span><span class="o">.</span><span class="n">history</span> <span class="o">=</span> <span class="n">add_history</span><span class="p">(</span><span class="n">ds</span><span class="o">=</span><span class="n">ds</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">descriptor</span></div>
@@ -222,7 +215,7 @@
 <div class="viewcode-block" id="ProjectionGridDescriptor.create">
 <a class="viewcode-back" href="../../../generated/pyremap.descriptor.ProjectionGridDescriptor.create.html#pyremap.descriptor.ProjectionGridDescriptor.create">[docs]</a>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">create</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">projection</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">meshName</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">projection</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">mesh_name</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Given x and y coordinates defining the axes of the logically</span>
 <span class="sd">        rectangular grid, save the coordinates interpolate/extrapolate to</span>
@@ -242,10 +235,10 @@
 <span class="sd">            One dimensional array defining the y coordinate of grid cell</span>
 <span class="sd">            centers.</span>
 
-<span class="sd">        meshName : str</span>
+<span class="sd">        mesh_name : str</span>
 <span class="sd">            The name of the grid (e.g. ``&#39;10km_Antarctic_stereo&#39;``)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">descriptor</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">projection</span><span class="p">,</span> <span class="n">meshName</span><span class="o">=</span><span class="n">meshName</span><span class="p">)</span>
+        <span class="n">descriptor</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">projection</span><span class="p">,</span> <span class="n">mesh_name</span><span class="o">=</span><span class="n">mesh_name</span><span class="p">)</span>
 
         <span class="n">descriptor</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">x</span>
         <span class="n">descriptor</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">y</span>
@@ -253,28 +246,28 @@
         <span class="n">descriptor</span><span class="o">.</span><span class="n">_set_coords</span><span class="p">(</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">)</span>
 
         <span class="c1"># interp/extrap corners</span>
-        <span class="n">descriptor</span><span class="o">.</span><span class="n">xCorner</span> <span class="o">=</span> <span class="n">interp_extrap_corner</span><span class="p">(</span><span class="n">descriptor</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
-        <span class="n">descriptor</span><span class="o">.</span><span class="n">yCorner</span> <span class="o">=</span> <span class="n">interp_extrap_corner</span><span class="p">(</span><span class="n">descriptor</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+        <span class="n">descriptor</span><span class="o">.</span><span class="n">x_corner</span> <span class="o">=</span> <span class="n">interp_extrap_corner</span><span class="p">(</span><span class="n">descriptor</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">descriptor</span><span class="o">.</span><span class="n">y_corner</span> <span class="o">=</span> <span class="n">interp_extrap_corner</span><span class="p">(</span><span class="n">descriptor</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
         <span class="n">descriptor</span><span class="o">.</span><span class="n">history</span> <span class="o">=</span> <span class="n">add_history</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">descriptor</span></div>
 
 
 <div class="viewcode-block" id="ProjectionGridDescriptor.to_scrip">
 <a class="viewcode-back" href="../../../generated/pyremap.descriptor.ProjectionGridDescriptor.to_scrip.html#pyremap.descriptor.ProjectionGridDescriptor.to_scrip">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">to_scrip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scripFileName</span><span class="p">,</span> <span class="n">expandDist</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">expandFactor</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_scrip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scrip_filename</span><span class="p">,</span> <span class="n">expand_dist</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">expand_factor</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create a SCRIP file based on the grid and projection.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        scripFileName : str</span>
+<span class="sd">        scrip_filename : str</span>
 <span class="sd">            The path to which the SCRIP file should be written</span>
 
-<span class="sd">        expandDist : float or numpy.ndarray, optional</span>
+<span class="sd">        expand_dist : float or numpy.ndarray, optional</span>
 <span class="sd">            A distance in meters to expand each grid cell outward from the</span>
 <span class="sd">            center.  If a ``numpy.ndarray``, one value per cell.</span>
 
-<span class="sd">        expandFactor : float or numpy.ndarray, optional</span>
+<span class="sd">        expand_factor : float or numpy.ndarray, optional</span>
 <span class="sd">            A factor by which to expand each grid cell outward from the center.</span>
 <span class="sd">            If a ``numpy.ndarray``, one value per cell.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -287,7 +280,7 @@
         <span class="n">grid_size</span> <span class="o">=</span> <span class="n">nx</span> <span class="o">*</span> <span class="n">ny</span>
 
         <span class="p">(</span><span class="n">center_x</span><span class="p">,</span> <span class="n">center_y</span><span class="p">)</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
-        <span class="p">(</span><span class="n">corner_x</span><span class="p">,</span> <span class="n">corner_y</span><span class="p">)</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xCorner</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">yCorner</span><span class="p">)</span>
+        <span class="p">(</span><span class="n">corner_x</span><span class="p">,</span> <span class="n">corner_y</span><span class="p">)</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_corner</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_corner</span><span class="p">)</span>
 
         <span class="p">(</span><span class="n">center_lat</span><span class="p">,</span> <span class="n">center_lon</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">project_to_lat_lon</span><span class="p">(</span><span class="n">center_x</span><span class="p">,</span> <span class="n">center_y</span><span class="p">)</span>
         <span class="p">(</span><span class="n">corner_lat</span><span class="p">,</span> <span class="n">corner_lon</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">project_to_lat_lon</span><span class="p">(</span><span class="n">corner_x</span><span class="p">,</span> <span class="n">corner_y</span><span class="p">)</span>
@@ -311,8 +304,8 @@
             <span class="n">dims</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;grid_size&#39;</span><span class="p">,)</span>
         <span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">expandDist</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">expandFactor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">expand_scrip</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">expandDist</span><span class="p">,</span> <span class="n">expandFactor</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">expand_dist</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">expand_factor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">expand_scrip</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">expand_dist</span><span class="p">,</span> <span class="n">expand_factor</span><span class="p">)</span>
 
         <span class="n">ds</span><span class="o">.</span><span class="n">grid_center_lat</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;units&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;degrees&#39;</span>
         <span class="n">ds</span><span class="o">.</span><span class="n">grid_center_lon</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;units&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;degrees&#39;</span>
@@ -320,62 +313,62 @@
         <span class="n">ds</span><span class="o">.</span><span class="n">grid_corner_lon</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;units&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;degrees&#39;</span>
         <span class="n">ds</span><span class="o">.</span><span class="n">grid_imask</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;units&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;unitless&#39;</span>
 
-        <span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;meshName&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">meshName</span>
+        <span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;mesh_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mesh_name</span>
         <span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;history&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">history</span>
-        <span class="n">write_netcdf</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">scripFileName</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">format</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write_netcdf</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">scrip_filename</span><span class="p">)</span></div>
 
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">project_to_lat_lon</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">project_to_lat_lon</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Given X and Y locations of points in a projection, returns the</span>
+<span class="sd">        Given x and y locations of points in a projection, returns the</span>
 <span class="sd">        corresponding latitude and longitude of each point.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        X : numpy.ndarray</span>
+<span class="sd">        x : numpy.ndarray</span>
 <span class="sd">            x array of points in the projection</span>
 
-<span class="sd">        Y : numpy.ndarray</span>
+<span class="sd">        y : numpy.ndarray</span>
 <span class="sd">            y array of points in the projection</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        Lat : numpy.ndarray</span>
-<span class="sd">            The latitude in degrees with the same size as X and Y</span>
+<span class="sd">        lat : numpy.ndarray</span>
+<span class="sd">            The latitude in degrees with the same size as x and y</span>
 
-<span class="sd">        Lon : numpy.ndarray</span>
-<span class="sd">            The longitude in degrees with the same size as X and Y</span>
+<span class="sd">        lon : numpy.ndarray</span>
+<span class="sd">            The longitude in degrees with the same size as x and y</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">transformer</span> <span class="o">=</span> <span class="n">pyproj</span><span class="o">.</span><span class="n">Transformer</span><span class="o">.</span><span class="n">from_proj</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">projection</span><span class="p">,</span>
-                                                   <span class="bp">self</span><span class="o">.</span><span class="n">latLonProjection</span><span class="p">)</span>
-        <span class="n">Lon</span><span class="p">,</span> <span class="n">Lat</span> <span class="o">=</span> <span class="n">transformer</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">)</span>
+                                                   <span class="bp">self</span><span class="o">.</span><span class="n">lat_lon_projection</span><span class="p">)</span>
+        <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span> <span class="o">=</span> <span class="n">transformer</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">Lat</span><span class="p">,</span> <span class="n">Lon</span>
+        <span class="k">return</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_set_coords</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xVarName</span><span class="p">,</span> <span class="n">yVarName</span><span class="p">,</span> <span class="n">xDimName</span><span class="p">,</span> <span class="n">yDimName</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_set_coords</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x_var_name</span><span class="p">,</span> <span class="n">y_var_name</span><span class="p">,</span> <span class="n">x_dim_name</span><span class="p">,</span> <span class="n">y_dim_name</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Set up a coords dict with x, y, lat and lon</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">xVarName</span> <span class="o">=</span> <span class="n">xVarName</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">yVarName</span> <span class="o">=</span> <span class="n">yVarName</span>
-        <span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">)</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
-        <span class="p">(</span><span class="n">Lat</span><span class="p">,</span> <span class="n">Lon</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">project_to_lat_lon</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x_var_name</span> <span class="o">=</span> <span class="n">x_var_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_var_name</span> <span class="o">=</span> <span class="n">y_var_name</span>
+        <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+        <span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">project_to_lat_lon</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">coords</span> <span class="o">=</span> <span class="p">{</span><span class="n">xVarName</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;dims&#39;</span><span class="p">:</span> <span class="n">xDimName</span><span class="p">,</span>
-                                  <span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span>
-                                  <span class="s1">&#39;attrs&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="s1">&#39;meters&#39;</span><span class="p">}},</span>
-                       <span class="n">yVarName</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;dims&#39;</span><span class="p">:</span> <span class="n">yDimName</span><span class="p">,</span>
-                                  <span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span>
-                                  <span class="s1">&#39;attrs&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="s1">&#39;meters&#39;</span><span class="p">}},</span>
-                       <span class="s1">&#39;lat&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;dims&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">yDimName</span><span class="p">,</span> <span class="n">xDimName</span><span class="p">),</span>
-                               <span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="n">Lat</span><span class="p">,</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coords</span> <span class="o">=</span> <span class="p">{</span><span class="n">x_var_name</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;dims&#39;</span><span class="p">:</span> <span class="n">x_dim_name</span><span class="p">,</span>
+                                    <span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span>
+                                    <span class="s1">&#39;attrs&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="s1">&#39;meters&#39;</span><span class="p">}},</span>
+                       <span class="n">y_var_name</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;dims&#39;</span><span class="p">:</span> <span class="n">y_dim_name</span><span class="p">,</span>
+                                    <span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span>
+                                    <span class="s1">&#39;attrs&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="s1">&#39;meters&#39;</span><span class="p">}},</span>
+                       <span class="s1">&#39;lat&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;dims&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">y_dim_name</span><span class="p">,</span> <span class="n">x_dim_name</span><span class="p">),</span>
+                               <span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="n">lat</span><span class="p">,</span>
                                <span class="s1">&#39;attrs&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="s1">&#39;degrees&#39;</span><span class="p">}},</span>
-                       <span class="s1">&#39;lon&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;dims&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">yDimName</span><span class="p">,</span> <span class="n">xDimName</span><span class="p">),</span>
-                               <span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="n">Lon</span><span class="p">,</span>
+                       <span class="s1">&#39;lon&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;dims&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">y_dim_name</span><span class="p">,</span> <span class="n">x_dim_name</span><span class="p">),</span>
+                               <span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="n">lon</span><span class="p">,</span>
                                <span class="s1">&#39;attrs&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="s1">&#39;degrees&#39;</span><span class="p">}}}</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">dims</span> <span class="o">=</span> <span class="p">[</span><span class="n">yDimName</span><span class="p">,</span> <span class="n">xDimName</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dimSize</span> <span class="o">=</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">)]</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dims</span> <span class="o">=</span> <span class="p">[</span><span class="n">y_dim_name</span><span class="p">,</span> <span class="n">x_dim_name</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dim_sizes</span> <span class="o">=</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">)]</span></div>
 
 </pre></div>
 

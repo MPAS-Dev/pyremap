@@ -15,8 +15,10 @@
    
       ~LatLonGridDescriptor.__init__
       ~LatLonGridDescriptor.create
+      ~LatLonGridDescriptor.mesh_name_from_attr
       ~LatLonGridDescriptor.read
       ~LatLonGridDescriptor.to_scrip
+      ~LatLonGridDescriptor.write_netcdf
    
    
 

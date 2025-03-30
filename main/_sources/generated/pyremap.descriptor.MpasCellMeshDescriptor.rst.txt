@@ -14,7 +14,9 @@
    .. autosummary::
    
       ~MpasCellMeshDescriptor.__init__
+      ~MpasCellMeshDescriptor.mesh_name_from_attr
       ~MpasCellMeshDescriptor.to_scrip
+      ~MpasCellMeshDescriptor.write_netcdf
    
    
 

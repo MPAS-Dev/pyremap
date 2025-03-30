@@ -14,7 +14,9 @@
    .. autosummary::
    
       ~PointCollectionDescriptor.__init__
+      ~PointCollectionDescriptor.mesh_name_from_attr
       ~PointCollectionDescriptor.to_scrip
+      ~PointCollectionDescriptor.write_netcdf
    
    
 

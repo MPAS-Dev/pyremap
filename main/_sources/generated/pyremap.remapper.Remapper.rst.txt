@@ -14,10 +14,17 @@
    .. autosummary::
    
       ~Remapper.__init__
-      ~Remapper.build_mapping_file
-      ~Remapper.esmf_build_map
-      ~Remapper.remap
-      ~Remapper.remap_file
+      ~Remapper.build_map
+      ~Remapper.dst_from_lon_lat
+      ~Remapper.dst_from_mpas
+      ~Remapper.dst_from_points
+      ~Remapper.dst_from_proj
+      ~Remapper.dst_global_lon_lat
+      ~Remapper.ncremap
+      ~Remapper.remap_numpy
+      ~Remapper.src_from_lon_lat
+      ~Remapper.src_from_mpas
+      ~Remapper.src_from_proj
    
    
 

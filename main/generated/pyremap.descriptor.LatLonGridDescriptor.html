@@ -112,25 +112,25 @@
 <h1>pyremap.descriptor.LatLonGridDescriptor<a class="headerlink" href="#pyremap-descriptor-latlongriddescriptor" title="Link to this heading"></a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyremap.descriptor.LatLonGridDescriptor">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyremap.descriptor.</span></span><span class="sig-name descname"><span class="pre">LatLonGridDescriptor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">meshName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regional</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyremap/descriptor/lat_lon_grid_descriptor.html#LatLonGridDescriptor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyremap.descriptor.LatLonGridDescriptor" title="Link to this definition"></a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyremap.descriptor.</span></span><span class="sig-name descname"><span class="pre">LatLonGridDescriptor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regional</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyremap/descriptor/lat_lon_grid_descriptor.html#LatLonGridDescriptor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyremap.descriptor.LatLonGridDescriptor" title="Link to this definition"></a></dt>
 <dd><p>A class for describing a lat-lon grid</p>
 <dl class="field-list simple">
 <dt class="field-odd">Variables<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>lat</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><em>numpy.ndarray</em></a>) – The latitude coordinate at grid-cell centers</p></li>
 <li><p><strong>lon</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><em>numpy.ndarray</em></a>) – The longitude coordinate at grid-cell centers</p></li>
-<li><p><strong>latCorner</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><em>numpy.ndarray</em></a>) – The latitude coordinate at grid-cell corners</p></li>
-<li><p><strong>lonCorner</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><em>numpy.ndarray</em></a>) – The longitude coordinate at grid-cell corners</p></li>
+<li><p><strong>lat_corner</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><em>numpy.ndarray</em></a>) – The latitude coordinate at grid-cell corners</p></li>
+<li><p><strong>lon_corner</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><em>numpy.ndarray</em></a>) – The longitude coordinate at grid-cell corners</p></li>
 <li><p><strong>history</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – The history attribute written to SCRIP files</p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="pyremap.descriptor.LatLonGridDescriptor.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">meshName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regional</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyremap/descriptor/lat_lon_grid_descriptor.html#LatLonGridDescriptor.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyremap.descriptor.LatLonGridDescriptor.__init__" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regional</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyremap/descriptor/lat_lon_grid_descriptor.html#LatLonGridDescriptor.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyremap.descriptor.LatLonGridDescriptor.__init__" title="Link to this definition"></a></dt>
 <dd><p>Construct a mesh descriptor</p>
 <dl class="simple">
-<dt>meshName<span class="classifier">str or None, optional</span></dt><dd><p>The name of the mesh or grid, used to give mapping files unique
+<dt>mesh_name<span class="classifier">str or None, optional</span></dt><dd><p>The name of the mesh or grid, used to give mapping files unique
 names</p>
 </dd>
 <dt>regional<span class="classifier">bool or None, optional</span></dt><dd><p>Whether this is a regional or global grid.  If <code class="docutils literal notranslate"><span class="pre">None</span></code>, this will
@@ -143,17 +143,23 @@ latitude and longitude to see if they cover the globe.</p>
 <p class="rubric">Methods</p>
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyremap.descriptor.LatLonGridDescriptor.__init__" title="pyremap.descriptor.LatLonGridDescriptor.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>([meshName, regional])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyremap.descriptor.LatLonGridDescriptor.__init__" title="pyremap.descriptor.LatLonGridDescriptor.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>([mesh_name, regional])</p></td>
 <td><p>Construct a mesh descriptor</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="pyremap.descriptor.LatLonGridDescriptor.create.html#pyremap.descriptor.LatLonGridDescriptor.create" title="pyremap.descriptor.LatLonGridDescriptor.create"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create</span></code></a>(latCorner, lonCorner[, units, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="pyremap.descriptor.LatLonGridDescriptor.create.html#pyremap.descriptor.LatLonGridDescriptor.create" title="pyremap.descriptor.LatLonGridDescriptor.create"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create</span></code></a>(lat_corner, lon_corner[, units, ...])</p></td>
 <td><p>Create the lat-lon grid with the given arrays and units.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="pyremap.descriptor.LatLonGridDescriptor.read.html#pyremap.descriptor.LatLonGridDescriptor.read" title="pyremap.descriptor.LatLonGridDescriptor.read"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read</span></code></a>([fileName, ds, latVarName, lonVarName, ...])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">mesh_name_from_attr</span></code>(ds)</p></td>
+<td><p>Get the mesh name from the dataset attributes if not already set</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="pyremap.descriptor.LatLonGridDescriptor.read.html#pyremap.descriptor.LatLonGridDescriptor.read" title="pyremap.descriptor.LatLonGridDescriptor.read"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read</span></code></a>([filename, ds, lat_var_name, ...])</p></td>
 <td><p>Read the lat-lon grid from a file with the given lat/lon var names.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="pyremap.descriptor.LatLonGridDescriptor.to_scrip.html#pyremap.descriptor.LatLonGridDescriptor.to_scrip" title="pyremap.descriptor.LatLonGridDescriptor.to_scrip"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_scrip</span></code></a>(scripFileName[, expandDist, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="pyremap.descriptor.LatLonGridDescriptor.to_scrip.html#pyremap.descriptor.LatLonGridDescriptor.to_scrip" title="pyremap.descriptor.LatLonGridDescriptor.to_scrip"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_scrip</span></code></a>(scrip_filename[, expand_dist, ...])</p></td>
 <td><p>Given a lat-lon grid file, create a SCRIP file based on the grid.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_netcdf</span></code>(ds, filename)</p></td>
+<td><p>Write the mesh to a NetCDF file</p></td>
 </tr>
 </tbody>
 </table>
