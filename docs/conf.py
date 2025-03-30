@@ -184,3 +184,8 @@ html_sidebars = {
         "versions.html",
     ],
 }
+
+html_context = {
+    'current_version': version,
+    # Other context variables
+}
