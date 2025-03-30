@@ -9,6 +9,7 @@
 # distributed with this code, or at
 # https://raw.githubusercontent.com/MPAS-Dev/pyremap/main/LICENSE
 
+import subprocess
 import sys
 
 import netCDF4
@@ -153,22 +154,18 @@ def write_netcdf(ds, filename, format, engine=None, fillvalues=None):
     filename : str
         The path for the NetCDF file to write
 
-    format : {'NETCDF4', 'NETCDF4_CLASSIC', 'NETCDF3_64BIT', 'NETCDF3_CLASSIC'}
-        The NetCDF file format to use.  Default is
-        ``mpas_tools.io.default_format``, which can be modified but which
-        defaults to ``'NETCDF3_64BIT'``
+    format : {'NETCDF4', 'NETCDF4_CLASSIC', 'NETCDF3_64BIT', 'NETCDF3_CLASSIC', 'NETCDF3_64BIT_DATA'}
+        The NetCDF file format to use.
 
     engine : {'netcdf4', 'scipy', 'h5netcdf'}, optional
         The library to use for NetCDF output.  The default is the same as
         in :py:meth:`xarray.Dataset.to_netcdf` and depends on ``format``.
-        You can override the default by setting
-        ``mpas_tools.io.default_engine``
 
     fillvalues : dict, optional
         A dictionary of fill values for different NetCDF types.  Default is
         ``mpas_tools.io.default_fills``, which can be modified but which
         defaults to ``netCDF4.default_fillvals``
-    """
+    """  # noqa: E501
 
     if fillvalues is None:
         fillvalues = netCDF4.default_fillvals
@@ -187,5 +184,22 @@ def write_netcdf(ds, filename, format, engine=None, fillvalues=None):
         else:
             encoding_dict[variable_name] = {'_FillValue': None}
 
+    if format == 'NETCDF3_64BIT_DATA':
+        # NETCDF3_64BIT_DATA needs special treatment because it isn't efficient
+        # in xarray
+        write_format = 'NETCDF4'
+        write_filename = filename.replace('.nc', '_netcdf4.nc')
+    else:
+        write_format = format
+        write_filename = filename
+
     ds.to_netcdf(
-        filename, encoding=encoding_dict, format=format, engine=engine)
+        write_filename,
+        encoding=encoding_dict,
+        format=write_format,
+        engine=engine)
+
+    if format == 'NETCDF3_64BIT_DATA':
+        # Still need to convert to NETCDF3_64BIT_DATA
+        args = ['ncks', '-O', '-5', write_filename, filename]
+        subprocess.run(args, check=True)
