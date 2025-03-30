@@ -27,7 +27,7 @@ for name in versions:
     if os.path.isdir(path) and name not in ('shared', '.git'):
         entries.append({
             'version': name,
-            'url': f'../pyremap/{name}/' if local else f'/{name}/'
+            'url': f'../{name}/' if local else f'/pyremap/{name}/'
         })
 
 os.makedirs(shared_dir, exist_ok=True)
