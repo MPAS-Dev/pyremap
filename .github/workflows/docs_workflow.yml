@@ -63,7 +63,7 @@ jobs:
           rm -rf gh-pages/${{ github.ref_name }}
 
           # don't clobber existing release versions (in case we retroactively fixed them)
-          cp -r -n _build/html/${{ github.ref_name }} gh-pages/
+          cp -r _build/html/${{ github.ref_name }} gh-pages/
 
           mkdir -p gh-pages/shared
           cp shared/version-switcher.js gh-pages/shared/version-switcher.js
