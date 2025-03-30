@@ -1,5 +1,28 @@
 {% extends "!layout.html" %}
+
 {% block extrahead %}
     <link href="{{ pathto("_static/style.css", True) }}" rel="stylesheet" type="text/css">
 {% endblock %}
 
+{% block footer %}
+    {{ super() }}
+
+    <!-- Inject version info -->
+    <meta name="doc-version" content="{{ current_version }}">
+
+    <!-- Create switcher container -->
+    <script>
+      // Inject the switcher div into the top of the sidebar
+      const sidebar = document.querySelector('.wy-side-nav-search');
+      if (sidebar) {
+        const versionDiv = document.createElement('div');
+        versionDiv.id = 'version-switcher';
+        versionDiv.style.marginTop = '1em';
+        sidebar.appendChild(versionDiv);
+      }
+    </script>
+
+    <!-- Load version switcher JS -->
+    <script src="../shared/version-switcher.js"></script>
+
+{% endblock %}

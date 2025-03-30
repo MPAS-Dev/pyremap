@@ -26,7 +26,6 @@ from pyremap.docs.parse_quick_start import build_quick_start
 # ones.
 extensions = [
     'sphinx_rtd_theme',
-    'sphinx_multiversion',
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
     'sphinx.ext.intersphinx',
@@ -186,7 +185,7 @@ html_sidebars = {
     ],
 }
 
-# -- Options sphinx-multiversion -------------------------------------------
-smv_tag_whitelist = r'^\d+\.\d+.\d+$'
-smv_branch_whitelist = 'main'
-smv_remote_whitelist = 'origin'
+html_context = {
+    'current_version': version,
+    # Other context variables
+}
