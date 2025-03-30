@@ -13,7 +13,7 @@ import numpy as np
 import xarray as xr
 
 from pyremap.descriptor.mesh_descriptor import MeshDescriptor
-from pyremap.descriptor.utility import add_history, write_netcdf
+from pyremap.descriptor.utility import add_history
 
 
 class PointCollectionDescriptor(MeshDescriptor):
@@ -143,4 +143,4 @@ class PointCollectionDescriptor(MeshDescriptor):
 
         ds.attrs['meshName'] = self.meshName
         ds.attrs['history'] = self.history
-        write_netcdf(ds, scripFileName, format=self.format)
+        self.write_netcdf(ds, scripFileName)

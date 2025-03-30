@@ -9,10 +9,8 @@
 # distributed with this code, or at
 # https://raw.githubusercontent.com/MPAS-Dev/pyremap/main/LICENSE
 
-import subprocess
 import sys
 
-import netCDF4
 import numpy as np
 import pyproj.enums
 from pyproj import Transformer
@@ -140,100 +138,3 @@ def add_history(ds=None):
             prev_hist = '\n'.join(prev_hist)
         history = '\n'.join([prev_hist, history])
     return history
-
-
-def write_netcdf(ds, filename, format, engine=None, fillvalues=None):
-    """
-    Write an xarray.Dataset to a file with NetCDF4 fill values.
-
-    Parameters
-    ----------
-    ds : xarray.Dataset
-        The dataset to save
-
-    filename : str
-        The path for the NetCDF file to write
-
-    format : {'NETCDF4', 'NETCDF4_CLASSIC', 'NETCDF3_64BIT', 'NETCDF3_CLASSIC', 'NETCDF3_64BIT_DATA'}
-        The NetCDF file format to use.
-
-    engine : {'netcdf4', 'scipy', 'h5netcdf'}, optional
-        The library to use for NetCDF output.  The default is the same as
-        in :py:meth:`xarray.Dataset.to_netcdf` and depends on ``format``.
-
-    fillvalues : dict, optional
-        A dictionary of fill values for different NetCDF types.  Default is
-        ``mpas_tools.io.default_fills``, which can be modified but which
-        defaults to ``netCDF4.default_fillvals``
-    """  # noqa: E501
-
-    if fillvalues is None:
-        fillvalues = netCDF4.default_fillvals
-
-    encoding_dict = {}
-    variable_names = list(ds.data_vars.keys()) + list(ds.coords.keys())
-    for variable_name in variable_names:
-        is_numeric = np.issubdtype(ds[variable_name].dtype, np.number)
-        if is_numeric and np.any(np.isnan(ds[variable_name])):
-            dtype = ds[variable_name].dtype
-            for fill_type in fillvalues:
-                if dtype == np.dtype(fill_type):
-                    encoding_dict[variable_name] = \
-                        {'_FillValue': fillvalues[fill_type]}
-                    break
-        else:
-            encoding_dict[variable_name] = {'_FillValue': None}
-
-    if format == 'NETCDF3_64BIT_DATA':
-        # NETCDF3_64BIT_DATA needs special treatment because it isn't efficient
-        # in xarray
-        write_format = 'NETCDF4'
-        write_filename = filename.replace('.nc', '_netcdf4.nc')
-    else:
-        write_format = format
-        write_filename = filename
-
-    ds.to_netcdf(
-        write_filename,
-        encoding=encoding_dict,
-        format=write_format,
-        engine=engine)
-
-    if format == 'NETCDF3_64BIT_DATA':
-        # Still need to convert to NETCDF3_64BIT_DATA
-        args = ['ncks', '-O', '-5', write_filename, filename]
-        check_call(args)
-
-
-def check_call(args, log_command=True, **kwargs):
-    """
-    Call the given subprocess
-
-    Parameters
-    ----------
-    args : list or str
-        A list or string of argument to the subprocess.  If ``args`` is a
-        string, you must pass ``shell=True`` as one of the ``kwargs``.
-
-    log_command : bool, optional
-        Whether to print the command that is running
-
-    **kwargs : dict
-        Keyword arguments to pass to subprocess.Popen
-
-    Raises
-    ------
-    subprocess.CalledProcessError
-        If the given subprocess exists with nonzero status
-
-    """
-
-    if isinstance(args, str):
-        print_args = args
-    else:
-        print_args = ' '.join(args)
-
-    if log_command:
-        print(f'Running: {print_args}')
-
-    subprocess.run(args, check=True, **kwargs)

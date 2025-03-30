@@ -13,7 +13,7 @@ import numpy as np
 import xarray as xr
 
 from pyremap.descriptor.mesh_descriptor import MeshDescriptor
-from pyremap.descriptor.utility import add_history, expand_scrip, write_netcdf
+from pyremap.descriptor.utility import add_history, expand_scrip
 
 
 class MpasVertexMeshDescriptor(MeshDescriptor):
@@ -178,4 +178,4 @@ class MpasVertexMeshDescriptor(MeshDescriptor):
 
         ds_out.attrs['meshName'] = self.meshName
         ds_out.attrs['history'] = self.history
-        write_netcdf(ds_out, scripFileName, format=self.format)
+        self.write_netcdf(ds_out, scripFileName)

@@ -19,7 +19,6 @@ from pyremap.descriptor.utility import (
     interp_extrap_corner,
     round_res,
     unwrap_corners,
-    write_netcdf,
 )
 
 
@@ -251,7 +250,7 @@ class LatLonGridDescriptor(MeshDescriptor):
 
         ds.attrs['meshName'] = self.meshName
         ds.attrs['history'] = self.history
-        write_netcdf(ds, scripFileName, format=self.format)
+        self.write_netcdf(ds, scripFileName)
 
     def _set_coords(self, latVarName, lonVarName, latDimName,
                     lonDimName):

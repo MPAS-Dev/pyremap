@@ -19,7 +19,6 @@ from pyremap.descriptor.utility import (
     expand_scrip,
     interp_extrap_corner,
     unwrap_corners,
-    write_netcdf,
 )
 
 
@@ -234,7 +233,7 @@ class ProjectionGridDescriptor(MeshDescriptor):
 
         ds.attrs['meshName'] = self.meshName
         ds.attrs['history'] = self.history
-        write_netcdf(ds, scripFileName, format=self.format)
+        self.write_netcdf(ds, scripFileName)
 
     def project_to_lat_lon(self, X, Y):
         """

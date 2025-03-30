@@ -9,6 +9,8 @@
 # distributed with this code, or at
 # https://raw.githubusercontent.com/MPAS-Dev/pyremap/main/LICENSE
 
+from pyremap.utility import write_netcdf as write_netcdf_util
+
 
 class MeshDescriptor:
     """
@@ -39,6 +41,10 @@ class MeshDescriptor:
     engine : {'netcdf4', 'scipy', 'h5netcdf'}
         The library to use for xarray NetCDF output.  The default is
         ``'netcdf4'``
+
+    logger : logging.Logger or None
+        A logger for command-line output.  If None, the logger will be set to
+        stdout/stderr.
     """
     def __init__(self, meshName=None, regional=None):
         """
@@ -60,6 +66,7 @@ class MeshDescriptor:
         self.coords = None
         self.format = 'NETCDF4'
         self.engine = None
+        self.logger = None
 
     def to_scrip(self, scripFileName, expandDist=None, expandFactor=None):
         """
@@ -81,3 +88,24 @@ class MeshDescriptor:
         """
         raise NotImplementedError(
             'to_scrip is not implemented for this descriptor')
+
+    def write_netcdf(self, ds, filename):
+        """
+        Write the mesh to a NetCDF file
+
+        Parameters
+        ----------
+        ds : xarray.Dataset
+            The dataset to save
+
+        filename : str
+            The path for the NetCDF file to write
+
+        """
+        write_netcdf_util(
+            ds,
+            filename,
+            format=self.format,
+            engine=self.engine,
+            logger=self.logger
+        )
