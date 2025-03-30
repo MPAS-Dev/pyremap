@@ -2,6 +2,7 @@ import os
 
 from pyremap.remapper.build_map import _build_map
 from pyremap.remapper.ncremap import _ncremap
+from pyremap.remapper.remap_numpy import _remap_numpy
 from pyremap.remapper.setup import _setup_remapper
 
 
@@ -116,6 +117,8 @@ class Remapper:
         self.esmf_path = None
         self.moab_path = None
         self.parallel_exec = 'mpirun'
+        self._ds_map = None
+        self._matrix = None
 
     def src_from_lon_lat(
         self, filename, mesh_name=None, lon_var='lon', lat_var='lat'
@@ -455,3 +458,29 @@ class Remapper:
             replace_mpas_fill,
             parallel_exec
         )
+
+    def remap_numpy(self, ds, renormalization_threshold=None):
+        """
+        Given a source data set, returns a remapped version of the data set,
+        possibly masked and renormalized.
+
+        Parameters
+        ----------
+        ds : xarray.Dataset or xarray.DataArray
+            The dimention(s) along ``self.sourceDimNames`` must match
+            ``self.src_grid_dims`` read from the mapping file.
+
+        renormalization_threshold : float, optional
+            The minimum weight of a denstination cell after remapping, below
+            which it is masked out, or ``None`` for no renormalization and
+            masking.
+
+        Returns
+        -------
+        ds_remap : xarray.Dataset or xarray.DataArray
+            Returns a remapped data set (or data array) where dimensions other
+            than ``self.src_descriptor.dims`` are the same as in ``ds`` and the
+            dimension(s) given by ``self.src_descriptor.dims`` have been
+            replaced by ``self.dst_descriptor.dims``.
+        """
+        return _remap_numpy(self, ds, renormalization_threshold)
