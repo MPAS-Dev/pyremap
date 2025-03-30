@@ -9,9 +9,10 @@ these same gridss.
 Usage: Copy this script into the main MPAS-Analysis directory (up one level).
 """
 
-import numpy
-import xarray
 import argparse
+
+import numpy as np
+import xarray as xr
 
 from pyremap import Remapper, ProjectionGridDescriptor
 from pyremap.polar import get_antarctic_stereographic_projection
@@ -19,55 +20,53 @@ from pyremap.polar import get_antarctic_stereographic_projection
 
 parser = argparse.ArgumentParser(
     description=__doc__, formatter_class=argparse.RawTextHelpFormatter)
-parser.add_argument('-i', dest='inFileName', required=True, type=str,
-                    help="Input file name")
-parser.add_argument('-o', dest='outFileName', required=True, type=str,
-                    help="Output file name")
+parser.add_argument('-i', dest='in_filename', required=True, type=str,
+                    help='Input file name')
+parser.add_argument('-o', dest='out_filename', required=True, type=str,
+                    help='Output file name')
 parser.add_argument('-r', dest='resolution', required=True, type=float,
-                    help="Output resolution")
-parser.add_argument('-m', dest='method', required=False, default="bilinear",
-                    help="Method: {'bilinear', 'neareststod', 'conserve'}")
-parser.add_argument('-t', dest='mpiTasks', required=False, type=int, default=1,
-                    help="Number of MPI tasks (default = 1)")
+                    help='Output resolution')
+parser.add_argument('-m', dest='method', required=False, default='bilinear',
+                    help='Method: {"bilinear", "neareststod", "conserve"}')
+parser.add_argument('-t', dest='mpi_tasks', required=False, type=int,
+                    default=1,
+                    help='Number of MPI tasks (default = 1)')
 args = parser.parse_args()
 
 
 if args.method not in ['bilinear', 'neareststod', 'conserve']:
     raise ValueError(f'Unexpected method {args.method}')
 
-dsIn = xarray.open_dataset(args.inFileName)
+ds_in = xr.open_dataset(args.in_filename)
 
-x = dsIn.x.values
-y = dsIn.y.values
-dx = int((x[1] - x[0]) / 1000.)
-Lx = int((x[-1] - x[0]) / 1000.)
-Ly = int((y[-1] - y[0]) / 1000.)
+x = ds_in.x.values
+y = ds_in.y.values
+dx = int((x[1] - x[0]) / 1000.0)
+lx = int((x[-1] - x[0]) / 1000.0)
+ly = int((y[-1] - y[0]) / 1000.0)
 
-inMeshName = f'{Lx}x{Ly}km_{dx}km_Antarctic_stereo'
+src_mesh_name = f'{lx}x{ly}km_{dx}km_Antarctic_stereo'
 
 projection = get_antarctic_stereographic_projection()
 
-inDescriptor = ProjectionGridDescriptor.create(projection, x, y, inMeshName)
+remapper = Remapper(ntasks=args.mpi_tasks, method=args.method)
+remapper.src_descriptor = ProjectionGridDescriptor.create(
+    projection, x, y, src_mesh_name)
 
-outRes = args.resolution * 1e3
+out_res = args.resolution * 1e3
 
-nxOut = int((x[-1] - x[0]) / outRes + 0.5) + 1
-nyOut = int((y[-1] - y[0]) / outRes + 0.5) + 1
+nx_out = int((x[-1] - x[0]) / out_res + 0.5) + 1
+ny_out = int((y[-1] - y[0]) / out_res + 0.5) + 1
 
-xOut = x[0] + outRes * numpy.arange(nxOut)
-yOut = y[0] + outRes * numpy.arange(nyOut)
+x_out = x[0] + out_res * np.arange(nx_out)
+y_out = y[0] + out_res * np.arange(ny_out)
 
+dst_mesh_name = f'{lx}x{ly}km_{args.resolution}km_Antarctic_stereo'
 
-outMeshName = f'{Lx}x{Ly}km_{args.resolution}km_Antarctic_stereo'
+remapper.dst_descriptor = ProjectionGridDescriptor.create(
+    projection, x_out, y_out, dst_mesh_name)
 
-outDescriptor = ProjectionGridDescriptor.create(projection, xOut, yOut,
-                                                outMeshName)
+remapper.build_map()
 
-mappingFileName = f'map_{inMeshName}_to_{outMeshName}_{args.method}.nc'
-
-remapper = Remapper(inDescriptor, outDescriptor, mappingFileName)
-
-remapper.esmf_build_map(method=args.method, mpi_tasks=args.mpiTasks)
-
-dsOut = remapper.remap(dsIn, renormalizationThreshold=0.01)
-dsOut.to_netcdf(args.outFileName)
+ds_out = remapper.remap_numpy(ds_in, renormalization_threshold=0.01)
+ds_out.to_netcdf(args.out_filename)

@@ -13,7 +13,7 @@ import numpy as np
 import xarray as xr
 
 from pyremap.descriptor.mesh_descriptor import MeshDescriptor
-from pyremap.descriptor.utility import add_history, write_netcdf
+from pyremap.descriptor.utility import add_history
 
 
 class PointCollectionDescriptor(MeshDescriptor):
@@ -34,9 +34,8 @@ class PointCollectionDescriptor(MeshDescriptor):
     history : str
         The history attribute written to SCRIP files
     """
-
-    def __init__(self, lats, lons, collectionName, units='degrees',
-                 outDimension='nPoints'):
+    def __init__(self, lats, lons, collection_name, units='degrees',
+                 out_dimension='n_points'):
         """
         Constructor stores
 
@@ -48,48 +47,48 @@ class PointCollectionDescriptor(MeshDescriptor):
         lons : numpy.ndarray
             The longitude of each point
 
-        collectionName : str
+        collection_name : str
             A unique name for the collection of transects, used in the names
             of files containing data mapped to these points.
 
         units : {'degrees', 'radians'}, optional
             The units of ``lats`` and ``lons``
 
-        outDimension : str, optional
+        out_dimension : str, optional
             The name of the dimension corresponding to the points (i.e. the
             "horizontal" dimension of the point collection)
         """
-        super().__init__(meshName=collectionName, regional=True)
+        super().__init__(mesh_name=collection_name, regional=True)
 
         self.lat = lats
         self.lon = lons
         self.units = units
 
         # build coords
-        self.coords = {'lat': {'dims': outDimension,
+        self.coords = {'lat': {'dims': out_dimension,
                                'data': self.lat,
                                'attrs': {'units': units}},
-                       'lon': {'dims': outDimension,
+                       'lon': {'dims': out_dimension,
                                'data': self.lon,
                                'attrs': {'units': units}}}
-        self.dims = [outDimension]
-        self.dimSize = [len(self.lat)]
+        self.dims = [out_dimension]
+        self.dim_sizes = [len(self.lat)]
         self.history = add_history()
 
-    def to_scrip(self, scripFileName, expandDist=None, expandFactor=None):
+    def to_scrip(self, scrip_filename, expand_dist=None, expand_factor=None):
         """
         Write a SCRIP file for the point collection
 
         Parameters
         ----------
-        scripFileName : str
+        scrip_filename : str
             The path to which the SCRIP file should be written
 
-        expandDist : float or numpy.ndarray, optional
+        expand_dist : float or numpy.ndarray, optional
             A distance in meters to expand each grid cell outward from the
             center.  If a ``numpy.ndarray``, one value per cell.
 
-        expandFactor : float or numpy.ndarray, optional
+        expand_factor : float or numpy.ndarray, optional
             A factor by which to expand each grid cell outward from the center.
             If a ``numpy.ndarray``, one value per cell.
         """
@@ -141,6 +140,6 @@ class PointCollectionDescriptor(MeshDescriptor):
         ds.grid_corner_lon.attrs['units'] = self.units
         ds.grid_imask.attrs['units'] = 'unitless'
 
-        ds.attrs['meshName'] = self.meshName
+        ds.attrs['mesh_name'] = self.mesh_name
         ds.attrs['history'] = self.history
-        write_netcdf(ds, scripFileName, format=self.format)
+        self.write_netcdf(ds, scrip_filename)

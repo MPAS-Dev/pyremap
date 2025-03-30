@@ -13,7 +13,7 @@ import numpy as np
 import xarray as xr
 
 from pyremap.descriptor.mesh_descriptor import MeshDescriptor
-from pyremap.descriptor.utility import add_history, expand_scrip, write_netcdf
+from pyremap.descriptor.utility import add_history, expand_scrip
 
 
 class MpasCellMeshDescriptor(MeshDescriptor):
@@ -22,78 +22,76 @@ class MpasCellMeshDescriptor(MeshDescriptor):
 
     Attributes
     ----------
-    fileName : str
+    filename : str
         The path of the file containing the MPAS mesh
 
     history : str
         The history attribute written to SCRIP files
     """
-    def __init__(self, fileName, meshName=None):
+    def __init__(self, filename, mesh_name=None):
         """
         Constructor stores the file name
 
         Parameters
         ----------
-        fileName : str
+        filename : str
             The path of the file containing the MPAS mesh
 
-        meshName : str, optional
+        mesh_name : str, optional
             The name of the MPAS mesh (e.g. ``'oEC60to30'`` or
-            ``'oRRS18to6'``).  If not provided, the data set in ``fileName``
-            must have a global attribute ``meshName`` that will be used
+            ``'oRRS18to6'``).  If not provided, the data set in ``filename``
+            must have a global attribute ``mesh_name`` that will be used
             instead.
         """
         super().__init__()
 
-        with xr.open_dataset(fileName) as ds:
+        with xr.open_dataset(filename) as ds:
 
-            if meshName is None:
-                if 'meshName' not in ds.attrs:
-                    raise ValueError('No meshName provided or found in file.')
-                self.meshName = ds.attrs['meshName']
-            else:
-                self.meshName = meshName
+            self.mesh_name = mesh_name
+            self.mesh_name_from_attr(ds)
+            if self.mesh_name is None:
+                raise ValueError('No mesh_name provided or found in file.')
 
-            self.fileName = fileName
+            self.filename = filename
             self.regional = True
 
             # build coords
             self.coords = {
-                'latCell': {
+                'lat_cell': {
                     'dims': 'nCells',
                     'data': ds.latCell.values,
                     'attrs': {'units': 'radians'}
                 },
-                'lonCell': {
+                'lon_cell': {
                     'dims': 'nCells',
                     'data': ds.lonCell.values,
                     'attrs': {'units': 'radians'}
                 },
             }
             self.dims = ['nCells']
-            self.dimSize = [ds.sizes[dim] for dim in self.dims]
+            self.dim_sizes = [ds.sizes[dim] for dim in self.dims]
 
             self.history = add_history(ds=ds)
 
-    def to_scrip(self, scripFileName, expandDist=None, expandFactor=None):
+    def to_scrip(self, scrip_filename, expand_dist=None, expand_factor=None):
         """
         Create a SCRIP file from the MPAS mesh.
 
         Parameters
         ----------
-        scripFileName : str
+        scrip_filename : str
             The path to which the SCRIP file should be written
 
-        expandDist : float or numpy.ndarray, optional
+        expand_dist : float or numpy.ndarray, optional
             A distance in meters to expand each grid cell outward from the
             center.  If a ``numpy.ndarray``, one value per cell.
 
-        expandFactor : float or numpy.ndarray, optional
+        expand_factor : float or numpy.ndarray, optional
             A factor by which to expand each grid cell outward from the center.
             If a ``numpy.ndarray``, one value per cell.
         """
 
-        ds_in = xr.open_dataset(self.fileName)
+        ds_in = xr.open_dataset(self.filename)
         lat_cell = ds_in.latCell.values
         lon_cell = ds_in.lonCell.values
         lat_vertex = ds_in.latVertex.values
@@ -144,8 +142,8 @@ class MpasCellMeshDescriptor(MeshDescriptor):
             dims=('grid_size',)
         )
 
-        if expandDist is not None or expandFactor is not None:
-            expand_scrip(ds_out, expandDist, expandFactor)
+        if expand_dist is not None or expand_factor is not None:
+            expand_scrip(ds_out, expand_dist, expand_factor)
 
         ds_out.grid_center_lat.attrs['units'] = 'radians'
         ds_out.grid_center_lon.attrs['units'] = 'radians'
@@ -154,6 +152,6 @@ class MpasCellMeshDescriptor(MeshDescriptor):
         ds_out.grid_imask.attrs['units'] = 'unitless'
         ds_out.grid_area.attrs['units'] = 'radians^2'
 
-        ds_out.attrs['meshName'] = self.meshName
+        ds_out.attrs['mesh_name'] = self.mesh_name
         ds_out.attrs['history'] = self.history
-        write_netcdf(ds_out, scripFileName, format=self.format)
+        self.write_netcdf(ds_out, scrip_filename)

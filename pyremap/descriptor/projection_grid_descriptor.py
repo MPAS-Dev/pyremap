@@ -19,7 +19,6 @@ from pyremap.descriptor.utility import (
     expand_scrip,
     interp_extrap_corner,
     unwrap_corners,
-    write_netcdf,
 )
 
 
@@ -34,7 +33,7 @@ class ProjectionGridDescriptor(MeshDescriptor):
         The projection used to map from grid x-y space to latitude and
         longitude
 
-    latLonProjection : pyproj.Proj
+    lat_lon_projection : pyproj.Proj
         lat-lon projection used to transform from x-y to lat-lon space
 
     x : numpy.ndarray
@@ -43,25 +42,22 @@ class ProjectionGridDescriptor(MeshDescriptor):
     y : numpy.ndarray
         The longitude coordinate at grid-cell centers
 
-    xCorner : numpy.ndarray
+    x_corner : numpy.ndarray
         The latitude coordinate at grid-cell corners
 
-    yCorner : numpy.ndarray
+    y_corner : numpy.ndarray
         The longitude coordinate at grid-cell corners
 
     history : str
         The history attribute written to SCRIP files
 
-    xVarName : str
+    x_var_name : str
         The name of the x variable
 
-    yVarName : str
+    y_var_name : str
         The name of the y variable
-
-    history : str
-        The history attribute written to SCRIP files
     """
-    def __init__(self, projection, meshName=None):
+    def __init__(self, projection, mesh_name=None):
         """
         Constructor stores the projection
 
@@ -71,26 +67,25 @@ class ProjectionGridDescriptor(MeshDescriptor):
             The projection used to map from grid x-y space to latitude and
             longitude
 
-        meshName : str, optional
+        mesh_name : str, optional
             The name of the grid (e.g. ``'10km_Antarctic_stereo'``)
         """
-        super().__init__(meshName=meshName, regional=True)
+        super().__init__(mesh_name=mesh_name, regional=True)
 
         self.projection = projection
-        self.latLonProjection = pyproj.Proj(proj='latlong', datum='WGS84')
+        self.lat_lon_projection = pyproj.Proj(proj='latlong', datum='WGS84')
 
         self.x = None
         self.y = None
-        self.xCorner = None
-        self.yCorner = None
+        self.x_corner = None
+        self.y_corner = None
         self.history = None
-        self.xVarName = None
-        self.yVarName = None
-        self.history = None
+        self.x_var_name = None
+        self.y_var_name = None
 
     @classmethod
-    def read(cls, projection, fileName, meshName=None, xVarName='x',
-             yVarName='y'):
+    def read(cls, projection, filename, mesh_name=None, x_var_name='x',
+             y_var_name='y'):
         """
         Given a grid file with x and y coordinates defining the axes of the
         logically rectangular grid, read in the x and y coordinates and
@@ -102,42 +97,40 @@ class ProjectionGridDescriptor(MeshDescriptor):
             The projection used to map from grid x-y space to latitude and
             longitude
 
-        fileName : str
+        filename : str
             The path of the file containing the grid data
 
-        meshName : str, optional
+        mesh_name : str, optional
             The name of the grid (e.g. ``'10km_Antarctic_stereo'``).  If not
-            provided, the data set in ``fileName`` must have a global
-            attribute ``meshName`` that will be used instead.
+            provided, the data set in ``filename`` must have a global
+            attribute ``mesh_name`` of ``meshName`` that will be used instead.
 
-        xVarName, yVarName : str, optional
+        x_var_name, y_var_name : str, optional
             The name of the x and y (in meters) variables in the grid file
         """
-        ds = xr.open_dataset(fileName)
+        ds = xr.open_dataset(filename)
 
-        if meshName is None:
-            if 'meshName' not in ds.attrs:
-                raise ValueError('No meshName provided or found in file.')
-            meshName = ds.attrs['meshName']
-
-        descriptor = cls(projection, meshName=meshName)
+        descriptor = cls(projection, mesh_name=mesh_name)
+        descriptor.mesh_name_from_attr(ds)
+        if descriptor.mesh_name is None:
+            raise ValueError('No mesh_name provided or found in file.')
 
         # Get info from input file
-        descriptor.x = np.array(ds[xVarName].values, float)
-        descriptor.y = np.array(ds[yVarName].values, float)
+        descriptor.x = np.array(ds[x_var_name].values, float)
+        descriptor.y = np.array(ds[y_var_name].values, float)
 
-        descriptor._set_coords(xVarName, yVarName, ds[xVarName].dims[0],
-                               ds[yVarName].dims[0])
+        descriptor._set_coords(x_var_name, y_var_name, ds[x_var_name].dims[0],
+                               ds[y_var_name].dims[0])
 
         # interp/extrap corners
-        descriptor.xCorner = interp_extrap_corner(descriptor.x)
-        descriptor.yCorner = interp_extrap_corner(descriptor.y)
+        descriptor.x_corner = interp_extrap_corner(descriptor.x)
+        descriptor.y_corner = interp_extrap_corner(descriptor.y)
 
         descriptor.history = add_history(ds=ds)
         return descriptor
 
     @classmethod
-    def create(cls, projection, x, y, meshName):
+    def create(cls, projection, x, y, mesh_name):
         """
         Given x and y coordinates defining the axes of the logically
         rectangular grid, save the coordinates interpolate/extrapolate to
@@ -157,10 +150,10 @@ class ProjectionGridDescriptor(MeshDescriptor):
             One dimensional array defining the y coordinate of grid cell
             centers.
 
-        meshName : str
+        mesh_name : str
             The name of the grid (e.g. ``'10km_Antarctic_stereo'``)
         """
-        descriptor = cls(projection, meshName=meshName)
+        descriptor = cls(projection, mesh_name=mesh_name)
 
         descriptor.x = x
         descriptor.y = y
@@ -168,25 +161,25 @@ class ProjectionGridDescriptor(MeshDescriptor):
         descriptor._set_coords('x', 'y', 'x', 'y')
 
         # interp/extrap corners
-        descriptor.xCorner = interp_extrap_corner(descriptor.x)
-        descriptor.yCorner = interp_extrap_corner(descriptor.y)
+        descriptor.x_corner = interp_extrap_corner(descriptor.x)
+        descriptor.y_corner = interp_extrap_corner(descriptor.y)
         descriptor.history = add_history()
         return descriptor
 
-    def to_scrip(self, scripFileName, expandDist=None, expandFactor=None):
+    def to_scrip(self, scrip_filename, expand_dist=None, expand_factor=None):
         """
         Create a SCRIP file based on the grid and projection.
 
         Parameters
         ----------
-        scripFileName : str
+        scrip_filename : str
             The path to which the SCRIP file should be written
 
-        expandDist : float or numpy.ndarray, optional
+        expand_dist : float or numpy.ndarray, optional
             A distance in meters to expand each grid cell outward from the
             center.  If a ``numpy.ndarray``, one value per cell.
 
-        expandFactor : float or numpy.ndarray, optional
+        expand_factor : float or numpy.ndarray, optional
             A factor by which to expand each grid cell outward from the center.
             If a ``numpy.ndarray``, one value per cell.
         """
@@ -199,7 +192,7 @@ class ProjectionGridDescriptor(MeshDescriptor):
         grid_size = nx * ny
 
         (center_x, center_y) = np.meshgrid(self.x, self.y)
-        (corner_x, corner_y) = np.meshgrid(self.xCorner, self.yCorner)
+        (corner_x, corner_y) = np.meshgrid(self.x_corner, self.y_corner)
 
         (center_lat, center_lon) = self.project_to_lat_lon(center_x, center_y)
         (corner_lat, corner_lon) = self.project_to_lat_lon(corner_x, corner_y)
@@ -223,8 +216,8 @@ class ProjectionGridDescriptor(MeshDescriptor):
             dims=('grid_size',)
         )
 
-        if expandDist is not None or expandFactor is not None:
-            expand_scrip(ds, expandDist, expandFactor)
+        if expand_dist is not None or expand_factor is not None:
+            expand_scrip(ds, expand_dist, expand_factor)
 
         ds.grid_center_lat.attrs['units'] = 'degrees'
         ds.grid_center_lon.attrs['units'] = 'degrees'
@@ -232,58 +225,58 @@ class ProjectionGridDescriptor(MeshDescriptor):
         ds.grid_corner_lon.attrs['units'] = 'degrees'
         ds.grid_imask.attrs['units'] = 'unitless'
 
-        ds.attrs['meshName'] = self.meshName
+        ds.attrs['mesh_name'] = self.mesh_name
         ds.attrs['history'] = self.history
-        write_netcdf(ds, scripFileName, format=self.format)
+        self.write_netcdf(ds, scrip_filename)
 
-    def project_to_lat_lon(self, X, Y):
+    def project_to_lat_lon(self, x, y):
         """
-        Given X and Y locations of points in a projection, returns the
+        Given x and y locations of points in a projection, returns the
         corresponding latitude and longitude of each point.
 
         Parameters
         ----------
-        X : numpy.ndarray
+        x : numpy.ndarray
             x array of points in the projection
 
-        Y : numpy.ndarray
+        y : numpy.ndarray
             y array of points in the projection
 
         Returns
         -------
-        Lat : numpy.ndarray
-            The latitude in degrees with the same size as X and Y
+        lat : numpy.ndarray
+            The latitude in degrees with the same size as x and y
 
-        Lon : numpy.ndarray
-            The longitude in degrees with the same size as X and Y
+        lon : numpy.ndarray
+            The longitude in degrees with the same size as x and y
         """
         transformer = pyproj.Transformer.from_proj(self.projection,
-                                                   self.latLonProjection)
-        Lon, Lat = transformer.transform(X, Y)
+                                                   self.lat_lon_projection)
+        lon, lat = transformer.transform(x, y)
 
-        return Lat, Lon
+        return lat, lon
 
-    def _set_coords(self, xVarName, yVarName, xDimName, yDimName):
+    def _set_coords(self, x_var_name, y_var_name, x_dim_name, y_dim_name):
         """
         Set up a coords dict with x, y, lat and lon
         """
-        self.xVarName = xVarName
-        self.yVarName = yVarName
-        (X, Y) = np.meshgrid(self.x, self.y)
-        (Lat, Lon) = self.project_to_lat_lon(X, Y)
+        self.x_var_name = x_var_name
+        self.y_var_name = y_var_name
+        (x, y) = np.meshgrid(self.x, self.y)
+        (lat, lon) = self.project_to_lat_lon(x, y)
 
-        self.coords = {xVarName: {'dims': xDimName,
-                                  'data': self.x,
-                                  'attrs': {'units': 'meters'}},
-                       yVarName: {'dims': yDimName,
-                                  'data': self.y,
-                                  'attrs': {'units': 'meters'}},
-                       'lat': {'dims': (yDimName, xDimName),
-                               'data': Lat,
+        self.coords = {x_var_name: {'dims': x_dim_name,
+                                    'data': self.x,
+                                    'attrs': {'units': 'meters'}},
+                       y_var_name: {'dims': y_dim_name,
+                                    'data': self.y,
+                                    'attrs': {'units': 'meters'}},
+                       'lat': {'dims': (y_dim_name, x_dim_name),
+                               'data': lat,
                                'attrs': {'units': 'degrees'}},
-                       'lon': {'dims': (yDimName, xDimName),
-                               'data': Lon,
+                       'lon': {'dims': (y_dim_name, x_dim_name),
+                               'data': lon,
                                'attrs': {'units': 'degrees'}}}
 
-        self.dims = [yDimName, xDimName]
-        self.dimSize = [len(self.y), len(self.x)]
+        self.dims = [y_dim_name, x_dim_name]
+        self.dim_sizes = [len(self.y), len(self.x)]
