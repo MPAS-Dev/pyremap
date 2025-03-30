@@ -202,4 +202,38 @@ def write_netcdf(ds, filename, format, engine=None, fillvalues=None):
     if format == 'NETCDF3_64BIT_DATA':
         # Still need to convert to NETCDF3_64BIT_DATA
         args = ['ncks', '-O', '-5', write_filename, filename]
-        subprocess.run(args, check=True)
+        check_call(args)
+
+
+def check_call(args, log_command=True, **kwargs):
+    """
+    Call the given subprocess
+
+    Parameters
+    ----------
+    args : list or str
+        A list or string of argument to the subprocess.  If ``args`` is a
+        string, you must pass ``shell=True`` as one of the ``kwargs``.
+
+    log_command : bool, optional
+        Whether to print the command that is running
+
+    **kwargs : dict
+        Keyword arguments to pass to subprocess.Popen
+
+    Raises
+    ------
+    subprocess.CalledProcessError
+        If the given subprocess exists with nonzero status
+
+    """
+
+    if isinstance(args, str):
+        print_args = args
+    else:
+        print_args = ' '.join(args)
+
+    if log_command:
+        print(f'Running: {print_args}')
+
+    subprocess.run(args, check=True, **kwargs)
