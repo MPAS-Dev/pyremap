@@ -20,8 +20,6 @@ flake8
 pre-commit
 
 # Documentation
-mock
-pillow
-sphinx
+sphinx >=7.0.0
 sphinx_rtd_theme
-m2r2
+myst-parser

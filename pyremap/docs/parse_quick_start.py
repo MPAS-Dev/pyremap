@@ -1,6 +1,3 @@
-from m2r2 import convert
-
-
 def build_quick_start():
 
     replace = {'# pyremap': '# Quick Start'}
@@ -22,8 +19,6 @@ def build_quick_start():
                         break
                 outContent = outContent + line
 
-    outContent = convert(outContent)
-
-    with open('quick_start.rst', 'w') as outFile:
-        outFile.write('.. _quick_start:\n\n')
+    with open('quick_start.md', 'w') as outFile:
+        outFile.write('(quick_start)=\n\n')
         outFile.write(outContent)
