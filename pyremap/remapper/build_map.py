@@ -19,12 +19,8 @@ def _build_map(remapper):
     if remapper.use_tmp:
         tempobj = TemporaryDirectory()
         scrip_dir = os.path.join(tempobj.name, scrip_dir)
-        src_scrip_filename = os.path.join(
-            tempobj.name, src_scrip_filename
-        )
-        dst_scrip_filename = os.path.join(
-            tempobj.name, dst_scrip_filename
-        )
+        src_scrip_filename = os.path.join(tempobj.name, src_scrip_filename)
+        dst_scrip_filename = os.path.join(tempobj.name, dst_scrip_filename)
     else:
         tempobj = None
 
@@ -43,14 +39,14 @@ def _build_map(remapper):
 
     if map_tool == 'esmf':
         args = _esmf_build_map_args(
-            remapper, src_scrip_filename, dst_scrip_filename)
+            remapper, src_scrip_filename, dst_scrip_filename
+        )
 
         esmf_path = remapper.esmf_path
         if esmf_path is None:
             esmf_exe = 'ESMF_RegridWeightGen'
         else:
-            esmf_exe = os.path.join(
-                esmf_path, 'bin', 'ESMF_RegridWeightGen')
+            esmf_exe = os.path.join(esmf_path, 'bin', 'ESMF_RegridWeightGen')
         args = [esmf_exe] + args
 
     elif map_tool == 'moab':
@@ -62,7 +58,8 @@ def _build_map(remapper):
             remapper, dst_scrip_filename, moab_path
         )
         args = _moab_build_map_args(
-            remapper, src_scrip_filename, dst_scrip_filename)
+            remapper, src_scrip_filename, dst_scrip_filename
+        )
 
         if moab_path is None:
             moab_exe = 'mbtempest'

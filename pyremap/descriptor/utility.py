@@ -76,19 +76,21 @@ def expand_scrip(ds, expand_dist, expand_factor):
         grid_center_lon.values,
         grid_center_lat.values,
         np.zeros(grid_size),
-        radians=radians)
+        radians=radians,
+    )
 
     x_corner, y_corner, z_corner = trans_lon_lat_to_xyz.transform(
         grid_corner_lon.values,
         grid_corner_lat.values,
         np.zeros((grid_size, grid_corners)),
-        radians=radians)
+        radians=radians,
+    )
 
     if expand_factor is None:
-        expand_factor = 1.
+        expand_factor = 1.0
 
     if expand_dist is None:
-        expand_dist = 0.
+        expand_dist = 0.0
 
     for index in range(grid_corners):
         dx = x_corner[:, index] - x_center
@@ -105,7 +107,8 @@ def expand_scrip(ds, expand_dist, expand_factor):
         y_corner,
         z_corner,
         radians=radians,
-        direction=pyproj.enums.TransformDirection.INVERSE)
+        direction=pyproj.enums.TransformDirection.INVERSE,
+    )
 
     ds['grid_corner_lat'] = (('grid_size', 'grid_corners'), grid_corner_lat)
     ds['grid_corner_lon'] = (('grid_size', 'grid_corners'), grid_corner_lon)
@@ -114,7 +117,8 @@ def expand_scrip(ds, expand_dist, expand_factor):
 def unwrap_corners(in_field):
     """Turn a 2D array of corners into an array of rectangular mesh elements"""
     out_field = np.zeros(
-        ((in_field.shape[0] - 1) * (in_field.shape[1] - 1), 4))
+        ((in_field.shape[0] - 1) * (in_field.shape[1] - 1), 4)
+    )
     # corners are counterclockwise
     out_field[:, 0] = in_field[0:-1, 0:-1].flat
     out_field[:, 1] = in_field[0:-1, 1:].flat
@@ -126,7 +130,7 @@ def unwrap_corners(in_field):
 
 def round_res(res):
     """Round the resolution to a reasonable number for grid names"""
-    rounded = np.round(res * 1000.) / 1000.
+    rounded = np.round(res * 1000.0) / 1000.0
     return f'{rounded}'
 
 

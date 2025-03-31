@@ -47,6 +47,7 @@ class LatLon2DGridDescriptor(MeshDescriptor):
     history : str
         The history attribute written to SCRIP files
     """
+
     def __init__(self, mesh_name=None, regional=True):
         """
         Construct a mesh descriptor
@@ -67,8 +68,15 @@ class LatLon2DGridDescriptor(MeshDescriptor):
         self.history = None
 
     @classmethod
-    def read(cls, filename=None, ds=None, lat_var_name='lat',
-             lon_var_name='lon', mesh_name=None, regional=True):
+    def read(
+        cls,
+        filename=None,
+        ds=None,
+        lat_var_name='lat',
+        lon_var_name='lon',
+        mesh_name=None,
+        regional=True,
+    ):
         """
         Read the lat-lon grid from a file with the given lat/lon var names.
 
@@ -117,7 +125,7 @@ class LatLon2DGridDescriptor(MeshDescriptor):
             lat_var_name,
             lon_var_name,
             ds[lat_var_name].dims[0],
-            ds[lat_var_name].dims[1]
+            ds[lat_var_name].dims[1],
         )
 
         descriptor.history = add_history(ds=ds)
@@ -145,22 +153,22 @@ class LatLon2DGridDescriptor(MeshDescriptor):
         ds['grid_center_lat'] = (('grid_size',), self.lat.flat)
         ds['grid_center_lon'] = (('grid_size',), self.lon.flat)
         ds['grid_corner_lat'] = (
-            ('grid_size', 'grid_corners'), unwrap_corners(self.lat_corner)
+            ('grid_size', 'grid_corners'),
+            unwrap_corners(self.lat_corner),
         )
         ds['grid_corner_lon'] = (
-            ('grid_size', 'grid_corners'), unwrap_corners(self.lon_corner)
+            ('grid_size', 'grid_corners'),
+            unwrap_corners(self.lon_corner),
         )
 
         nlat, nlon = self.lat.shape
 
         ds['grid_dims'] = xr.DataArray(
-            [nlon, nlat],
-            dims=('grid_rank',)
+            [nlon, nlat], dims=('grid_rank',)
         ).astype('int32')
 
         ds['grid_imask'] = xr.DataArray(
-            np.ones(ds.sizes['grid_size'], dtype='int32'),
-            dims=('grid_size',)
+            np.ones(ds.sizes['grid_size'], dtype='int32'), dims=('grid_size',)
         )
 
         if expand_dist is not None or expand_factor is not None:
@@ -176,19 +184,26 @@ class LatLon2DGridDescriptor(MeshDescriptor):
         ds.attrs['history'] = self.history
         self.write_netcdf(ds, scrip_filename)
 
-    def _set_coords(self, lat_var_name, lon_var_name, lat_dim_name,
-                    lon_dim_name):
+    def _set_coords(
+        self, lat_var_name, lon_var_name, lat_dim_name, lon_dim_name
+    ):
         """
         Set up a coords dict with lat and lon
         """
         self.lat_var_name = lat_var_name
         self.lon_var_name = lon_var_name
-        self.coords = {lat_var_name: {'dims': (lat_dim_name, lon_dim_name),
-                                      'data': self.lat,
-                                      'attrs': {'units': self.units}},
-                       lon_var_name: {'dims': (lat_dim_name, lon_dim_name),
-                                      'data': self.lon,
-                                      'attrs': {'units': self.units}}}
+        self.coords = {
+            lat_var_name: {
+                'dims': (lat_dim_name, lon_dim_name),
+                'data': self.lat,
+                'attrs': {'units': self.units},
+            },
+            lon_var_name: {
+                'dims': (lat_dim_name, lon_dim_name),
+                'data': self.lon,
+                'attrs': {'units': self.units},
+            },
+        }
 
         self.dims = [lat_dim_name, lon_dim_name]
         self.dim_sizes = self.lat.shape
@@ -203,5 +218,6 @@ class LatLon2DGridDescriptor(MeshDescriptor):
         else:
             raise ValueError(f'Could not figure out units {self.units}')
         if self.mesh_name is None:
-            self.mesh_name = \
+            self.mesh_name = (
                 f'{round_res(abs(dlat))}x{round_res(abs(dlon))}{units}'
+            )

@@ -11,8 +11,7 @@ def _setup_remapper(remapper):
     else:
         src = remapper.src_grid_info
         if 'type' not in src:
-            raise ValueError(
-                'None of the "src_from_*()" methods were called')
+            raise ValueError('None of the "src_from_*()" methods were called')
         src_descriptor = _get_descriptor(src)
         src_descriptor.format = remapper.format
 
@@ -22,8 +21,7 @@ def _setup_remapper(remapper):
         dst = remapper.dst_grid_info
 
         if 'type' not in dst:
-            raise ValueError(
-                'None of the "dst_from_*()" methods were called')
+            raise ValueError('None of the "dst_from_*()" methods were called')
 
         dst_descriptor = _get_descriptor(dst)
         dst_descriptor.format = remapper.format
@@ -50,8 +48,9 @@ def _setup_remapper(remapper):
             f'values are "esmf" or "moab".'
         )
 
-    if (isinstance(dst_descriptor, PointCollectionDescriptor) and
-            method not in ['bilinear', 'neareststod']):
+    if isinstance(
+        dst_descriptor, PointCollectionDescriptor
+    ) and method not in ['bilinear', 'neareststod']:
         raise ValueError(
             f'method {method} not supported for destination '
             f'grid of type PointCollectionDescriptor.'

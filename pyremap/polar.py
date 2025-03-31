@@ -28,8 +28,10 @@ def get_arctic_stereographic_projection():
     # -------
     # Milena Veneziani
 
-    projection = pyproj.Proj('+proj=stere +lat_ts=75.0 +lat_0=90 +lon_0=0.0 '
-                             '+k_0=1.0 +x_0=0.0 +y_0=0.0 +ellps=WGS84')
+    projection = pyproj.Proj(
+        '+proj=stere +lat_ts=75.0 +lat_0=90 +lon_0=0.0 '
+        '+k_0=1.0 +x_0=0.0 +y_0=0.0 +ellps=WGS84'
+    )
 
     return projection
 
@@ -39,8 +41,10 @@ def get_antarctic_stereographic_projection():
     Get a projection for an Antarctic steregraphic grid
     """
 
-    projection = pyproj.Proj('+proj=stere +lat_ts=-71.0 +lat_0=-90 +lon_0=0.0 '
-                             '+k_0=1.0 +x_0=0.0 +y_0=0.0 +ellps=WGS84')
+    projection = pyproj.Proj(
+        '+proj=stere +lat_ts=-71.0 +lat_0=-90 +lon_0=0.0 '
+        '+k_0=1.0 +x_0=0.0 +y_0=0.0 +ellps=WGS84'
+    )
 
     return projection
 
@@ -66,9 +70,9 @@ def get_polar_descriptor_from_file(filename, projection='antarctic'):
     ds_in = xarray.open_dataset(filename)
     x = ds_in.x.values
     y = ds_in.y.values
-    dx = int((x[1] - x[0]) / 1000.)
-    lx = int((x[-1] - x[0]) / 1000.)
-    ly = int((y[-1] - y[0]) / 1000.)
+    dx = int((x[1] - x[0]) / 1000.0)
+    lx = int((x[-1] - x[0]) / 1000.0)
+    ly = int((y[-1] - y[0]) / 1000.0)
 
     mesh_name = f'{lx}x{ly}km_{dx}km_antarctic_stereo'
 

@@ -36,7 +36,6 @@ from pyremap.test import TestCase, loaddatadir  # noqa: F401
 
 @pytest.mark.usefixtures('loaddatadir')
 class TestInterp(TestCase):
-
     def setUp(self):
         # Create a temporary directory
         self.test_dir = tempfile.mkdtemp()
@@ -52,9 +51,11 @@ class TestInterp(TestCase):
     def get_mpas_cell_descriptor(self):
         mpas_mesh_filename = str(self.datadir.join('mpasMesh.nc'))
         time_series_filename = str(
-            self.datadir.join('timeSeries.0002-01-01.nc'))
+            self.datadir.join('timeSeries.0002-01-01.nc')
+        )
         descriptor = MpasCellMeshDescriptor(
-            mpas_mesh_filename, mesh_name='oQU240')
+            mpas_mesh_filename, mesh_name='oQU240'
+        )
 
         return descriptor, mpas_mesh_filename, time_series_filename
 
@@ -62,7 +63,8 @@ class TestInterp(TestCase):
         mpas_mesh_filename = str(self.datadir.join('mpasMesh.nc'))
         area_filename = str(self.datadir.join('mpasAreaEdge.nc'))
         descriptor = MpasEdgeMeshDescriptor(
-            mpas_mesh_filename, mesh_name='oQU240')
+            mpas_mesh_filename, mesh_name='oQU240'
+        )
 
         return descriptor, mpas_mesh_filename, area_filename
 
@@ -70,28 +72,32 @@ class TestInterp(TestCase):
         mpas_mesh_filename = str(self.datadir.join('mpasMesh.nc'))
         area_filename = str(self.datadir.join('mpasAreaVertex.nc'))
         descriptor = MpasVertexMeshDescriptor(
-            mpas_mesh_filename, mesh_name='oQU240')
+            mpas_mesh_filename, mesh_name='oQU240'
+        )
 
         return descriptor, mpas_mesh_filename, area_filename
 
     def get_latlon_file_descriptor(self):
         latlon_grid_filename = str(
-            self.datadir.join('SST_annual_1870-1900.nc'))
+            self.datadir.join('SST_annual_1870-1900.nc')
+        )
         descriptor = LatLonGridDescriptor.read(
-            latlon_grid_filename, lat_var_name='lat', lon_var_name='lon')
+            latlon_grid_filename, lat_var_name='lat', lon_var_name='lon'
+        )
 
         return descriptor, latlon_grid_filename
 
     def get_latlon_array_descriptor(self):
-        lat = np.linspace(-90., 90., 91)
-        lon = np.linspace(-180., 180., 181)
+        lat = np.linspace(-90.0, 90.0, 91)
+        lon = np.linspace(-180.0, 180.0, 181)
 
         descriptor = LatLonGridDescriptor.create(lat, lon, units='degrees')
         return descriptor
 
     def get_latlon2d_file_descriptor(self):
         latlon_grid_filename = str(
-            self.datadir.join('SST_annual_1870-1900.nc'))
+            self.datadir.join('SST_annual_1870-1900.nc')
+        )
         ds = xr.open_dataset(latlon_grid_filename)
         lon2d, lat2d = np.meshgrid(ds.lon.values, ds.lat.values)
         ds['lat2d'] = (('lat', 'lon'), lat2d)
@@ -99,7 +105,8 @@ class TestInterp(TestCase):
         ds.lat2d.attrs['units'] = ds.lat.attrs['units']
         ds.lon2d.attrs['units'] = ds.lon.attrs['units']
         descriptor = LatLon2DGridDescriptor.read(
-            ds=ds, lat_var_name='lat2d', lon_var_name='lon2d')
+            ds=ds, lat_var_name='lat2d', lon_var_name='lon2d'
+        )
 
         return descriptor, latlon_grid_filename
 
@@ -113,14 +120,17 @@ class TestInterp(TestCase):
             lats=lats,
             lons=lons,
             collection_name='mpasCellCenters',
-            units='radians')
+            units='radians',
+        )
         return descriptor
 
     def get_stereographic_array_descriptor(self):
         # projection for BEDMAP2 and other common Antarctic data sets
-        projection = pyproj.Proj('+proj=stere +lat_ts=-71.0 +lat_0=-90 '
-                                 '+lon_0=0.0  +k_0=1.0 +x_0=0.0 +y_0=0.0 '
-                                 '+ellps=WGS84')
+        projection = pyproj.Proj(
+            '+proj=stere +lat_ts=-71.0 +lat_0=-90 '
+            '+lon_0=0.0  +k_0=1.0 +x_0=0.0 +y_0=0.0 '
+            '+ellps=WGS84'
+        )
 
         # a 61x51 cell map with 100 km resolution and
         x_max = 3000e3
@@ -132,7 +142,8 @@ class TestInterp(TestCase):
         y = np.linspace(-y_max, y_max, ny)
         mesh_name = f'{int(res * 1e-3)}km_Antarctic_stereo'
         descriptor = ProjectionGridDescriptor.create(
-            projection, x, y, mesh_name)
+            projection, x, y, mesh_name
+        )
         return descriptor
 
     def get_filenames(self, suffix):
@@ -146,9 +157,7 @@ class TestInterp(TestCase):
         ref_filename = f'{self.datadir}/ref_scrip_{suffix}.nc'
         return scrip_filename, ref_filename
 
-    def build_remapper(self, src_descriptor, dst_descriptor,
-                       weight_filename):
-
+    def build_remapper(self, src_descriptor, dst_descriptor, weight_filename):
         remapper = Remapper(
             ntasks=1,
             map_filename=weight_filename,
@@ -164,20 +173,19 @@ class TestInterp(TestCase):
         return remapper
 
     def check_scrip(self, scrip_filename, ref_filename):
-
         ds_ref = xr.open_dataset(ref_filename)
         assert os.path.exists(scrip_filename)
         ds_scrip = xr.open_dataset(scrip_filename)
         self.assertDatasetApproxEqual(ds_scrip, ds_ref)
 
     def check_remap(
-            self,
-            in_filename,
-            out_filename,
-            ref_filename,
-            remapper,
-            remap_file=True):
-
+        self,
+        in_filename,
+        out_filename,
+        ref_filename,
+        remapper,
+        remap_file=True,
+    ):
         drop_vars = [
             'lat_bnds',
             'lon_bnds',
@@ -185,7 +193,7 @@ class TestInterp(TestCase):
             'area',
             'nvertices',
             'lat_vertices',
-            'lon_vertices'
+            'lon_vertices',
         ]
         ds_remapped_file = None
         if remap_file:
@@ -193,7 +201,8 @@ class TestInterp(TestCase):
             remapper.ncremap(
                 in_filename=in_filename,
                 out_filename=out_filename,
-                replace_mpas_fill=True)
+                replace_mpas_fill=True,
+            )
 
             assert os.path.exists(out_filename)
             ds_remapped_file = xr.open_dataset(out_filename)
@@ -222,8 +231,9 @@ class TestInterp(TestCase):
         test writing a SCRIP file for a lat/lon grid file
         """
 
-        scrip_filename, ref_filename = \
-            self.get_scrip_filenames(suffix='latlon_file')
+        scrip_filename, ref_filename = self.get_scrip_filenames(
+            suffix='latlon_file'
+        )
 
         src_descriptor, _ = self.get_latlon_file_descriptor()
         print(f'Writing SCRIP file for lat/lon grid {scrip_filename}')
@@ -236,8 +246,9 @@ class TestInterp(TestCase):
         test writing a SCRIP file for a lat/lon grid array
         """
 
-        scrip_filename, ref_filename = \
-            self.get_scrip_filenames(suffix='latlon_array')
+        scrip_filename, ref_filename = self.get_scrip_filenames(
+            suffix='latlon_array'
+        )
 
         src_descriptor = self.get_latlon_array_descriptor()
         print(f'Writing SCRIP file for lat/lon grid {scrip_filename}')
@@ -250,8 +261,9 @@ class TestInterp(TestCase):
         test writing a SCRIP file for a 2D lat/lon grid
         """
 
-        scrip_filename, ref_filename = \
-            self.get_scrip_filenames(suffix='latlon2d')
+        scrip_filename, ref_filename = self.get_scrip_filenames(
+            suffix='latlon2d'
+        )
 
         src_descriptor, _ = self.get_latlon2d_file_descriptor()
         print(f'Writing SCRIP file for 2D lat/lon grid {scrip_filename}')
@@ -264,11 +276,11 @@ class TestInterp(TestCase):
         test writing a SCRIP file for an MPAS cell mesh
         """
 
-        scrip_filename, ref_filename = \
-            self.get_scrip_filenames(suffix='mpas_cell')
+        scrip_filename, ref_filename = self.get_scrip_filenames(
+            suffix='mpas_cell'
+        )
 
-        src_descriptor, _, _ = \
-            self.get_mpas_cell_descriptor()
+        src_descriptor, _, _ = self.get_mpas_cell_descriptor()
         print(f'Writing SCRIP file for MPAS cell mesh {scrip_filename}')
         src_descriptor.to_scrip(scrip_filename)
 
@@ -279,11 +291,11 @@ class TestInterp(TestCase):
         test writing a SCRIP file for an MPAS edge mesh
         """
 
-        scrip_filename, ref_filename = \
-            self.get_scrip_filenames(suffix='mpas_edge')
+        scrip_filename, ref_filename = self.get_scrip_filenames(
+            suffix='mpas_edge'
+        )
 
-        src_descriptor, _, _ = \
-            self.get_mpas_edge_descriptor()
+        src_descriptor, _, _ = self.get_mpas_edge_descriptor()
         print(f'Writing SCRIP file for MPAS edge mesh {scrip_filename}')
         src_descriptor.to_scrip(scrip_filename)
 
@@ -294,11 +306,11 @@ class TestInterp(TestCase):
         test writing a SCRIP file for an MPAS vertex mesh
         """
 
-        scrip_filename, ref_filename = \
-            self.get_scrip_filenames(suffix='mpas_vertex')
+        scrip_filename, ref_filename = self.get_scrip_filenames(
+            suffix='mpas_vertex'
+        )
 
-        src_descriptor, _, _ = \
-            self.get_mpas_vertex_descriptor()
+        src_descriptor, _, _ = self.get_mpas_vertex_descriptor()
         print(f'Writing SCRIP file for MPAS vertex mesh {scrip_filename}')
         src_descriptor.to_scrip(scrip_filename)
 
@@ -309,8 +321,9 @@ class TestInterp(TestCase):
         test writing a SCRIP file for a point collection
         """
 
-        scrip_filename, ref_filename = \
-            self.get_scrip_filenames(suffix='point_collection')
+        scrip_filename, ref_filename = self.get_scrip_filenames(
+            suffix='point_collection'
+        )
 
         src_descriptor = self.get_point_collection_descriptor()
         print(f'Writing SCRIP file for point collection {scrip_filename}')
@@ -323,8 +336,9 @@ class TestInterp(TestCase):
         test writing a SCRIP file for a stereographic projection grid
         """
 
-        scrip_filename, ref_filename = \
-            self.get_scrip_filenames(suffix='stereographic')
+        scrip_filename, ref_filename = self.get_scrip_filenames(
+            suffix='stereographic'
+        )
 
         src_descriptor = self.get_stereographic_array_descriptor()
         print(f'Writing SCRIP file for stereographic grid {scrip_filename}')
@@ -338,21 +352,24 @@ class TestInterp(TestCase):
         lat/lon grid determined from a file containing 'lat' and 'lon' coords
         """
 
-        weight_filename, out_filename, ref_filename = \
-            self.get_filenames(suffix='mpas_cell_to_latlon')
+        weight_filename, out_filename, ref_filename = self.get_filenames(
+            suffix='mpas_cell_to_latlon'
+        )
 
-        src_descriptor, _, time_series_filename = \
+        src_descriptor, _, time_series_filename = (
             self.get_mpas_cell_descriptor()
+        )
         dst_descriptor, _ = self.get_latlon_file_descriptor()
 
         remapper = self.build_remapper(
-            src_descriptor, dst_descriptor, weight_filename)
+            src_descriptor, dst_descriptor, weight_filename
+        )
         self.check_remap(
             time_series_filename,
             out_filename,
             ref_filename,
             remapper,
-            remap_file=True
+            remap_file=True,
         )
 
     def test_mpas_edge_to_latlon(self):
@@ -361,21 +378,22 @@ class TestInterp(TestCase):
         lat/lon grid determined from a file containing 'lat' and 'lon' coords
         """
 
-        weight_filename, out_filename, ref_filename = \
-            self.get_filenames(suffix='mpas_edge_to_latlon')
+        weight_filename, out_filename, ref_filename = self.get_filenames(
+            suffix='mpas_edge_to_latlon'
+        )
 
-        src_descriptor, _, area_filename = \
-            self.get_mpas_edge_descriptor()
+        src_descriptor, _, area_filename = self.get_mpas_edge_descriptor()
         dst_descriptor, _ = self.get_latlon_file_descriptor()
 
         remapper = self.build_remapper(
-            src_descriptor, dst_descriptor, weight_filename)
+            src_descriptor, dst_descriptor, weight_filename
+        )
         self.check_remap(
             area_filename,
             out_filename,
             ref_filename,
             remapper,
-            remap_file=True
+            remap_file=True,
         )
 
     def test_mpas_vertex_to_latlon(self):
@@ -384,21 +402,22 @@ class TestInterp(TestCase):
         lat/lon grid determined from a file containing 'lat' and 'lon' coords
         """
 
-        weight_filename, out_filename, ref_filename = \
-            self.get_filenames(suffix='mpas_vertex_to_latlon')
+        weight_filename, out_filename, ref_filename = self.get_filenames(
+            suffix='mpas_vertex_to_latlon'
+        )
 
-        src_descriptor, _, area_filename = \
-            self.get_mpas_vertex_descriptor()
+        src_descriptor, _, area_filename = self.get_mpas_vertex_descriptor()
         dst_descriptor, _ = self.get_latlon_file_descriptor()
 
         remapper = self.build_remapper(
-            src_descriptor, dst_descriptor, weight_filename)
+            src_descriptor, dst_descriptor, weight_filename
+        )
         self.check_remap(
             area_filename,
             out_filename,
             ref_filename,
             remapper,
-            remap_file=True
+            remap_file=True,
         )
 
     def test_latlon_file_to_latlon_array(self):
@@ -407,21 +426,24 @@ class TestInterp(TestCase):
         lat/lon grid determined from config options 'lat' and 'lon'.
         """
 
-        weight_filename, out_filename, ref_filename = \
-            self.get_filenames(suffix='latlon_file_to_latlon_array')
+        weight_filename, out_filename, ref_filename = self.get_filenames(
+            suffix='latlon_file_to_latlon_array'
+        )
 
-        src_descriptor, latlon_grid_filename = \
+        src_descriptor, latlon_grid_filename = (
             self.get_latlon_file_descriptor()
+        )
         dst_descriptor = self.get_latlon_array_descriptor()
 
         remapper = self.build_remapper(
-            src_descriptor, dst_descriptor, weight_filename)
+            src_descriptor, dst_descriptor, weight_filename
+        )
         self.check_remap(
             latlon_grid_filename,
             out_filename,
             ref_filename,
             remapper,
-            remap_file=True
+            remap_file=True,
         )
 
     def test_mpas_cell_to_stereographic(self):
@@ -430,15 +452,18 @@ class TestInterp(TestCase):
         stereographic grid.
         """
 
-        weight_filename, out_filename, ref_filename = \
-            self.get_filenames(suffix='mpas_cell_to_stereographic')
+        weight_filename, out_filename, ref_filename = self.get_filenames(
+            suffix='mpas_cell_to_stereographic'
+        )
 
-        src_descriptor, _, time_series_filename = \
+        src_descriptor, _, time_series_filename = (
             self.get_mpas_cell_descriptor()
+        )
         dst_descriptor = self.get_stereographic_array_descriptor()
 
         remapper = self.build_remapper(
-            src_descriptor, dst_descriptor, weight_filename)
+            src_descriptor, dst_descriptor, weight_filename
+        )
 
         # ncremap doesn't support stereographic grids so just check the
         # Remapper
@@ -447,7 +472,7 @@ class TestInterp(TestCase):
             out_filename,
             ref_filename,
             remapper,
-            remap_file=True
+            remap_file=True,
         )
 
     def test_latlon_to_stereographic(self):
@@ -456,15 +481,18 @@ class TestInterp(TestCase):
         stereographic grid.
         """
 
-        weight_filename, out_filename, ref_filename = \
-            self.get_filenames(suffix='latlon_to_stereographic')
+        weight_filename, out_filename, ref_filename = self.get_filenames(
+            suffix='latlon_to_stereographic'
+        )
 
-        src_descriptor, latlon_grid_filename = \
+        src_descriptor, latlon_grid_filename = (
             self.get_latlon_file_descriptor()
+        )
         dst_descriptor = self.get_stereographic_array_descriptor()
 
         remapper = self.build_remapper(
-            src_descriptor, dst_descriptor, weight_filename)
+            src_descriptor, dst_descriptor, weight_filename
+        )
 
         # ncremap doesn't support stereographic grids so just check the
         # Remapper
@@ -473,7 +501,8 @@ class TestInterp(TestCase):
             out_filename,
             ref_filename,
             remapper,
-            remap_file=True)
+            remap_file=True,
+        )
 
     def test_stereographic_array_to_latlon_array(self):
         """
@@ -482,8 +511,9 @@ class TestInterp(TestCase):
         'lon'.
         """
 
-        weight_filename, out_filename, ref_filename = \
-            self.get_filenames(suffix='stereographic_to_latlon')
+        weight_filename, out_filename, ref_filename = self.get_filenames(
+            suffix='stereographic_to_latlon'
+        )
 
         src_descriptor = self.get_stereographic_array_descriptor()
         dst_descriptor = self.get_latlon_array_descriptor()
@@ -502,23 +532,24 @@ class TestInterp(TestCase):
             'data_vars': {
                 'complicated': {
                     'dims': ('dim0', 'y', 'x', 'dim3'),
-                    'data': in_field
+                    'data': in_field,
                 }
-            }
+            },
         }
 
         ds = xr.Dataset.from_dict(dataset_dict)
         in_filename = (
-            f'{self.test_dir}/unmapped_stereographic_array_to_latlon_'
-            f'array.nc'
+            f'{self.test_dir}/unmapped_stereographic_array_to_latlon_array.nc'
         )
         ds.to_netcdf(in_filename)
 
         remapper = self.build_remapper(
-            src_descriptor, dst_descriptor, weight_filename)
+            src_descriptor, dst_descriptor, weight_filename
+        )
 
-        self.check_remap(in_filename, out_filename, ref_filename,
-                         remapper, remap_file=False)
+        self.check_remap(
+            in_filename, out_filename, ref_filename, remapper, remap_file=False
+        )
 
     def test_latlon_file_to_point_collection(self):
         """
@@ -526,19 +557,22 @@ class TestInterp(TestCase):
         point collection.
         """
 
-        weight_filename, out_filename, ref_filename = \
-            self.get_filenames(suffix='latlon_file_to_point_collection')
+        weight_filename, out_filename, ref_filename = self.get_filenames(
+            suffix='latlon_file_to_point_collection'
+        )
 
-        src_descriptor, latlon_grid_filename = \
+        src_descriptor, latlon_grid_filename = (
             self.get_latlon_file_descriptor()
+        )
         dst_descriptor = self.get_point_collection_descriptor()
 
         remapper = self.build_remapper(
-            src_descriptor, dst_descriptor, weight_filename)
+            src_descriptor, dst_descriptor, weight_filename
+        )
         self.check_remap(
             latlon_grid_filename,
             out_filename,
             ref_filename,
             remapper,
-            remap_file=True
+            remap_file=True,
         )

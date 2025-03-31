@@ -28,6 +28,7 @@ class MpasCellMeshDescriptor(MeshDescriptor):
     history : str
         The history attribute written to SCRIP files
     """
+
     def __init__(self, filename, mesh_name=None):
         """
         Constructor stores the file name
@@ -46,7 +47,6 @@ class MpasCellMeshDescriptor(MeshDescriptor):
         super().__init__()
 
         with xr.open_dataset(filename) as ds:
-
             self.mesh_name = mesh_name
             self.mesh_name_from_attr(ds)
             if self.mesh_name is None:
@@ -60,12 +60,12 @@ class MpasCellMeshDescriptor(MeshDescriptor):
                 'lat_cell': {
                     'dims': 'nCells',
                     'data': ds.latCell.values,
-                    'attrs': {'units': 'radians'}
+                    'attrs': {'units': 'radians'},
                 },
                 'lon_cell': {
                     'dims': 'nCells',
                     'data': ds.lonCell.values,
-                    'attrs': {'units': 'radians'}
+                    'attrs': {'units': 'radians'},
                 },
             }
             self.dims = ['nCells']
@@ -106,10 +106,7 @@ class MpasCellMeshDescriptor(MeshDescriptor):
 
         ds_out = xr.Dataset()
 
-        ds_out['grid_area'] = (
-            ('grid_size',),
-            area_cell / (sphere_radius**2)
-        )
+        ds_out['grid_area'] = (('grid_size',), area_cell / (sphere_radius**2))
 
         ds_out['grid_center_lat'] = (('grid_size',), lat_cell)
         ds_out['grid_center_lon'] = (('grid_size',), lon_cell)
@@ -126,20 +123,20 @@ class MpasCellMeshDescriptor(MeshDescriptor):
             grid_corner_lon[cell_indices, ivert] = lon_vertex[vert_indices]
 
         ds_out['grid_corner_lat'] = (
-            ('grid_size', 'grid_corners'), grid_corner_lat
+            ('grid_size', 'grid_corners'),
+            grid_corner_lat,
         )
         ds_out['grid_corner_lon'] = (
-            ('grid_size', 'grid_corners'), grid_corner_lon
+            ('grid_size', 'grid_corners'),
+            grid_corner_lon,
         )
 
         ds_out['grid_dims'] = xr.DataArray(
-            [ncells],
-            dims=('grid_rank',)
+            [ncells], dims=('grid_rank',)
         ).astype('int32')
 
         ds_out['grid_imask'] = xr.DataArray(
-            np.ones(ncells, dtype='int32'),
-            dims=('grid_size',)
+            np.ones(ncells, dtype='int32'), dims=('grid_size',)
         )
 
         if expand_dist is not None or expand_factor is not None:

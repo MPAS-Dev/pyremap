@@ -34,8 +34,15 @@ class PointCollectionDescriptor(MeshDescriptor):
     history : str
         The history attribute written to SCRIP files
     """
-    def __init__(self, lats, lons, collection_name, units='degrees',
-                 out_dimension='n_points'):
+
+    def __init__(
+        self,
+        lats,
+        lons,
+        collection_name,
+        units='degrees',
+        out_dimension='n_points',
+    ):
         """
         Constructor stores
 
@@ -65,12 +72,18 @@ class PointCollectionDescriptor(MeshDescriptor):
         self.units = units
 
         # build coords
-        self.coords = {'lat': {'dims': out_dimension,
-                               'data': self.lat,
-                               'attrs': {'units': units}},
-                       'lon': {'dims': out_dimension,
-                               'data': self.lon,
-                               'attrs': {'units': units}}}
+        self.coords = {
+            'lat': {
+                'dims': out_dimension,
+                'data': self.lat,
+                'attrs': {'units': units},
+            },
+            'lon': {
+                'dims': out_dimension,
+                'data': self.lon,
+                'attrs': {'units': units},
+            },
+        }
         self.dims = [out_dimension]
         self.dim_sizes = [len(self.lat)]
         self.history = add_history()
@@ -108,31 +121,31 @@ class PointCollectionDescriptor(MeshDescriptor):
             grid_corner_lon[:, ivert] = self.lon
 
         ds['grid_corner_lat'] = (
-            ('grid_size', 'grid_corners'), grid_corner_lat
+            ('grid_size', 'grid_corners'),
+            grid_corner_lat,
         )
         ds['grid_corner_lon'] = (
-            ('grid_size', 'grid_corners'), grid_corner_lon
+            ('grid_size', 'grid_corners'),
+            grid_corner_lon,
         )
 
-        ds['grid_dims'] = xr.DataArray(
-            [npoints],
-            dims=('grid_rank',)
-        ).astype('int32')
+        ds['grid_dims'] = xr.DataArray([npoints], dims=('grid_rank',)).astype(
+            'int32'
+        )
 
         ds['grid_imask'] = xr.DataArray(
-            np.ones(npoints, dtype='int32'),
-            dims=('grid_size',)
+            np.ones(npoints, dtype='int32'), dims=('grid_size',)
         )
 
-        ds['grid_area'] = xr.DataArray(
-            np.zeros(npoints),
-            dims=('grid_size',)
-        )
+        ds['grid_area'] = xr.DataArray(np.zeros(npoints), dims=('grid_size',))
 
-        ds['grid_dims'] = (('grid_rank',), [npoints,])
-        ds['grid_imask'] = (
-            ('grid_size',), np.ones(npoints, dtype=int)
+        ds['grid_dims'] = (
+            ('grid_rank',),
+            [
+                npoints,
+            ],
         )
+        ds['grid_imask'] = (('grid_size',), np.ones(npoints, dtype=int))
 
         ds.grid_center_lat.attrs['units'] = self.units
         ds.grid_center_lon.attrs['units'] = self.units

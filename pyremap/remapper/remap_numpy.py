@@ -32,9 +32,10 @@ def _remap_numpy(remapper, ds, renormalization_threshold):
     for index, dim in enumerate(remapper.src_descriptor.dims):
         if src_grid_dims[index] != ds.sizes[dim]:
             raise ValueError(
-                f'data set and remapping source dimension {dim} don\'t '
+                f"data set and remapping source dimension {dim} don't "
                 f'have the same size: {src_grid_dims[index]} != '
-                f'{ds.sizes[dim]}')
+                f'{ds.sizes[dim]}'
+            )
 
     if isinstance(ds, xr.DataArray):
         ds_remap = _remap_data_array(ds, remapper, renormalization_threshold)
@@ -47,14 +48,17 @@ def _remap_numpy(remapper, ds, renormalization_threshold):
         ds_remap = ds_remap.map(
             _remap_data_array,
             keep_attrs=True,
-            args=(remapper, renormalization_threshold,))
+            args=(
+                remapper,
+                renormalization_threshold,
+            ),
+        )
     else:
         raise TypeError('ds not an xarray Dataset or DataArray.')
 
     # Update history attribute of netCDF file
     if 'history' in ds_remap.attrs:
-        newhist = '\n'.join(
-            [ds_remap.attrs['history'], ' '.join(sys.argv[:])])
+        newhist = '\n'.join([ds_remap.attrs['history'], ' '.join(sys.argv[:])])
     else:
         newhist = sys.argv[:]
     ds_remap.attrs['history'] = newhist
@@ -90,15 +94,15 @@ def _load_mapping(remapper):
     dst_grid_rank = ds_map.sizes['dst_grid_rank']
 
     # check that the mapping file has the right number of dimensions
-    if n_source_dims != src_grid_rank or \
-            n_destination_dims != dst_grid_rank:
+    if n_source_dims != src_grid_rank or n_destination_dims != dst_grid_rank:
         raise ValueError(
             f'The number of source and/or destination dimensions does not '
             f'match the expected \n'
             f'number of source and destination dimensions in the mapping '
             f'file. \n'
             f'{n_source_dims} != {src_grid_rank} and/or {n_destination_dims} '
-            f'!= {dst_grid_rank}')
+            f'!= {dst_grid_rank}'
+        )
 
     # grid dimensions need to be reversed because they are in Fortran order
     src_grid_dims = ds_map['src_grid_dims'].values[::-1]
@@ -112,8 +116,9 @@ def _load_mapping(remapper):
         if dim_size != check_dim_size:
             raise ValueError(
                 f'source mesh descriptor and remapping source dimension '
-                f'{dim} don\'t have the same size: \n'
-                f'{dim_size} != {check_dim_size}')
+                f"{dim} don't have the same size: \n"
+                f'{dim_size} != {check_dim_size}'
+            )
     for index in range(len(dst_descriptor.dims)):
         dim = dst_descriptor.dims[index]
         dim_size = dst_descriptor.dim_sizes[index]
@@ -121,8 +126,9 @@ def _load_mapping(remapper):
         if dim_size != check_dim_size:
             raise ValueError(
                 f'dest. mesh descriptor and remapping dest. dimension '
-                f'{dim} don\'t have the same size: \n'
-                f'{dim_size} != {check_dim_size}')
+                f"{dim} don't have the same size: \n"
+                f'{dim_size} != {check_dim_size}'
+            )
 
     col = ds_map['col'].values - 1
     row = ds_map['row'].values - 1
@@ -137,7 +143,7 @@ def _check_drop(remapper, da):
 
     src_dims_in_array = [dim in da.dims for dim in src_dims]
 
-    return (np.any(src_dims_in_array) and not np.all(src_dims_in_array))
+    return np.any(src_dims_in_array) and not np.all(src_dims_in_array)
 
 
 def _remap_data_array(da, remapper, renormalization_threshold):
@@ -178,11 +184,14 @@ def _remap_data_array(da, remapper, renormalization_threshold):
     coord_dict = {}
     # copy unmodified coords
     for coord in da.coords:
-        src_dim_in_coord = np.any([dim in da.coords[coord].dims
-                                   for dim in src_dims])
+        src_dim_in_coord = np.any(
+            [dim in da.coords[coord].dims for dim in src_dims]
+        )
         if not src_dim_in_coord:
-            coord_dict[coord] = {'dims': da.coords[coord].dims,
-                                 'data': da.coords[coord].values}
+            coord_dict[coord] = {
+                'dims': da.coords[coord].dims,
+                'data': da.coords[coord].values,
+            }
 
     # add destination coords
     coord_dict.update(remapper.dst_descriptor.coords)
@@ -193,13 +202,16 @@ def _remap_data_array(da, remapper, renormalization_threshold):
     if np.count_nonzero(mask) > 0:
         field = np.ma.masked_array(field, mask)
     remapped_field = _remap_numpy_array(
-        remapper, field, remap_axes, renormalization_threshold)
+        remapper, field, remap_axes, renormalization_threshold
+    )
 
-    array_dict = {'coords': coord_dict,
-                  'attrs': da.attrs,
-                  'dims': dims,
-                  'data': remapped_field,
-                  'name': da.name}
+    array_dict = {
+        'coords': coord_dict,
+        'attrs': da.attrs,
+        'dims': dims,
+        'data': remapped_field,
+        'name': da.name,
+    }
 
     # make a new data array
     remapped_array = xr.DataArray.from_dict(array_dict)
@@ -208,7 +220,8 @@ def _remap_data_array(da, remapper, renormalization_threshold):
 
 
 def _remap_numpy_array(
-        remapper, in_field, remap_axes, renormalization_threshold):
+    remapper, in_field, remap_axes, renormalization_threshold
+):
     """
     Remap a single numpy array
     """
@@ -220,7 +233,8 @@ def _remap_numpy_array(
     # then flatten the remapping and the extra dimensions separately for
     # the matrix multiply
     extra_axes = [
-        axis for axis in np.arange(in_field.ndim) if axis not in remap_axes]
+        axis for axis in np.arange(in_field.ndim) if axis not in remap_axes
+    ]
 
     new_shape = [np.prod([in_field.shape[axis] for axis in remap_axes])]
     if len(extra_axes) > 0:
@@ -240,8 +254,10 @@ def _remap_numpy_array(
     # the remapping dimension
     in_field = in_field.transpose(permuted_axes).reshape(new_shape)
 
-    masked = (isinstance(in_field, np.ma.MaskedArray) and
-              renormalization_threshold is not None)
+    masked = (
+        isinstance(in_field, np.ma.MaskedArray)
+        and renormalization_threshold is not None
+    )
     if masked:
         in_mask = np.array(np.logical_not(in_field.mask), float)
         out_field = matrix.dot(in_mask * in_field)
@@ -252,13 +268,13 @@ def _remap_numpy_array(
         # make frac_b match the shape of out_field
         frac_b = remapper._ds_map['frac_b'].values
         out_mask = np.reshape(frac_b, (len(frac_b), 1)).repeat(
-            new_shape[1], axis=1)
-        mask = out_mask > 0.
+            new_shape[1], axis=1
+        )
+        mask = out_mask > 0.0
 
     # normalize the result based on out_mask
     out_field[mask] /= out_mask[mask]
-    out_field = np.ma.masked_array(out_field,
-                                   mask=np.logical_not(mask))
+    out_field = np.ma.masked_array(out_field, mask=np.logical_not(mask))
 
     dest_remap_dim_count = len(dst_grid_dims)
     out_dim_count = len(extra_shape) + dest_remap_dim_count
@@ -270,9 +286,11 @@ def _remap_numpy_array(
     # "unpermute" the axes to be in the expected order
     index = np.amin(remap_axes)
     unpermute_axes = list(np.arange(dest_remap_dim_count, out_dim_count))
-    unpermute_axes = (unpermute_axes[0:index] +
-                      list(np.arange(dest_remap_dim_count)) +
-                      unpermute_axes[index:])
+    unpermute_axes = (
+        unpermute_axes[0:index]
+        + list(np.arange(dest_remap_dim_count))
+        + unpermute_axes[index:]
+    )
     out_field = np.transpose(out_field, axes=unpermute_axes)
 
     return out_field

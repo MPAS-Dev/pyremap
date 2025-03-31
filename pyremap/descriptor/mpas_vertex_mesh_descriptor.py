@@ -28,6 +28,7 @@ class MpasVertexMeshDescriptor(MeshDescriptor):
     history : str
         The history attribute written to SCRIP files
     """
+
     def __init__(self, filename, mesh_name=None):
         """
         Constructor stores the file name
@@ -46,7 +47,6 @@ class MpasVertexMeshDescriptor(MeshDescriptor):
         super().__init__()
 
         with xr.open_dataset(filename) as ds:
-
             self.mesh_name = mesh_name
             self.mesh_name_from_attr(ds)
             if self.mesh_name is None:
@@ -56,12 +56,18 @@ class MpasVertexMeshDescriptor(MeshDescriptor):
             self.regional = True
 
             # build coords
-            self.coords = {'lat_vertex': {'dims': 'nVertices',
-                                          'data': ds.latVertex.values,
-                                          'attrs': {'units': 'radians'}},
-                           'lon_vertex': {'dims': 'nVertices',
-                                          'data': ds.lonVertex.values,
-                                          'attrs': {'units': 'radians'}}}
+            self.coords = {
+                'lat_vertex': {
+                    'dims': 'nVertices',
+                    'data': ds.latVertex.values,
+                    'attrs': {'units': 'radians'},
+                },
+                'lon_vertex': {
+                    'dims': 'nVertices',
+                    'data': ds.lonVertex.values,
+                    'attrs': {'units': 'radians'},
+                },
+            }
             self.dims = ['nVertices']
             self.dim_sizes = [ds.sizes[dim] for dim in self.dims]
 
@@ -102,8 +108,10 @@ class MpasVertexMeshDescriptor(MeshDescriptor):
         ds_out = xr.Dataset()
 
         if vertex_degree != 3:
-            raise ValueError(f'MpasVertexMeshDescriptor does not support '
-                             f'vertexDegree {vertex_degree}')
+            raise ValueError(
+                f'MpasVertexMeshDescriptor does not support '
+                f'vertexDegree {vertex_degree}'
+            )
 
         valid_cells_on_vertex = np.zeros(nvertices, dtype=int)
         vertex_area = np.zeros(nvertices)
@@ -116,7 +124,7 @@ class MpasVertexMeshDescriptor(MeshDescriptor):
 
         ds_out['grid_area'] = (
             ('grid_size',),
-            vertex_area / (sphere_radius**2)
+            vertex_area / (sphere_radius**2),
         )
 
         ds_out['grid_center_lat'] = (('grid_size',), lat_vertex)
@@ -148,20 +156,20 @@ class MpasVertexMeshDescriptor(MeshDescriptor):
             grid_corner_lat[mask, 2 * icell + 1] = lat_cell[cells]
 
         ds_out['grid_corner_lat'] = (
-            ('grid_size', 'grid_corners'), grid_corner_lat
+            ('grid_size', 'grid_corners'),
+            grid_corner_lat,
         )
         ds_out['grid_corner_lon'] = (
-            ('grid_size', 'grid_corners'), grid_corner_lon
+            ('grid_size', 'grid_corners'),
+            grid_corner_lon,
         )
 
         ds_out['grid_dims'] = xr.DataArray(
-            [nvertices],
-            dims=('grid_rank',)
+            [nvertices], dims=('grid_rank',)
         ).astype('int32')
 
         ds_out['grid_imask'] = xr.DataArray(
-            np.ones(nvertices, dtype='int32'),
-            dims=('grid_size',)
+            np.ones(nvertices, dtype='int32'), dims=('grid_size',)
         )
 
         if expand_dist is not None or expand_factor is not None:
