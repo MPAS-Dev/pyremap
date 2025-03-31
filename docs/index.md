@@ -1,4 +1,4 @@
-![pyremap logo](../_static/logo.png)
+![pyremap logo](_static/logo.png)
 =(pyremap)
 
 # pyremap
@@ -6,7 +6,8 @@
 Python remapping tools for climate and earth system models.
 
 ## Introduction
-:index:
+```{index} single: Introduction
+```
 
 `pyremap` is a Python library designed to facilitate the remapping
 (interpolation) of data between different spatial representations, such as
@@ -36,7 +37,8 @@ custom spatial datasets, `pyremap` provides the tools you need to perform
 accurate and efficient remapping.
 
 ## Documentation Overview
-:index:
+```{index} single: Documentation; Overview
+```
 
 This documentation is organized into the following sections:
 
@@ -59,6 +61,7 @@ developer_guide/index
 - **Developer Guide**: Resources for contributors, including API references, testing instructions, contribution guidelines, and coding standards.
 
 # Indices and tables
-:index:
+```{index} single: Indices and tables
+```
 
 * {ref}`genindex`

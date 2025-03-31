@@ -1,6 +1,6 @@
 # API reference
-
-:index:
+```{index} single: API reference
+```
 
 This page provides an auto-generated summary of the pyremap API.
 

@@ -1,6 +1,6 @@
 # Developer Guide
-
-:index:
+```{index} single: Developer Guide
+```
 
 Welcome to the Developer Guide for `pyremap`. This section provides resources and guidelines for contributors.
 
@@ -31,6 +31,11 @@ Welcome to the Developer Guide for `pyremap`. This section provides resources an
 
 ## Additional Resources
 
-- [API Reference](api.md)
-- [Testing Instructions](testing_instructions.md)
-- [Contribution Workflow](contribution_workflow.md)
+```{toctree}
+:maxdepth: 2
+
+contribution_workflow
+testing_instructions
+generate_preview_docs
+api
+```

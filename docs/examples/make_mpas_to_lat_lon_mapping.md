@@ -1,4 +1,6 @@
 # Make MPAS to Lat-Lon Mapping
+```{index} single: Examples; MPAS to Lat-Lon
+```
 
 This example demonstrates how to create a mapping file from an MPAS cell mesh
 to a regular latitude-longitude grid.

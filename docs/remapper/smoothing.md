@@ -1,8 +1,10 @@
-### Smoothing with `expand_dist` and `expand_factor`
+# Smoothing with `expand_dist` and `expand_factor`
+```{index} single: Remapper; Smoothing
+```
 
 `pyremap` provides a unique capability for controlled smoothing when writing out the destination mesh descriptor. This is achieved through the use of two optional attributes: `expand_dist` and `expand_factor`. These attributes can be specified either as part of the destination descriptor or as attributes of the `remapper`, which will then pass them along to the destination descriptor.
 
-#### Attributes Overview
+## Attributes Overview
 
 - **`expand_dist`**:
   Specifies a distance in meters by which each grid cell is expanded. This can be provided as:
@@ -16,11 +18,11 @@
 
 > **Note**: The default values are `expand_dist = 0.0` and `expand_factor = 1.0`, which result in no smoothing.
 
-#### Usage and Behavior
+## Usage and Behavior
 
 These attributes are particularly useful for producing highly controlled smoothing as part of the remapping process. By expanding grid cells either by a fixed distance (`expand_dist`) or by a fraction of their size (`expand_factor`), users can fine-tune the smoothing effect to meet specific requirements.
 
-#### Important Notes
+## Important Notes
 
 1. **Combination with the `conserve` Method**:
    The `expand_dist` and `expand_factor` attributes must be used in combination with the `conserve` remapping method. This is because they leverage the area-weighted interpolation mechanism inherent to this method.

@@ -1,4 +1,6 @@
 # MpasEdgeMeshDescriptor
+```{index} single: Mesh Descriptors; MpasEdgeMeshDescriptor
+```
 
 A descriptor for MPAS edge meshes.
 

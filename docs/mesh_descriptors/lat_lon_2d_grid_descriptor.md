@@ -1,4 +1,6 @@
 # LatLon2DGridDescriptor
+```{index} single: Mesh Descriptors; LatLon2DGridDescriptor
+```
 
 A descriptor for 2D latitude-longitude grids.
 

@@ -34,7 +34,7 @@ extensions = [
     'sphinx.ext.napoleon'
 ]
 
-autosummary_generate = ['api.md']
+autosummary_generate = ['developer_guide/api.md']
 
 # Otherwise, the Return parameter list looks different from the Parameters list
 napoleon_use_rtype = False

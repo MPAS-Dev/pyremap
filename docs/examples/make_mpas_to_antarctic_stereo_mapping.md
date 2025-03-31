@@ -1,6 +1,6 @@
 # Make MPAS to Antarctic Stereo Mapping
-
-:index:
+```{index} single: Examples; MPAS to Antarctic Stereo
+```
 
 This example demonstrates how to create a mapping file from an MPAS mesh to an Antarctic stereographic grid.
 
