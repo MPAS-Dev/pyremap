@@ -1,5 +1,7 @@
 # API reference
 
+:index:
+
 This page provides an auto-generated summary of the pyremap API.
 
 ## Mesh Descriptors

@@ -1,9 +1,9 @@
 # This software is open source software available under the BSD-3 license.
 #
-# Copyright (c) 2022 Triad National Security, LLC. All rights reserved.
-# Copyright (c) 2022 Lawrence Livermore National Security, LLC. All rights
+# Copyright (c) 2025 Triad National Security, LLC. All rights reserved.
+# Copyright (c) 2025 Lawrence Livermore National Security, LLC. All rights
 # reserved.
-# Copyright (c) 2022 UT-Battelle, LLC. All rights reserved.
+# Copyright (c) 2025 UT-Battelle, LLC. All rights reserved.
 #
 # Additional copyright and license information can be found in the LICENSE file
 # distributed with this code, or at
