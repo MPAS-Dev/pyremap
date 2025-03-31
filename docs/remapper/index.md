@@ -1,6 +1,6 @@
 # Remapper
-
-:index:
+```{index} single: Remapper
+```
 
 Overview of the remapping process in pyremap.
 

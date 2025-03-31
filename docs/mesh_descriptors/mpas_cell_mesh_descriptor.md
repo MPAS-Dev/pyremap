@@ -1,4 +1,6 @@
 # MpasCellMeshDescriptor
+```{index} single: Mesh Descriptors; MpasCellMeshDescriptor
+```
 
 A descriptor for MPAS cell meshes.
 

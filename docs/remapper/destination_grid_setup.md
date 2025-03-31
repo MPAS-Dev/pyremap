@@ -1,4 +1,6 @@
 # Destination Grid Setup
+```{index} single: Remapper; Destination Grid Setup
+```
 
 How to set up the destination grid for remapping.
 

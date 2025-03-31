@@ -1,6 +1,6 @@
 # Make MPAS Vertex to Antarctic Stereo Mapping
-
-:index:
+```{index} single: Examples; MPAS Vertex to Antarctic Stereo
+```
 
 This example demonstrates how to create a mapping file from MPAS mesh vertices to an Antarctic stereographic grid.
 

@@ -1,4 +1,6 @@
 # ProjectionGridDescriptor
+```{index} single: Mesh Descriptors; ProjectionGridDescriptor
+```
 
 A descriptor for grids based on map projections.
 

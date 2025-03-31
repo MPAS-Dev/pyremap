@@ -53,4 +53,4 @@ remapper.ncremap(
 
 ## Additional Resources
 
-For more detailed examples and advanced usage, refer to the [documentation]({ref}`pyremap`).
+For more detailed examples and advanced usage, refer to the [documentation](index.md#pyremap).

@@ -1,4 +1,6 @@
 # PointCollectionDescriptor
+```{index} single: Mesh Descriptors; PointCollectionDescriptor
+```
 
 A descriptor for a collection of points.
 

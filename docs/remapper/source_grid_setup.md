@@ -1,4 +1,6 @@
 # Source Grid Setup
+```{index} single: Remapper; Source Grid Setup
+```
 
 How to set up the source grid for remapping.
 

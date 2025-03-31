@@ -1,4 +1,6 @@
 # Contribution Workflow
+```{index} single: Contribution Workflow
+```
 
 This document outlines the workflow for contributing to `pyremap`.
 
