@@ -13,7 +13,6 @@ import os
 from datetime import date
 
 from pyremap.version import __version__
-from pyremap.docs.parse_quick_start import build_quick_start
 
 # -- General configuration ------------------------------------------------
 
@@ -118,6 +117,9 @@ html_theme = 'sphinx_rtd_theme'
 #
 # html_theme_options = {}
 
+# Ensure the index is enabled
+html_use_index = True
+
 # -- Options for HTMLHelp output ------------------------------------------
 
 # Output file base name for HTML help builder.
@@ -180,8 +182,6 @@ intersphinx_mapping = {
     'numpy': ('http://docs.scipy.org/doc/numpy/', None),
     'xarray': ('http://xarray.pydata.org/en/stable/', None)}
 
-build_quick_start()
-
 github_doc_root = 'https://github.com/rtfd/recommonmark/tree/master/doc/'
 
 # Add any paths that contain custom static files (such as style sheets) here,
@@ -196,6 +196,6 @@ html_sidebars = {
 }
 
 html_context = {
-    'current_version': version,
+    'current_version': version if 'DOCS_VERSION' in os.environ else 'main',
     # Other context variables
 }

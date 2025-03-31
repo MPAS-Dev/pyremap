@@ -18,6 +18,9 @@ shared_dir = os.path.join(base_dir, 'shared')
 
 entries = []
 
+if not os.path.exists(base_dir) or not os.listdir(base_dir):
+    raise FileNotFoundError(f"Base directory '{base_dir}' does not exist or is empty.")
+
 versions = sorted(os.listdir(base_dir), reverse=True)
 if 'main' in versions:
     versions.insert(0, versions.pop(versions.index('main')))

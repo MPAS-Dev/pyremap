@@ -1,5 +1,7 @@
 # pyremap
 
+![pyremap logo](docs/_static/logo.png)
+
 Python remapping tools for climate and earth system models.
 
 ## Documentation
@@ -24,44 +26,10 @@ python -m pip install --no-deps --no-build-isolation -e .
 
 ## Examples
 
-```
-cd examples
-```
-First, make mapping files for a lat-lon grid, and test it out by remapping
-temperature from the example file:
-```
-wget https://web.lcrc.anl.gov/public/e3sm/inputdata/ocn/mpas-o/oQU240/ocean.QU.240km.151209.nc
-./make_mpas_to_lat_lon_mapping.py
-```
-You should now see the mapping file:
-```
-map_oQU240_to_0.5x0.5degree.nc
-```
-as well as the input file (an initial condition for the MPAS-Ocean model) and
-an example of temperature from the initial condition remapped to the new grid.
-```
-ocean.QU.240km.151209.nc
-temp_0.5x0.5degree.nc
-```
+Detailed examples of how to use `pyremap` can be found in the [documentation](http://mpas-dev.github.io/pyremap/main/). These include:
 
-Second, let's try the same but to an Antarctic stereographic grid:
-```
-./make_mpas_to_antarctic_stereo_mapping.py
-```
-Now, there's a new mapping file and example output file:
-```
-map_oQU240_to_6000.0x6000.0km_10.0km_Antarctic_stereo.nc
-temp_6000.0x6000.0km_10.0km_Antarctic_stereo.nc
-```
+1. Creating mapping files for remapping to a lat-lon grid.
+2. Creating mapping files for remapping to an Antarctic stereographic grid.
+3. Remapping data between different stereographic grids.
 
-Finally, let's remap the temperature on the Antarctic grid to a lower
-resolution Antarctic grid:
-```
-./remap_stereographic.py -i temp_6000.0x6000.0km_10.0km_Antarctic_stereo.nc \
-    -o temp_6000.0x6000.0km_20.0km_Antarctic_stereo.nc -r 20
-```
-This created another mapping file and an output file:
-```
-map_6000x6000km_10km_Antarctic_stereo_to_6000x6000km_20.0km_Antarctic_stereo.nc
-temp_6000.0x6000.0km_20.0km_Antarctic_stereo.nc
-```
+For step-by-step walkthroughs, see the [examples section](http://mpas-dev.github.io/pyremap/main/examples/index.html).

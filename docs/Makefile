@@ -33,6 +33,10 @@ clean:
 	rm -rf generated
 	@$(SPHINXBUILD) -M clean "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 
+clean-versioned-html:
+	rm -rf $(BUILDDIR)/html/*
+	@echo "Cleaned versioned HTML builds."
+
 .PHONY: help Makefile
 
 # Catch-all target: route all unknown targets to Sphinx using the new
