@@ -127,7 +127,7 @@ def unwrap_corners(in_field):
 def round_res(res):
     """Round the resolution to a reasonable number for grid names"""
     rounded = np.round(res * 1000.) / 1000.
-    return '{}'.format(rounded)
+    return f'{rounded}'
 
 
 def add_history(ds=None):

@@ -286,8 +286,7 @@ class LatLonGridDescriptor(MeshDescriptor):
         elif 'rad' in self.units:
             units = 'radian'
         else:
-            raise ValueError('Could not figure out units {}'.format(
-                self.units))
+            raise ValueError(f'Could not figure out units {self.units}')
 
         if self.regional is None:
             self.regional = False
@@ -302,5 +301,4 @@ class LatLonGridDescriptor(MeshDescriptor):
                 if np.abs(lat_range - np.pi) > 1e-10:
                     self.regional = True
         if self.mesh_name is None:
-            self.mesh_name = '{}x{}{}'.format(round_res(abs(dlat)),
-                                              round_res(abs(dlon)), units)
+            self.mesh_name = f'{round_res(abs(dlat))}x{round_res(abs(dlon))}{units}'

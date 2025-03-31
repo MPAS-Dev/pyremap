@@ -70,7 +70,7 @@ def get_polar_descriptor_from_file(filename, projection='antarctic'):
     lx = int((x[-1] - x[0]) / 1000.)
     ly = int((y[-1] - y[0]) / 1000.)
 
-    mesh_name = '{}x{}km_{}km_antarctic_stereo'.format(lx, ly, dx)
+    mesh_name = f'{lx}x{ly}km_{dx}km_antarctic_stereo'
 
     projection = _get_projection(projection)
 
@@ -103,7 +103,7 @@ def get_polar_descriptor(lx, ly, dx, dy, projection='antarctic'):
 
     upper_proj = projection[0].upper() + projection[1:]
 
-    mesh_name = '{}x{}km_{}km_{}_stereo'.format(lx, ly, dx, upper_proj)
+    mesh_name = f'{lx}x{ly}km_{dx}km_{upper_proj}_stereo'
 
     x_max = 0.5 * lx * 1e3
     nx = int(lx / dx) + 1
@@ -149,5 +149,5 @@ def _get_projection(projection):
         elif projection == 'antarctic':
             projection = get_antarctic_stereographic_projection()
         else:
-            raise ValueError('Bad projection name {}'.format(projection))
+            raise ValueError(f'Bad projection name {projection}')
     return projection
