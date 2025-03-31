@@ -301,4 +301,5 @@ class LatLonGridDescriptor(MeshDescriptor):
                 if np.abs(lat_range - np.pi) > 1e-10:
                     self.regional = True
         if self.mesh_name is None:
-            self.mesh_name = f'{round_res(abs(dlat))}x{round_res(abs(dlon))}{units}'
+            self.mesh_name = \
+                f'{round_res(abs(dlat))}x{round_res(abs(dlon))}{units}'

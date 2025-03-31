@@ -203,4 +203,5 @@ class LatLon2DGridDescriptor(MeshDescriptor):
         else:
             raise ValueError(f'Could not figure out units {self.units}')
         if self.mesh_name is None:
-            self.mesh_name = f'{round_res(abs(dlat))}x{round_res(abs(dlon))}{units}'
+            self.mesh_name = \
+                f'{round_res(abs(dlat))}x{round_res(abs(dlon))}{units}'
