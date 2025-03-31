@@ -19,6 +19,7 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Contribution Workflow" href="contribution_workflow.html" />
     <link rel="prev" title="Make MPAS Vertex to Antarctic Stereo Mapping" href="../examples/make_mpas_vertex_to_antarctic_stereo_mapping.html" />
     <link href="../_static/style.css" rel="stylesheet" type="text/css">
 
@@ -53,7 +54,13 @@
 <li class="toctree-l2"><a class="reference internal" href="#coding-standards">Coding Standards</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#testing">Testing</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#contribution-guidelines">Contribution Guidelines</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#additional-resources">Additional Resources</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#additional-resources">Additional Resources</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="contribution_workflow.html">Contribution Workflow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing_instructions.html">Testing Instructions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generate_preview_docs.html">Generating and Previewing Documentation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api.html">API reference</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -84,8 +91,7 @@
              
   <section class="tex2jax_ignore mathjax_ignore" id="developer-guide">
 <h1>Developer Guide<a class="headerlink" href="#developer-guide" title="Link to this heading"></a></h1>
-<p>:index:</p>
-<p>Welcome to the Developer Guide for <code class="docutils literal notranslate"><span class="pre">pyremap</span></code>. This section provides resources and guidelines for contributors.</p>
+<p id="index-0">Welcome to the Developer Guide for <code class="docutils literal notranslate"><span class="pre">pyremap</span></code>. This section provides resources and guidelines for contributors.</p>
 <section id="coding-standards">
 <h2>Coding Standards<a class="headerlink" href="#coding-standards" title="Link to this heading"></a></h2>
 <ul class="simple">
@@ -120,11 +126,43 @@
 </section>
 <section id="additional-resources">
 <h2>Additional Resources<a class="headerlink" href="#additional-resources" title="Link to this heading"></a></h2>
-<ul class="simple">
-<li><p><a class="reference internal" href="api.html"><span class="std std-doc">API Reference</span></a></p></li>
-<li><p><a class="reference internal" href="testing_instructions.html"><span class="std std-doc">Testing Instructions</span></a></p></li>
-<li><p><a class="reference internal" href="contribution_workflow.html"><span class="std std-doc">Contribution Workflow</span></a></p></li>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="contribution_workflow.html">Contribution Workflow</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="contribution_workflow.html#step-1-fork-the-repository">Step 1: Fork the Repository</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contribution_workflow.html#step-2-clone-your-fork">Step 2: Clone Your Fork</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contribution_workflow.html#step-3-create-a-feature-branch">Step 3: Create a Feature Branch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contribution_workflow.html#step-4-use-a-worktree-alternative-to-step-3">Step 4: Use a Worktree (Alternative to Step 3)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contribution_workflow.html#step-5-make-changes">Step 5: Make Changes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contribution_workflow.html#step-6-commit-your-changes">Step 6: Commit Your Changes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contribution_workflow.html#step-7-push-your-changes">Step 7: Push Your Changes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contribution_workflow.html#step-8-submit-a-pull-request">Step 8: Submit a Pull Request</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contribution_workflow.html#step-9-address-feedback">Step 9: Address Feedback</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contribution_workflow.html#additional-resources">Additional Resources</a></li>
 </ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="testing_instructions.html">Testing Instructions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="testing_instructions.html#running-tests">Running Tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="testing_instructions.html#writing-tests">Writing Tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="testing_instructions.html#debugging-failures">Debugging Failures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="testing_instructions.html#additional-resources">Additional Resources</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="generate_preview_docs.html">Generating and Previewing Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="generate_preview_docs.html#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generate_preview_docs.html#building-the-documentation">Building the Documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generate_preview_docs.html#previewing-the-documentation">Previewing the Documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="generate_preview_docs.html#notes">Notes</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api.html#mesh-descriptors">Mesh Descriptors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#remapping">Remapping</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#polar-projections">Polar projections</a></li>
+</ul>
+</li>
+</ul>
+</div>
 </section>
 </section>
 
@@ -133,6 +171,7 @@
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="../examples/make_mpas_vertex_to_antarctic_stereo_mapping.html" class="btn btn-neutral float-left" title="Make MPAS Vertex to Antarctic Stereo Mapping" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="contribution_workflow.html" class="btn btn-neutral float-right" title="Contribution Workflow" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

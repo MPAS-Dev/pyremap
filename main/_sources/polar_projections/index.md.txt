@@ -1,6 +1,6 @@
 # Polar Projections
-
-:index:
+```{index} single: Polar Projections
+```
 
 This is a set of functions used to support polar projections from `pyproj` and associated mesh descriptors.
 

@@ -1,0 +1,25 @@
+﻿pyremap.descriptor.MpasCellMeshDescriptor
+=========================================
+
+.. currentmodule:: pyremap.descriptor
+
+.. autoclass:: MpasCellMeshDescriptor
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~MpasCellMeshDescriptor.__init__
+      ~MpasCellMeshDescriptor.mesh_name_from_attr
+      ~MpasCellMeshDescriptor.to_scrip
+      ~MpasCellMeshDescriptor.write_netcdf
+   
+   
+
+   
+   
+   

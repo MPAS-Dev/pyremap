@@ -1,6 +1,6 @@
 # Mesh Descriptors
-
-:index:
+```{index} single: Mesh Descriptors
+```
 
 Overview of mesh descriptors used in pyremap.
 

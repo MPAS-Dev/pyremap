@@ -1,4 +1,6 @@
 # Testing Instructions
+```{index} single: Testing Instructions
+```
 
 This document provides detailed instructions for testing `pyremap`.
 

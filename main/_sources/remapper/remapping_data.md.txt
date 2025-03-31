@@ -1,4 +1,6 @@
 # Remapping Data
+```{index} single: Remapper; Remapping Data
+```
 
 How to remap data using the generated mapping file.
 

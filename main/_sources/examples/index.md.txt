@@ -1,4 +1,6 @@
 # Examples
+```{index} single: Examples
+```
 
 Detailed walkthroughs of example scripts.
 

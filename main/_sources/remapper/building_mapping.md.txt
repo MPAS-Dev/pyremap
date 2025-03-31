@@ -1,4 +1,6 @@
 # Building the Mapping
+```{index} single: Remapper; Building the Mapping
+```
 
 How to build the mapping file for remapping.
 

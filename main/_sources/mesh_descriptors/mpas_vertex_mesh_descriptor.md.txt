@@ -1,4 +1,6 @@
 # MpasVertexMeshDescriptor
+```{index} single: Mesh Descriptors; MpasVertexMeshDescriptor
+```
 
 A descriptor for MPAS vertex meshes.
 
