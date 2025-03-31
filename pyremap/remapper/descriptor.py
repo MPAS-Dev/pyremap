@@ -1,3 +1,5 @@
+from typing import TYPE_CHECKING
+
 import pyproj
 import xarray as xr
 
@@ -12,10 +14,18 @@ from pyremap import (
     get_lat_lon_descriptor,
 )
 
+if TYPE_CHECKING:
+    from pyremap.descriptor.mesh_descriptor import MeshDescriptor
+
 
 def _get_descriptor(info):
     """
     Get a mesh descriptor from the mesh info
+
+    Returns
+    -------
+    MeshDescriptor
+        A mesh descriptor object
     """
     grid_type = info['type']
     if grid_type == 'mpas':
@@ -32,13 +42,20 @@ def _get_descriptor(info):
     return descriptor
 
 
-def _get_mpas_descriptor(info):
+def _get_mpas_descriptor(info) -> 'MeshDescriptor':
     """
     Get an MPAS mesh descriptor from the given info
+
+    Returns
+    -------
+    MeshDescriptor
+        An MPAS mesh descriptor
     """
     mesh_type = info['mpas_mesh_type']
     filename = info['filename']
     mesh_name = info['name']
+
+    descriptor: MeshDescriptor
 
     if mesh_type == 'cell':
         descriptor = MpasCellMeshDescriptor(
@@ -58,19 +75,25 @@ def _get_mpas_descriptor(info):
     return descriptor
 
 
-def _get_lon_lat_descriptor(info):
+def _get_lon_lat_descriptor(info) -> 'MeshDescriptor':
     """
     Get a lon-lat descriptor from the given info
+
+    Returns
+    -------
+    MeshDescriptor
+        A lon-lat mesh descriptor
     """
+    descriptor: MeshDescriptor
 
     if 'dlat' in info and 'dlon' in info:
         lon_min = info['lon_min']
         lon_max = lon_min + 360.0
         descriptor = get_lat_lon_descriptor(
-            dLon=info['dlon'],
-            dLat=info['dlat'],
-            lonMin=lon_min,
-            lonMax=lon_max,
+            dlon=info['dlon'],
+            dlat=info['dlat'],
+            lon_min=lon_min,
+            lon_max=lon_max,
         )
     else:
         filename = info['filename']
@@ -102,10 +125,17 @@ def _get_lon_lat_descriptor(info):
     return descriptor
 
 
-def _get_proj_descriptor(info):
+def _get_proj_descriptor(info) -> 'MeshDescriptor':
     """
     Get a ProjectionGridDescriptor from the given info
+
+    Returns
+    -------
+    MeshDescriptor
+        A projection grid descriptor
     """
+    descriptor: MeshDescriptor
+
     filename = info['filename']
     grid_name = info['name']
     x = info['x']
@@ -129,10 +159,17 @@ def _get_proj_descriptor(info):
     return descriptor
 
 
-def _get_points_descriptor(info):
+def _get_points_descriptor(info) -> 'MeshDescriptor':
     """
     Get a PointCollectionDescriptor from the given info
+
+    Returns
+    -------
+    MeshDescriptor
+        A point collection descriptor
     """
+    descriptor: MeshDescriptor
+
     filename = info['filename']
     collection_name = info['name']
     lon_var = info['lon']
@@ -149,7 +186,7 @@ def _get_points_descriptor(info):
             raise ValueError(f'Unexpected longitude unit unit {unit_attr}')
 
     descriptor = PointCollectionDescriptor(
-        lons=lon, lats=lat, collectionName=collection_name, units=units
+        lons=lon, lats=lat, collection_name=collection_name, units=units
     )
 
     return descriptor

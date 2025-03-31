@@ -9,6 +9,8 @@
 # distributed with this code, or at
 # https://raw.githubusercontent.com/MPAS-Dev/pyremap/main/LICENSE
 
+from typing import Optional
+
 import numpy as np
 import xarray as xr
 
@@ -69,19 +71,19 @@ class LatLonGridDescriptor(MeshDescriptor):
 
     Attributes
     ----------
-    lat : numpy.ndarray
+    lat : Optional[numpy.ndarray]
         The latitude coordinate at grid-cell centers
 
-    lon : numpy.ndarray
+    lon : Optional[numpy.ndarray]
         The longitude coordinate at grid-cell centers
 
-    lat_corner : numpy.ndarray
+    lat_corner : Optional[numpy.ndarray]
         The latitude coordinate at grid-cell corners
 
-    lon_corner : numpy.ndarray
+    lon_corner : Optional[numpy.ndarray]
         The longitude coordinate at grid-cell corners
 
-    history : str
+    history : Optional[str]
         The history attribute written to SCRIP files
     """
 
@@ -99,12 +101,12 @@ class LatLonGridDescriptor(MeshDescriptor):
             latitude and longitude to see if they cover the globe.
         """
         super().__init__(mesh_name=mesh_name, regional=regional)
-        self.lat = None
-        self.lon = None
-        self.units = None
-        self.lat_corner = None
-        self.lon_corner = None
-        self.history = None
+        self.lat: Optional[np.ndarray] = None
+        self.lon: Optional[np.ndarray] = None
+        self.units: Optional[str] = None
+        self.lat_corner: Optional[np.ndarray] = None
+        self.lon_corner: Optional[np.ndarray] = None
+        self.history: Optional[str] = None
 
     @classmethod
     def read(
@@ -231,6 +233,18 @@ class LatLonGridDescriptor(MeshDescriptor):
             A factor by which to expand each grid cell outward from the center.
             If a ``numpy.ndarray``, one value per cell.
         """
+        assert self.lat is not None, 'lat must be set before calling to_scrip'
+        assert self.lon is not None, 'lon must be set before calling to_scrip'
+        assert self.lat_corner is not None, (
+            'lat_corner must be set before calling to_scrip'
+        )
+        assert self.lon_corner is not None, (
+            'lon_corner must be set before calling to_scrip'
+        )
+        assert self.units is not None, (
+            'units must be set before calling to_scrip'
+        )
+
         ds = xr.Dataset()
 
         (center_lon, center_lat) = np.meshgrid(self.lon, self.lat)
@@ -276,6 +290,22 @@ class LatLonGridDescriptor(MeshDescriptor):
         """
         Set up a coords dict with lat and lon
         """
+        assert self.lat is not None, (
+            'lat must be set before calling _set_coords'
+        )
+        assert self.lon is not None, (
+            'lon must be set before calling _set_coords'
+        )
+        assert self.lat_corner is not None, (
+            'lat_corner must be set before calling _set_coords'
+        )
+        assert self.lon_corner is not None, (
+            'lon_corner must be set before calling _set_coords'
+        )
+        assert self.units is not None, (
+            'units must be set before calling _set_coords'
+        )
+
         self.lat_var_name = lat_var_name
         self.lon_var_name = lon_var_name
         self.coords = {

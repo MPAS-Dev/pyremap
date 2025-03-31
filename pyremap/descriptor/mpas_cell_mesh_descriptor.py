@@ -9,6 +9,8 @@
 # distributed with this code, or at
 # https://raw.githubusercontent.com/MPAS-Dev/pyremap/main/LICENSE
 
+from typing import Optional
+
 import numpy as np
 import xarray as xr
 
@@ -22,12 +24,19 @@ class MpasCellMeshDescriptor(MeshDescriptor):
 
     Attributes
     ----------
-    filename : str
+    filename : Optional[str]
         The path of the file containing the MPAS mesh
 
-    history : str
+    mesh_name : Optional[str]
+        The name of the MPAS mesh
+
+    history : Optional[str]
         The history attribute written to SCRIP files
     """
+
+    filename: Optional[str]
+    mesh_name: Optional[str]
+    history: Optional[str]
 
     def __init__(self, filename, mesh_name=None):
         """
@@ -54,6 +63,7 @@ class MpasCellMeshDescriptor(MeshDescriptor):
 
             self.filename = filename
             self.regional = True
+            self.history = None
 
             # build coords
             self.coords = {
@@ -90,6 +100,17 @@ class MpasCellMeshDescriptor(MeshDescriptor):
             A factor by which to expand each grid cell outward from the center.
             If a ``numpy.ndarray``, one value per cell.
         """
+
+        # Ensure attributes are not None before proceeding
+        assert self.filename is not None, (
+            'filename must be set before calling to_scrip'
+        )
+        assert self.mesh_name is not None, (
+            'mesh_name must be set before calling to_scrip'
+        )
+        assert self.history is not None, (
+            'history must be set before calling to_scrip'
+        )
 
         ds_in = xr.open_dataset(self.filename)
         lat_cell = ds_in.latCell.values

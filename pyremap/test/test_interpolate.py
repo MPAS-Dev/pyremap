@@ -15,6 +15,7 @@ Unit test infrastructure for horizontal interpolation.
 import os
 import shutil
 import tempfile
+from typing import Optional
 
 import numpy as np
 import pyproj
@@ -36,6 +37,8 @@ from pyremap.test import TestCase, loaddatadir  # noqa: F401
 
 @pytest.mark.usefixtures('loaddatadir')
 class TestInterp(TestCase):
+    datadir: Optional[str]  # Added type hint for datadir
+
     def setUp(self):
         # Create a temporary directory
         self.test_dir = tempfile.mkdtemp()
@@ -49,6 +52,7 @@ class TestInterp(TestCase):
         shutil.rmtree(self.test_dir)
 
     def get_mpas_cell_descriptor(self):
+        assert self.datadir is not None, 'datadir must not be None'
         mpas_mesh_filename = str(self.datadir.join('mpasMesh.nc'))
         time_series_filename = str(
             self.datadir.join('timeSeries.0002-01-01.nc')
@@ -60,6 +64,7 @@ class TestInterp(TestCase):
         return descriptor, mpas_mesh_filename, time_series_filename
 
     def get_mpas_edge_descriptor(self):
+        assert self.datadir is not None, 'datadir must not be None'
         mpas_mesh_filename = str(self.datadir.join('mpasMesh.nc'))
         area_filename = str(self.datadir.join('mpasAreaEdge.nc'))
         descriptor = MpasEdgeMeshDescriptor(
@@ -69,6 +74,7 @@ class TestInterp(TestCase):
         return descriptor, mpas_mesh_filename, area_filename
 
     def get_mpas_vertex_descriptor(self):
+        assert self.datadir is not None, 'datadir must not be None'
         mpas_mesh_filename = str(self.datadir.join('mpasMesh.nc'))
         area_filename = str(self.datadir.join('mpasAreaVertex.nc'))
         descriptor = MpasVertexMeshDescriptor(
@@ -78,6 +84,7 @@ class TestInterp(TestCase):
         return descriptor, mpas_mesh_filename, area_filename
 
     def get_latlon_file_descriptor(self):
+        assert self.datadir is not None, 'datadir must not be None'
         latlon_grid_filename = str(
             self.datadir.join('SST_annual_1870-1900.nc')
         )
@@ -95,6 +102,7 @@ class TestInterp(TestCase):
         return descriptor
 
     def get_latlon2d_file_descriptor(self):
+        assert self.datadir is not None, 'datadir must not be None'
         latlon_grid_filename = str(
             self.datadir.join('SST_annual_1870-1900.nc')
         )
@@ -111,6 +119,7 @@ class TestInterp(TestCase):
         return descriptor, latlon_grid_filename
 
     def get_point_collection_descriptor(self):
+        assert self.datadir is not None, 'datadir must not be None'
         mpas_mesh_filename = str(self.datadir.join('mpasMesh.nc'))
         ds = xr.open_dataset(mpas_mesh_filename)
         lats = ds.latCell.values
@@ -147,12 +156,14 @@ class TestInterp(TestCase):
         return descriptor
 
     def get_filenames(self, suffix):
+        assert self.datadir is not None, 'datadir must not be None'
         weight_filename = f'{self.test_dir}/weights_{suffix}.nc'
         out_filename = f'{self.test_dir}/remapped_{suffix}.nc'
         ref_filename = f'{self.datadir}/ref_{suffix}.nc'
         return weight_filename, out_filename, ref_filename
 
     def get_scrip_filenames(self, suffix):
+        assert self.datadir is not None, 'datadir must not be None'
         scrip_filename = f'{self.test_dir}/scrip_{suffix}.nc'
         ref_filename = f'{self.datadir}/ref_scrip_{suffix}.nc'
         return scrip_filename, ref_filename

@@ -9,6 +9,8 @@
 # distributed with this code, or at
 # https://raw.githubusercontent.com/MPAS-Dev/pyremap/main/LICENSE
 
+from typing import Optional
+
 import numpy as np
 import pyproj
 import xarray as xr
@@ -76,13 +78,13 @@ class ProjectionGridDescriptor(MeshDescriptor):
         self.projection = projection
         self.lat_lon_projection = pyproj.Proj(proj='latlong', datum='WGS84')
 
-        self.x = None
-        self.y = None
-        self.x_corner = None
-        self.y_corner = None
-        self.history = None
-        self.x_var_name = None
-        self.y_var_name = None
+        self.x: Optional[np.ndarray] = None
+        self.y: Optional[np.ndarray] = None
+        self.x_corner: Optional[np.ndarray] = None
+        self.y_corner: Optional[np.ndarray] = None
+        self.history: Optional[str] = None
+        self.x_var_name: Optional[str] = None
+        self.y_var_name: Optional[str] = None
 
     @classmethod
     def read(
@@ -194,6 +196,14 @@ class ProjectionGridDescriptor(MeshDescriptor):
             A factor by which to expand each grid cell outward from the center.
             If a ``numpy.ndarray``, one value per cell.
         """
+        assert self.x is not None, 'x must be set before calling to_scrip'
+        assert self.y is not None, 'y must be set before calling to_scrip'
+        assert self.x_corner is not None, (
+            'x_corner must be set before calling to_scrip'
+        )
+        assert self.y_corner is not None, (
+            'y_corner must be set before calling to_scrip'
+        )
 
         ds = xr.Dataset()
 
@@ -272,6 +282,8 @@ class ProjectionGridDescriptor(MeshDescriptor):
         """
         Set up a coords dict with x, y, lat and lon
         """
+        assert self.x is not None, 'x must be set before calling to_scrip'
+        assert self.y is not None, 'y must be set before calling to_scrip'
         self.x_var_name = x_var_name
         self.y_var_name = y_var_name
         (x, y) = np.meshgrid(self.x, self.y)

@@ -9,6 +9,8 @@
 # distributed with this code, or at
 # https://raw.githubusercontent.com/MPAS-Dev/pyremap/main/LICENSE
 
+from typing import Optional
+
 import numpy as np
 import xarray as xr
 
@@ -60,12 +62,12 @@ class LatLon2DGridDescriptor(MeshDescriptor):
             Whether this is a regional or global grid
         """
         super().__init__(mesh_name=mesh_name, regional=regional)
-        self.lat = None
-        self.lon = None
-        self.units = None
-        self.lat_corner = None
-        self.lon_corner = None
-        self.history = None
+        self.lat: Optional[np.ndarray] = None
+        self.lon: Optional[np.ndarray] = None
+        self.units: Optional[str] = None
+        self.lat_corner: Optional[np.ndarray] = None
+        self.lon_corner: Optional[np.ndarray] = None
+        self.history: Optional[str] = None
 
     @classmethod
     def read(
@@ -148,6 +150,22 @@ class LatLon2DGridDescriptor(MeshDescriptor):
             A factor by which to expand each grid cell outward from the center.
             If a ``numpy.ndarray``, one value per cell.
         """
+        # Ensure required attributes are set
+        assert self.lat is not None, 'lat must be set before calling to_scrip'
+        assert self.lon is not None, 'lon must be set before calling to_scrip'
+        assert self.lat_corner is not None, (
+            'lat_corner must be set before calling to_scrip'
+        )
+        assert self.lon_corner is not None, (
+            'lon_corner must be set before calling to_scrip'
+        )
+        assert self.units is not None, (
+            'units must be set before calling to_scrip'
+        )
+        assert self.history is not None, (
+            'history must be set before calling to_scrip'
+        )
+
         ds = xr.Dataset()
 
         ds['grid_center_lat'] = (('grid_size',), self.lat.flat)
@@ -190,6 +208,17 @@ class LatLon2DGridDescriptor(MeshDescriptor):
         """
         Set up a coords dict with lat and lon
         """
+        # Ensure required attributes are set
+        assert self.lat is not None, (
+            'lat must be set before calling _set_coords'
+        )
+        assert self.lon is not None, (
+            'lon must be set before calling _set_coords'
+        )
+        assert self.units is not None, (
+            'units must be set before calling _set_coords'
+        )
+
         self.lat_var_name = lat_var_name
         self.lon_var_name = lon_var_name
         self.coords = {

@@ -134,12 +134,12 @@ def check_call(args, logger=None, log_command=True, **kwargs):
 
 def _print_running(args, fn):
     if isinstance(args, str):
-        print_args = args
+        print_string = args
     else:
         print_args = []
         for arg in args:
             if ' ' in arg:
                 arg = f'"{arg}"'
             print_args.append(arg)
-        print_args = ' '.join(print_args)
-    fn(f'running: {print_args}')
+        print_string = ' '.join(print_args)
+    fn(f'running: {print_string}')

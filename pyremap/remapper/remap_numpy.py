@@ -57,10 +57,11 @@ def _remap_numpy(remapper, ds, renormalization_threshold):
         raise TypeError('ds not an xarray Dataset or DataArray.')
 
     # Update history attribute of netCDF file
+    current_hist = ' '.join(sys.argv[:])
     if 'history' in ds_remap.attrs:
-        newhist = '\n'.join([ds_remap.attrs['history'], ' '.join(sys.argv[:])])
+        newhist = '\n'.join([ds_remap.attrs['history'], current_hist])
     else:
-        newhist = sys.argv[:]
+        newhist = current_hist
     ds_remap.attrs['history'] = newhist
 
     ds_remap.attrs['mesh_name'] = remapper.dst_descriptor.mesh_name
