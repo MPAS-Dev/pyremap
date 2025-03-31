@@ -1,6 +1,0 @@
-﻿pyremap.descriptor.PointCollectionDescriptor.to\_scrip
-======================================================
-
-.. currentmodule:: pyremap.descriptor
-
-.. automethod:: PointCollectionDescriptor.to_scrip

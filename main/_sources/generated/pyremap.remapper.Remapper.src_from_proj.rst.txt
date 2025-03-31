@@ -1,6 +1,0 @@
-﻿pyremap.remapper.Remapper.src\_from\_proj
-=========================================
-
-.. currentmodule:: pyremap.remapper
-
-.. automethod:: Remapper.src_from_proj

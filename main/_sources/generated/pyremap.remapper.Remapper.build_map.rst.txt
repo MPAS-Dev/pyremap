@@ -1,6 +1,0 @@
-﻿pyremap.remapper.Remapper.build\_map
-====================================
-
-.. currentmodule:: pyremap.remapper
-
-.. automethod:: Remapper.build_map

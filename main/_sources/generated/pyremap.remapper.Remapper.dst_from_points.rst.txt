@@ -1,6 +1,0 @@
-﻿pyremap.remapper.Remapper.dst\_from\_points
-===========================================
-
-.. currentmodule:: pyremap.remapper
-
-.. automethod:: Remapper.dst_from_points

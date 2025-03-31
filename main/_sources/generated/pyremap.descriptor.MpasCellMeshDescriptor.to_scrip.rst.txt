@@ -1,6 +1,0 @@
-﻿pyremap.descriptor.MpasCellMeshDescriptor.to\_scrip
-===================================================
-
-.. currentmodule:: pyremap.descriptor
-
-.. automethod:: MpasCellMeshDescriptor.to_scrip

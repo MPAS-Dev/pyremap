@@ -19,7 +19,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="API reference" href="api.html" />
+    <link rel="next" title="Mesh Descriptors" href="mesh_descriptors/index.html" />
     <link rel="prev" title="pyremap" href="index.html" />
     <link href="_static/style.css" rel="stylesheet" type="text/css">
 
@@ -47,12 +47,20 @@
               <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Quick Start</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#examples">Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#basic-usage">Basic Usage</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#step-1-define-source-and-destination-grids">Step 1: Define Source and Destination Grids</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#step-2-generate-a-mapping-file">Step 2: Generate a Mapping File</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#step-3-apply-the-mapping">Step 3: Apply the Mapping</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#additional-resources">Additional Resources</a></li>
 </ul>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="api.html">API reference</a></li>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="mesh_descriptors/index.html">Mesh Descriptors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="remapper/index.html">Remapper</a></li>
+<li class="toctree-l1"><a class="reference internal" href="polar_projections/index.html">Polar Projections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developer_guide/index.html">Developer Guide</a></li>
 </ul>
 
         </div>
@@ -80,64 +88,59 @@
            <div itemprop="articleBody">
              
   <section class="tex2jax_ignore mathjax_ignore" id="quick-start">
-<span id="id1"></span><h1>Quick Start<a class="headerlink" href="#quick-start" title="Link to this heading"></a></h1>
-<p>Python remapping tools for climate and earth system models.</p>
+<h1>Quick Start<a class="headerlink" href="#quick-start" title="Link to this heading"></a></h1>
+<p>This guide will help you get started with <code class="docutils literal notranslate"><span class="pre">pyremap</span></code> for remapping data between different spatial representations.</p>
 <section id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h2>
-<p>To use the latest version for developers, get the code from:
-<a class="reference external" href="https://github.com/MPAS-Dev/pyremap">https://github.com/MPAS-Dev/pyremap</a></p>
-<p>Then, you will need to set up a conda environment and install the package
-in a way that points to the repo (so changes you make are available in the
-conda environment):</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">config</span> <span class="o">--</span><span class="n">add</span> <span class="n">channels</span> <span class="n">conda</span><span class="o">-</span><span class="n">forge</span>
-<span class="n">conda</span> <span class="n">config</span> <span class="o">--</span><span class="nb">set</span> <span class="n">channel_priority</span> <span class="n">strict</span>
-<span class="n">conda</span> <span class="n">create</span> <span class="o">-</span><span class="n">y</span> <span class="o">-</span><span class="n">n</span> <span class="n">pyremap</span> <span class="o">--</span><span class="n">file</span> <span class="n">dev</span><span class="o">-</span><span class="n">spec</span><span class="o">.</span><span class="n">txt</span>
-<span class="n">conda</span> <span class="n">activate</span> <span class="n">pyremap</span>
-<span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">pip</span> <span class="n">install</span> <span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">deps</span> <span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">build</span><span class="o">-</span><span class="n">isolation</span> <span class="o">-</span><span class="n">e</span> <span class="o">.</span>
+<p>To install <code class="docutils literal notranslate"><span class="pre">pyremap</span></code>, use <code class="docutils literal notranslate"><span class="pre">conda</span></code> (from the <code class="docutils literal notranslate"><span class="pre">conda-forge</span></code> channel):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>install<span class="w"> </span>pyremap
 </pre></div>
 </div>
 </section>
-<section id="examples">
-<h2>Examples<a class="headerlink" href="#examples" title="Link to this heading"></a></h2>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">examples</span>
+<section id="basic-usage">
+<h2>Basic Usage<a class="headerlink" href="#basic-usage" title="Link to this heading"></a></h2>
+<p>Here is a simple example of how to use <code class="docutils literal notranslate"><span class="pre">pyremap</span></code> to remap data from a source grid to a destination grid.</p>
+<section id="step-1-define-source-and-destination-grids">
+<h3>Step 1: Define Source and Destination Grids<a class="headerlink" href="#step-1-define-source-and-destination-grids" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyremap</span><span class="w"> </span><span class="kn">import</span> <span class="n">LatLonGridDescriptor</span><span class="p">,</span> <span class="n">MpasCellMeshDescriptor</span>
+
+<span class="c1"># Define a source grid (e.g., a regular latitude-longitude grid)</span>
+<span class="n">source_grid</span> <span class="o">=</span> <span class="n">LatLonGridDescriptor</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">file_name</span><span class="o">=</span><span class="s1">&#39;source_grid.nc&#39;</span><span class="p">)</span>
+
+<span class="c1"># Define a destination grid (e.g., an unstructured mesh)</span>
+<span class="n">destination_grid</span> <span class="o">=</span> <span class="n">MpasCellMeshDescriptor</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">file_name</span><span class="o">=</span><span class="s1">&#39;destination_grid.nc&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>First, make mapping files for a lat-lon grid, and test it out by remapping
-temperature from the example file:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">wget</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">web</span><span class="o">.</span><span class="n">lcrc</span><span class="o">.</span><span class="n">anl</span><span class="o">.</span><span class="n">gov</span><span class="o">/</span><span class="n">public</span><span class="o">/</span><span class="n">e3sm</span><span class="o">/</span><span class="n">inputdata</span><span class="o">/</span><span class="n">ocn</span><span class="o">/</span><span class="n">mpas</span><span class="o">-</span><span class="n">o</span><span class="o">/</span><span class="n">oQU240</span><span class="o">/</span><span class="n">ocean</span><span class="o">.</span><span class="n">QU</span><span class="mf">.240</span><span class="n">km</span><span class="mf">.151209</span><span class="o">.</span><span class="n">nc</span>
-<span class="o">./</span><span class="n">make_mpas_to_lat_lon_mapping</span><span class="o">.</span><span class="n">py</span>
+</section>
+<section id="step-2-generate-a-mapping-file">
+<h3>Step 2: Generate a Mapping File<a class="headerlink" href="#step-2-generate-a-mapping-file" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyremap</span><span class="w"> </span><span class="kn">import</span> <span class="n">Remapper</span>
+
+<span class="c1"># Create a remapper object</span>
+<span class="n">remapper</span> <span class="o">=</span> <span class="n">Remapper</span><span class="p">(</span><span class="n">map_filename</span><span class="o">=</span><span class="s1">&#39;map_source_to_dest.nc&#39;</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;bilinear&#39;</span><span class="p">)</span>
+<span class="n">remapper</span><span class="o">.</span><span class="n">src_descriptor</span> <span class="o">=</span> <span class="n">source_grid</span>
+<span class="n">remapper</span><span class="o">.</span><span class="n">dst_descriptor</span> <span class="o">=</span> <span class="n">destination_grid</span>
+
+<span class="c1"># Generate the mapping file</span>
+<span class="n">remapper</span><span class="o">.</span><span class="n">build_map</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>You should now see the mapping file:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">map_oQU240_to_0</span><span class="mf">.5</span><span class="n">x0</span><span class="mf">.5</span><span class="n">degree</span><span class="o">.</span><span class="n">nc</span>
+</section>
+<section id="step-3-apply-the-mapping">
+<h3>Step 3: Apply the Mapping<a class="headerlink" href="#step-3-apply-the-mapping" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Remap data from the source grid to the destination grid</span>
+<span class="n">remapper</span><span class="o">.</span><span class="n">ncremap</span><span class="p">(</span>
+    <span class="n">in_filename</span><span class="o">=</span><span class="s1">&#39;source_data.nc&#39;</span><span class="p">,</span>
+    <span class="n">out_filename</span><span class="o">=</span><span class="s1">&#39;remapped_data.nc&#39;</span><span class="p">,</span>
+    <span class="n">variable_list</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;temperature&#39;</span><span class="p">,</span> <span class="s1">&#39;salinity&#39;</span><span class="p">]</span>
+<span class="p">)</span>
 </pre></div>
 </div>
-<p>as well as the input file (an initial condition for the MPAS-Ocean model) and
-an example of temperature from the initial condition remapped to the new grid.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ocean</span><span class="o">.</span><span class="n">QU</span><span class="mf">.240</span><span class="n">km</span><span class="mf">.151209</span><span class="o">.</span><span class="n">nc</span>
-<span class="n">temp_0</span><span class="mf">.5</span><span class="n">x0</span><span class="mf">.5</span><span class="n">degree</span><span class="o">.</span><span class="n">nc</span>
-</pre></div>
-</div>
-<p>Second, let’s try the same but to an Antarctic stereographic grid:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">./</span><span class="n">make_mpas_to_antarctic_stereo_mapping</span><span class="o">.</span><span class="n">py</span>
-</pre></div>
-</div>
-<p>Now, there’s a new mapping file and example output file:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">map_oQU240_to_6000</span><span class="mf">.0</span><span class="n">x6000</span><span class="mf">.0</span><span class="n">km_10</span><span class="mf">.0</span><span class="n">km_Antarctic_stereo</span><span class="o">.</span><span class="n">nc</span>
-<span class="n">temp_6000</span><span class="mf">.0</span><span class="n">x6000</span><span class="mf">.0</span><span class="n">km_10</span><span class="mf">.0</span><span class="n">km_Antarctic_stereo</span><span class="o">.</span><span class="n">nc</span>
-</pre></div>
-</div>
-<p>Finally, let’s remap the temperature on the Antarctic grid to a lower
-resolution Antarctic grid:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">./</span><span class="n">remap_stereographic</span><span class="o">.</span><span class="n">py</span> <span class="o">-</span><span class="n">i</span> <span class="n">temp_6000</span><span class="mf">.0</span><span class="n">x6000</span><span class="mf">.0</span><span class="n">km_10</span><span class="mf">.0</span><span class="n">km_Antarctic_stereo</span><span class="o">.</span><span class="n">nc</span> \
-    <span class="o">-</span><span class="n">o</span> <span class="n">temp_6000</span><span class="mf">.0</span><span class="n">x6000</span><span class="mf">.0</span><span class="n">km_20</span><span class="mf">.0</span><span class="n">km_Antarctic_stereo</span><span class="o">.</span><span class="n">nc</span> <span class="o">-</span><span class="n">r</span> <span class="mi">20</span>
-</pre></div>
-</div>
-<p>This created another mapping file and an output file:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">map_6000x6000km_10km_Antarctic_stereo_to_6000x6000km_20</span><span class="mf">.0</span><span class="n">km_Antarctic_stereo</span><span class="o">.</span><span class="n">nc</span>
-<span class="n">temp_6000</span><span class="mf">.0</span><span class="n">x6000</span><span class="mf">.0</span><span class="n">km_20</span><span class="mf">.0</span><span class="n">km_Antarctic_stereo</span><span class="o">.</span><span class="n">nc</span>
-</pre></div>
-</div>
+</section>
+</section>
+<section id="additional-resources">
+<h2>Additional Resources<a class="headerlink" href="#additional-resources" title="Link to this heading"></a></h2>
+<p>For more detailed examples and advanced usage, refer to the <a class="reference internal" href="#%7Bref%7D%60pyremap%60"><span class="xref myst">documentation</span></a>.</p>
 </section>
 </section>
 
@@ -146,7 +149,7 @@ resolution Antarctic grid:</p>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="index.html" class="btn btn-neutral float-left" title="pyremap" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="api.html" class="btn btn-neutral float-right" title="API reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="mesh_descriptors/index.html" class="btn btn-neutral float-right" title="Mesh Descriptors" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
@@ -188,7 +191,7 @@ resolution Antarctic grid:</p>
     </script>
 
     <!-- Load version switcher JS -->
-    <script src="../shared/version-switcher.js"></script>
+    <script src="shared/version-switcher.js"></script>
 
 
 

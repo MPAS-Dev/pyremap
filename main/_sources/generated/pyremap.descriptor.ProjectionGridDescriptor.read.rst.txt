@@ -1,6 +1,0 @@
-﻿pyremap.descriptor.ProjectionGridDescriptor.read
-================================================
-
-.. currentmodule:: pyremap.descriptor
-
-.. automethod:: ProjectionGridDescriptor.read

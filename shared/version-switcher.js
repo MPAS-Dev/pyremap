@@ -17,7 +17,11 @@
       }
     }
 
-    const versions = await fetchVersions();
+    const versions = await fetchVersions().catch(() => []);
+    if (!versions.length) {
+        console.warn("No versions found or failed to load versions.json.");
+        return;
+    }
 
     const select = document.createElement("select");
     select.style.marginLeft = "1em";

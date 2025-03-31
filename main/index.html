@@ -45,9 +45,11 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="quick_start.html">Quick Start</a></li>
-</ul>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="api.html">API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mesh_descriptors/index.html">Mesh Descriptors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="remapper/index.html">Remapper</a></li>
+<li class="toctree-l1"><a class="reference internal" href="polar_projections/index.html">Polar Projections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developer_guide/index.html">Developer Guide</a></li>
 </ul>
 
         </div>
@@ -74,34 +76,104 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section class="tex2jax_ignore mathjax_ignore" id="pyremap">
+  <p><img alt="pyremap logo" src="../_static/logo.png" />
+=(pyremap)</p>
+<section class="tex2jax_ignore mathjax_ignore" id="pyremap">
 <h1>pyremap<a class="headerlink" href="#pyremap" title="Link to this heading"></a></h1>
 <p>Python remapping tools for climate and earth system models.</p>
+<section id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading"></a></h2>
+<p>:index:</p>
+<p><code class="docutils literal notranslate"><span class="pre">pyremap</span></code> is a Python library designed to facilitate the remapping
+(interpolation) of data between different spatial representations, such as
+grids and meshes. Remapping is a critical step in climate and Earth system
+modeling, where data from various sources—such as models, observations, or
+reanalysis products—often need to be compared, combined, or transformed to a
+common spatial domain.</p>
+<p>The library provides a high-level interface for defining source and
+destination grids or meshes, generating mapping (weight) files, and applying
+these mappings to remap data. It supports structured grids (e.g., regular
+latitude-longitude grids) and unstructured meshes (e.g., MPAS meshes), making
+it a versatile tool for a wide range of applications.</p>
+<p>Key features of <code class="docutils literal notranslate"><span class="pre">pyremap</span></code> include:</p>
+<ul class="simple">
+<li><p><strong>Support for multiple grid types</strong>: Structured grids, unstructured meshes,
+and projected grids.</p></li>
+<li><p><strong>Flexible remapping methods</strong>: Bilinear, conservative, and nearest-neighbor
+interpolation.</p></li>
+<li><p><strong>Integration with external tools</strong>: Leverages tools like ESMF (Earth System
+Modeling Framework) and MOAB for generating mapping files.</p></li>
+<li><p><strong>Ease of use</strong>: High-level Python API for defining grids, building
+mappings, and remapping data.</p></li>
+</ul>
+<p>Whether you are working with climate model output, observational data, or
+custom spatial datasets, <code class="docutils literal notranslate"><span class="pre">pyremap</span></code> provides the tools you need to perform
+accurate and efficient remapping.</p>
+</section>
+<section id="documentation-overview">
+<h2>Documentation Overview<a class="headerlink" href="#documentation-overview" title="Link to this heading"></a></h2>
+<p>:index:</p>
+<p>This documentation is organized into the following sections:</p>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="quick_start.html">Quick Start</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="quick_start.html#installation">Installation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="quick_start.html#examples">Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quick_start.html#basic-usage">Basic Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quick_start.html#additional-resources">Additional Resources</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="mesh_descriptors/index.html">Mesh Descriptors</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="mesh_descriptors/lat_lon_grid_descriptor.html">LatLonGridDescriptor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mesh_descriptors/lat_lon_2d_grid_descriptor.html">LatLon2DGridDescriptor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mesh_descriptors/mpas_cell_mesh_descriptor.html">MpasCellMeshDescriptor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mesh_descriptors/mpas_edge_mesh_descriptor.html">MpasEdgeMeshDescriptor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mesh_descriptors/mpas_vertex_mesh_descriptor.html">MpasVertexMeshDescriptor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mesh_descriptors/point_collection_descriptor.html">PointCollectionDescriptor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mesh_descriptors/projection_grid_descriptor.html">ProjectionGridDescriptor</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="remapper/index.html">Remapper</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="remapper/source_grid_setup.html">Source Grid Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="remapper/destination_grid_setup.html">Destination Grid Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="remapper/smoothing.html">Smoothing with <code class="docutils literal notranslate"><span class="pre">expand_dist</span></code> and <code class="docutils literal notranslate"><span class="pre">expand_factor</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="remapper/building_mapping.html">Building the Mapping</a></li>
+<li class="toctree-l2"><a class="reference internal" href="remapper/remapping_data.html">Remapping Data</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="polar_projections/index.html">Polar Projections</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="polar_projections/polar_descriptor.html">Polar Descriptor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="polar_projections/arctic_stereographic.html">Arctic Stereographic Projection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="polar_projections/antarctic_stereographic.html">Antarctic Stereographic Projection</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples/index.html">Examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="examples/make_mpas_to_lat_lon_mapping.html">Make MPAS to Lat-Lon Mapping</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/make_mpas_to_antarctic_stereo_mapping.html">Make MPAS to Antarctic Stereo Mapping</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/make_mpas_vertex_to_antarctic_stereo_mapping.html">Make MPAS Vertex to Antarctic Stereo Mapping</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="developer_guide/index.html">Developer Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="developer_guide/index.html#coding-standards">Coding Standards</a></li>
+<li class="toctree-l2"><a class="reference internal" href="developer_guide/index.html#testing">Testing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="developer_guide/index.html#contribution-guidelines">Contribution Guidelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="developer_guide/index.html#additional-resources">Additional Resources</a></li>
 </ul>
 </li>
 </ul>
 </div>
+<ul class="simple">
+<li><p><strong>Quick Start</strong>: A brief guide to get you started with <code class="docutils literal notranslate"><span class="pre">pyremap</span></code>.</p></li>
+<li><p><strong>Mesh Descriptors</strong>: Detailed descriptions of the different types of grids and meshes supported by <code class="docutils literal notranslate"><span class="pre">pyremap</span></code>.</p></li>
+<li><p><strong>Remapper</strong>: An overview of the remapping process, including source and destination grid setup, mapping file generation, and data remapping.</p></li>
+<li><p><strong>Polar Projections</strong>: Information on working with polar stereographic projections.</p></li>
+<li><p><strong>Examples</strong>: Step-by-step examples demonstrating common use cases.</p></li>
+<li><p><strong>Developer Guide</strong>: Resources for contributors, including API references, testing instructions, contribution guidelines, and coding standards.</p></li>
+</ul>
 </section>
-<section class="tex2jax_ignore mathjax_ignore" id="developer-s-guide">
-<h1>Developer’s Guide<a class="headerlink" href="#developer-s-guide" title="Link to this heading"></a></h1>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="api.html">API reference</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="api.html#mesh-descriptors">Mesh Descriptors</a></li>
-<li class="toctree-l2"><a class="reference internal" href="api.html#remapping">Remapping</a></li>
-<li class="toctree-l2"><a class="reference internal" href="api.html#polar-projections">Polar projections</a></li>
-</ul>
-</li>
-</ul>
-</div>
 </section>
 <section class="tex2jax_ignore mathjax_ignore" id="indices-and-tables">
 <h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Link to this heading"></a></h1>
+<p>:index:</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
 </ul>
@@ -153,7 +225,7 @@
     </script>
 
     <!-- Load version switcher JS -->
-    <script src="../shared/version-switcher.js"></script>
+    <script src="shared/version-switcher.js"></script>
 
 
 

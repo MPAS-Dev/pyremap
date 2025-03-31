@@ -1,64 +1,56 @@
-(quick_start)=
-
 # Quick Start
-Python remapping tools for climate and earth system models.
+
+This guide will help you get started with `pyremap` for remapping data between different spatial representations.
 
 ## Installation
 
-To use the latest version for developers, get the code from:
-[https://github.com/MPAS-Dev/pyremap](https://github.com/MPAS-Dev/pyremap)
+To install `pyremap`, use `conda` (from the `conda-forge` channel):
 
-Then, you will need to set up a conda environment and install the package
-in a way that points to the repo (so changes you make are available in the
-conda environment):
-```
-conda config --add channels conda-forge
-conda config --set channel_priority strict
-conda create -y -n pyremap --file dev-spec.txt
-conda activate pyremap
-python -m pip install --no-deps --no-build-isolation -e .
+```bash
+conda install pyremap
 ```
 
-## Examples
+## Basic Usage
 
-```
-cd examples
-```
-First, make mapping files for a lat-lon grid, and test it out by remapping
-temperature from the example file:
-```
-wget https://web.lcrc.anl.gov/public/e3sm/inputdata/ocn/mpas-o/oQU240/ocean.QU.240km.151209.nc
-./make_mpas_to_lat_lon_mapping.py
-```
-You should now see the mapping file:
-```
-map_oQU240_to_0.5x0.5degree.nc
-```
-as well as the input file (an initial condition for the MPAS-Ocean model) and
-an example of temperature from the initial condition remapped to the new grid.
-```
-ocean.QU.240km.151209.nc
-temp_0.5x0.5degree.nc
+Here is a simple example of how to use `pyremap` to remap data from a source grid to a destination grid.
+
+### Step 1: Define Source and Destination Grids
+
+```python
+from pyremap import LatLonGridDescriptor, MpasCellMeshDescriptor
+
+# Define a source grid (e.g., a regular latitude-longitude grid)
+source_grid = LatLonGridDescriptor.read(file_name='source_grid.nc')
+
+# Define a destination grid (e.g., an unstructured mesh)
+destination_grid = MpasCellMeshDescriptor.read(file_name='destination_grid.nc')
 ```
 
-Second, let's try the same but to an Antarctic stereographic grid:
-```
-./make_mpas_to_antarctic_stereo_mapping.py
-```
-Now, there's a new mapping file and example output file:
-```
-map_oQU240_to_6000.0x6000.0km_10.0km_Antarctic_stereo.nc
-temp_6000.0x6000.0km_10.0km_Antarctic_stereo.nc
+### Step 2: Generate a Mapping File
+
+```python
+from pyremap import Remapper
+
+# Create a remapper object
+remapper = Remapper(map_filename='map_source_to_dest.nc', method='bilinear')
+remapper.src_descriptor = source_grid
+remapper.dst_descriptor = destination_grid
+
+# Generate the mapping file
+remapper.build_map()
 ```
 
-Finally, let's remap the temperature on the Antarctic grid to a lower
-resolution Antarctic grid:
+### Step 3: Apply the Mapping
+
+```python
+# Remap data from the source grid to the destination grid
+remapper.ncremap(
+    in_filename='source_data.nc',
+    out_filename='remapped_data.nc',
+    variable_list=['temperature', 'salinity']
+)
 ```
-./remap_stereographic.py -i temp_6000.0x6000.0km_10.0km_Antarctic_stereo.nc \
-    -o temp_6000.0x6000.0km_20.0km_Antarctic_stereo.nc -r 20
-```
-This created another mapping file and an output file:
-```
-map_6000x6000km_10km_Antarctic_stereo_to_6000x6000km_20.0km_Antarctic_stereo.nc
-temp_6000.0x6000.0km_20.0km_Antarctic_stereo.nc
-```
+
+## Additional Resources
+
+For more detailed examples and advanced usage, refer to the [documentation]({ref}`pyremap`).

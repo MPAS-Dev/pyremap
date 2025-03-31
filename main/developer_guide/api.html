@@ -1,0 +1,268 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>API reference &mdash; pyremap main documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=a8da1a53"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link href="../_static/style.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            pyremap
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../quick_start.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mesh_descriptors/index.html">Mesh Descriptors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../remapper/index.html">Remapper</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../polar_projections/index.html">Polar Projections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html">Developer Guide</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">pyremap</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">API reference</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/developer_guide/api.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section class="tex2jax_ignore mathjax_ignore" id="api-reference">
+<h1>API reference<a class="headerlink" href="#api-reference" title="Link to this heading"></a></h1>
+<p>:index:</p>
+<p>This page provides an auto-generated summary of the pyremap API.</p>
+<section id="mesh-descriptors">
+<h2>Mesh Descriptors<a class="headerlink" href="#mesh-descriptors" title="Link to this heading"></a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">interp_extrap_corner</span></code>(in_field)</p></td>
+<td><p>Interpolate/extrapolate a 1D field from grid centers to grid corners</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">interp_extrap_corners_2d</span></code>(in_field)</p></td>
+<td><p>Interpolate/extrapolate a 1D field from grid centers to grid corners</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_lat_lon_descriptor</span></code>(dlon, dlat[, ...])</p></td>
+<td><p>Get a descriptor of a lat-lon grid, used for remapping</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">LatLonGridDescriptor</span></code>([mesh_name, regional])</p></td>
+<td><p>A class for describing a lat-lon grid</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">LatLonGridDescriptor.read</span></code>([filename, ds, ...])</p></td>
+<td><p>Read the lat-lon grid from a file with the given lat/lon var names.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">LatLonGridDescriptor.create</span></code>(lat_corner, ...)</p></td>
+<td><p>Create the lat-lon grid with the given arrays and units.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">LatLonGridDescriptor.to_scrip</span></code>(scrip_filename)</p></td>
+<td><p>Given a lat-lon grid file, create a SCRIP file based on the grid.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">LatLon2DGridDescriptor</span></code>([mesh_name, regional])</p></td>
+<td><p>A class for describing a lat-lon grid that may not be a tensor grid (lat/lon are 2D arrays).</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">LatLon2DGridDescriptor.read</span></code>([filename, ds, ...])</p></td>
+<td><p>Read the lat-lon grid from a file with the given lat/lon var names.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">LatLon2DGridDescriptor.to_scrip</span></code>(scrip_filename)</p></td>
+<td><p>Create a SCRIP file based on the grid.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">MpasCellMeshDescriptor</span></code>(filename[, mesh_name])</p></td>
+<td><p>A class for describing an MPAS cell mesh</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">MpasCellMeshDescriptor.to_scrip</span></code>(scrip_filename)</p></td>
+<td><p>Create a SCRIP file from the MPAS mesh.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">MpasEdgeMeshDescriptor</span></code>(filename[, mesh_name])</p></td>
+<td><p>A class for describing an MPAS edge mesh</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">MpasEdgeMeshDescriptor.to_scrip</span></code>(scrip_filename)</p></td>
+<td><p>Create a SCRIP file from the MPAS mesh.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">MpasVertexMeshDescriptor</span></code>(filename[, mesh_name])</p></td>
+<td><p>A class for describing an MPAS vertex mesh</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">MpasVertexMeshDescriptor.to_scrip</span></code>(scrip_filename)</p></td>
+<td><p>Create a SCRIP file from the MPAS mesh.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">PointCollectionDescriptor</span></code>(lats, lons, ...[, ...])</p></td>
+<td><p>A class for describing a collection of points</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">PointCollectionDescriptor.to_scrip</span></code>(...[, ...])</p></td>
+<td><p>Write a SCRIP file for the point collection</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProjectionGridDescriptor</span></code>(projection[, mesh_name])</p></td>
+<td><p>A class for describing a general logically rectangular grid that can be defined by a <code class="docutils literal notranslate"><span class="pre">pyproj</span></code> projection.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProjectionGridDescriptor.read</span></code>(projection, ...)</p></td>
+<td><p>Given a grid file with x and y coordinates defining the axes of the logically rectangular grid, read in the x and y coordinates and interpolate/extrapolate to locate corners.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProjectionGridDescriptor.create</span></code>(projection, ...)</p></td>
+<td><p>Given x and y coordinates defining the axes of the logically rectangular grid, save the coordinates interpolate/extrapolate to locate corners.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ProjectionGridDescriptor.to_scrip</span></code>(scrip_filename)</p></td>
+<td><p>Create a SCRIP file based on the grid and projection.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="remapping">
+<h2>Remapping<a class="headerlink" href="#remapping" title="Link to this heading"></a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Remapper.src_from_lon_lat</span></code>(filename[, ...])</p></td>
+<td><p>Set the source grid from a file with a longitude-latitude grid.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Remapper.src_from_mpas</span></code>(filename, mesh_name)</p></td>
+<td><p>Set the source grid from an MPAS mesh file</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Remapper.src_from_proj</span></code>(filename, mesh_name)</p></td>
+<td><p>Set the source grid from a file with a projection grid.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Remapper.dst_from_lon_lat</span></code>(filename[, ...])</p></td>
+<td><p>Set the destination grid from a file with a longitude-latitude grid.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Remapper.dst_from_mpas</span></code>(filename, mesh_name)</p></td>
+<td><p>Set the destination grid from an MPAS mesh file</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Remapper.dst_from_points</span></code>(filename, mesh_name)</p></td>
+<td><p>Set the destination grid from a file with a collection of points.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Remapper.dst_from_proj</span></code>(filename, mesh_name)</p></td>
+<td><p>Set the destination grid from a file with a projection grid.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Remapper.build_map</span></code>()</p></td>
+<td><p>Make the mapping file</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Remapper.ncremap</span></code>(in_filename, out_filename)</p></td>
+<td><p>Given a source file defining either an MPAS mesh or a lat-lon grid and a destination file or set of arrays defining a lat-lon grid, constructs a mapping file used for interpolation between the source and destination grids.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Remapper.remap_numpy</span></code>(ds[, ...])</p></td>
+<td><p>Given a source data set, returns a remapped version of the data set, possibly masked and renormalized.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="polar-projections">
+<h2>Polar projections<a class="headerlink" href="#polar-projections" title="Link to this heading"></a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_arctic_stereographic_projection</span></code>()</p></td>
+<td><p>Get a projection for an Arctic stereographic comparison grid</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_antarctic_stereographic_projection</span></code>()</p></td>
+<td><p>Get a projection for an Antarctic steregraphic grid</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_polar_descriptor_from_file</span></code>(filename[, ...])</p></td>
+<td><p>Get a descriptor of a polar stereographic grid used for remapping</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_polar_descriptor</span></code>(lx, ly, dx, dy[, ...])</p></td>
+<td><p>Get a descriptor of a polar stereographic grid used for remapping</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_polar</span></code>(points)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_polar</span></code>(points)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright This software is open source software available under the BSD-3license. Copyright (c) 2025.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+     
+
+    <!-- Inject version info -->
+    <meta name="doc-version" content="main">
+
+    <!-- Create switcher container -->
+    <script>
+      // Inject the switcher div into the top of the sidebar
+      const sidebar = document.querySelector('.wy-side-nav-search');
+      if (sidebar) {
+        const versionDiv = document.createElement('div');
+        versionDiv.id = 'version-switcher';
+        versionDiv.style.marginTop = '1em';
+        sidebar.appendChild(versionDiv);
+      }
+    </script>
+
+    <!-- Load version switcher JS -->
+    <script src="../shared/version-switcher.js"></script>
+
+
+
+</body>
+</html>
