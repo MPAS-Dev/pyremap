@@ -86,6 +86,8 @@
 <span class="c1"># distributed with this code, or at</span>
 <span class="c1"># https://raw.githubusercontent.com/MPAS-Dev/pyremap/main/LICENSE</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span>
+
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
 
@@ -101,12 +103,20 @@
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
-<span class="sd">    filename : str</span>
+<span class="sd">    filename : Optional[str]</span>
 <span class="sd">        The path of the file containing the MPAS mesh</span>
 
-<span class="sd">    history : str</span>
+<span class="sd">    mesh_name : Optional[str]</span>
+<span class="sd">        The name of the MPAS mesh</span>
+
+<span class="sd">    history : Optional[str]</span>
 <span class="sd">        The history attribute written to SCRIP files</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">filename</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="n">mesh_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="n">history</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+
 <div class="viewcode-block" id="MpasCellMeshDescriptor.__init__">
 <a class="viewcode-back" href="../../../developer_guide/generated/pyremap.descriptor.MpasCellMeshDescriptor.html#pyremap.descriptor.MpasCellMeshDescriptor.__init__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">mesh_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -127,7 +137,6 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
         <span class="k">with</span> <span class="n">xr</span><span class="o">.</span><span class="n">open_dataset</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span> <span class="k">as</span> <span class="n">ds</span><span class="p">:</span>
-
             <span class="bp">self</span><span class="o">.</span><span class="n">mesh_name</span> <span class="o">=</span> <span class="n">mesh_name</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">mesh_name_from_attr</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mesh_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -135,18 +144,19 @@
 
             <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="n">filename</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">regional</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">history</span> <span class="o">=</span> <span class="kc">None</span>
 
             <span class="c1"># build coords</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">coords</span> <span class="o">=</span> <span class="p">{</span>
                 <span class="s1">&#39;lat_cell&#39;</span><span class="p">:</span> <span class="p">{</span>
                     <span class="s1">&#39;dims&#39;</span><span class="p">:</span> <span class="s1">&#39;nCells&#39;</span><span class="p">,</span>
                     <span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="n">ds</span><span class="o">.</span><span class="n">latCell</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
-                    <span class="s1">&#39;attrs&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="s1">&#39;radians&#39;</span><span class="p">}</span>
+                    <span class="s1">&#39;attrs&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="s1">&#39;radians&#39;</span><span class="p">},</span>
                 <span class="p">},</span>
                 <span class="s1">&#39;lon_cell&#39;</span><span class="p">:</span> <span class="p">{</span>
                     <span class="s1">&#39;dims&#39;</span><span class="p">:</span> <span class="s1">&#39;nCells&#39;</span><span class="p">,</span>
                     <span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="n">ds</span><span class="o">.</span><span class="n">lonCell</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
-                    <span class="s1">&#39;attrs&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="s1">&#39;radians&#39;</span><span class="p">}</span>
+                    <span class="s1">&#39;attrs&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="s1">&#39;radians&#39;</span><span class="p">},</span>
                 <span class="p">},</span>
             <span class="p">}</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">dims</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;nCells&#39;</span><span class="p">]</span>
@@ -175,6 +185,17 @@
 <span class="sd">            If a ``numpy.ndarray``, one value per cell.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
+        <span class="c1"># Ensure attributes are not None before proceeding</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="p">(</span>
+            <span class="s1">&#39;filename must be set before calling to_scrip&#39;</span>
+        <span class="p">)</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">mesh_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="p">(</span>
+            <span class="s1">&#39;mesh_name must be set before calling to_scrip&#39;</span>
+        <span class="p">)</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">history</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="p">(</span>
+            <span class="s1">&#39;history must be set before calling to_scrip&#39;</span>
+        <span class="p">)</span>
+
         <span class="n">ds_in</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">open_dataset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
         <span class="n">lat_cell</span> <span class="o">=</span> <span class="n">ds_in</span><span class="o">.</span><span class="n">latCell</span><span class="o">.</span><span class="n">values</span>
         <span class="n">lon_cell</span> <span class="o">=</span> <span class="n">ds_in</span><span class="o">.</span><span class="n">lonCell</span><span class="o">.</span><span class="n">values</span>
@@ -190,10 +211,7 @@
 
         <span class="n">ds_out</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">()</span>
 
-        <span class="n">ds_out</span><span class="p">[</span><span class="s1">&#39;grid_area&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="p">(</span><span class="s1">&#39;grid_size&#39;</span><span class="p">,),</span>
-            <span class="n">area_cell</span> <span class="o">/</span> <span class="p">(</span><span class="n">sphere_radius</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
-        <span class="p">)</span>
+        <span class="n">ds_out</span><span class="p">[</span><span class="s1">&#39;grid_area&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">((</span><span class="s1">&#39;grid_size&#39;</span><span class="p">,),</span> <span class="n">area_cell</span> <span class="o">/</span> <span class="p">(</span><span class="n">sphere_radius</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
 
         <span class="n">ds_out</span><span class="p">[</span><span class="s1">&#39;grid_center_lat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">((</span><span class="s1">&#39;grid_size&#39;</span><span class="p">,),</span> <span class="n">lat_cell</span><span class="p">)</span>
         <span class="n">ds_out</span><span class="p">[</span><span class="s1">&#39;grid_center_lon&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">((</span><span class="s1">&#39;grid_size&#39;</span><span class="p">,),</span> <span class="n">lon_cell</span><span class="p">)</span>
@@ -210,20 +228,20 @@
             <span class="n">grid_corner_lon</span><span class="p">[</span><span class="n">cell_indices</span><span class="p">,</span> <span class="n">ivert</span><span class="p">]</span> <span class="o">=</span> <span class="n">lon_vertex</span><span class="p">[</span><span class="n">vert_indices</span><span class="p">]</span>
 
         <span class="n">ds_out</span><span class="p">[</span><span class="s1">&#39;grid_corner_lat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="p">(</span><span class="s1">&#39;grid_size&#39;</span><span class="p">,</span> <span class="s1">&#39;grid_corners&#39;</span><span class="p">),</span> <span class="n">grid_corner_lat</span>
+            <span class="p">(</span><span class="s1">&#39;grid_size&#39;</span><span class="p">,</span> <span class="s1">&#39;grid_corners&#39;</span><span class="p">),</span>
+            <span class="n">grid_corner_lat</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="n">ds_out</span><span class="p">[</span><span class="s1">&#39;grid_corner_lon&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="p">(</span><span class="s1">&#39;grid_size&#39;</span><span class="p">,</span> <span class="s1">&#39;grid_corners&#39;</span><span class="p">),</span> <span class="n">grid_corner_lon</span>
+            <span class="p">(</span><span class="s1">&#39;grid_size&#39;</span><span class="p">,</span> <span class="s1">&#39;grid_corners&#39;</span><span class="p">),</span>
+            <span class="n">grid_corner_lon</span><span class="p">,</span>
         <span class="p">)</span>
 
         <span class="n">ds_out</span><span class="p">[</span><span class="s1">&#39;grid_dims&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
-            <span class="p">[</span><span class="n">ncells</span><span class="p">],</span>
-            <span class="n">dims</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;grid_rank&#39;</span><span class="p">,)</span>
+            <span class="p">[</span><span class="n">ncells</span><span class="p">],</span> <span class="n">dims</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;grid_rank&#39;</span><span class="p">,)</span>
         <span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;int32&#39;</span><span class="p">)</span>
 
         <span class="n">ds_out</span><span class="p">[</span><span class="s1">&#39;grid_imask&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
-            <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">ncells</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;int32&#39;</span><span class="p">),</span>
-            <span class="n">dims</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;grid_size&#39;</span><span class="p">,)</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">ncells</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;int32&#39;</span><span class="p">),</span> <span class="n">dims</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;grid_size&#39;</span><span class="p">,)</span>
         <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">expand_dist</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">expand_factor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>

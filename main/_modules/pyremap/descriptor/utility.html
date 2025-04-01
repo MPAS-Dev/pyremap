@@ -159,19 +159,21 @@
         <span class="n">grid_center_lon</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
         <span class="n">grid_center_lat</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
         <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">grid_size</span><span class="p">),</span>
-        <span class="n">radians</span><span class="o">=</span><span class="n">radians</span><span class="p">)</span>
+        <span class="n">radians</span><span class="o">=</span><span class="n">radians</span><span class="p">,</span>
+    <span class="p">)</span>
 
     <span class="n">x_corner</span><span class="p">,</span> <span class="n">y_corner</span><span class="p">,</span> <span class="n">z_corner</span> <span class="o">=</span> <span class="n">trans_lon_lat_to_xyz</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span>
         <span class="n">grid_corner_lon</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
         <span class="n">grid_corner_lat</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
         <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">grid_size</span><span class="p">,</span> <span class="n">grid_corners</span><span class="p">)),</span>
-        <span class="n">radians</span><span class="o">=</span><span class="n">radians</span><span class="p">)</span>
+        <span class="n">radians</span><span class="o">=</span><span class="n">radians</span><span class="p">,</span>
+    <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">expand_factor</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">expand_factor</span> <span class="o">=</span> <span class="mf">1.</span>
+        <span class="n">expand_factor</span> <span class="o">=</span> <span class="mf">1.0</span>
 
     <span class="k">if</span> <span class="n">expand_dist</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">expand_dist</span> <span class="o">=</span> <span class="mf">0.</span>
+        <span class="n">expand_dist</span> <span class="o">=</span> <span class="mf">0.0</span>
 
     <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">grid_corners</span><span class="p">):</span>
         <span class="n">dx</span> <span class="o">=</span> <span class="n">x_corner</span><span class="p">[:,</span> <span class="n">index</span><span class="p">]</span> <span class="o">-</span> <span class="n">x_center</span>
@@ -188,7 +190,8 @@
         <span class="n">y_corner</span><span class="p">,</span>
         <span class="n">z_corner</span><span class="p">,</span>
         <span class="n">radians</span><span class="o">=</span><span class="n">radians</span><span class="p">,</span>
-        <span class="n">direction</span><span class="o">=</span><span class="n">pyproj</span><span class="o">.</span><span class="n">enums</span><span class="o">.</span><span class="n">TransformDirection</span><span class="o">.</span><span class="n">INVERSE</span><span class="p">)</span>
+        <span class="n">direction</span><span class="o">=</span><span class="n">pyproj</span><span class="o">.</span><span class="n">enums</span><span class="o">.</span><span class="n">TransformDirection</span><span class="o">.</span><span class="n">INVERSE</span><span class="p">,</span>
+    <span class="p">)</span>
 
     <span class="n">ds</span><span class="p">[</span><span class="s1">&#39;grid_corner_lat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">((</span><span class="s1">&#39;grid_size&#39;</span><span class="p">,</span> <span class="s1">&#39;grid_corners&#39;</span><span class="p">),</span> <span class="n">grid_corner_lat</span><span class="p">)</span>
     <span class="n">ds</span><span class="p">[</span><span class="s1">&#39;grid_corner_lon&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">((</span><span class="s1">&#39;grid_size&#39;</span><span class="p">,</span> <span class="s1">&#39;grid_corners&#39;</span><span class="p">),</span> <span class="n">grid_corner_lon</span><span class="p">)</span>
@@ -197,7 +200,8 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">unwrap_corners</span><span class="p">(</span><span class="n">in_field</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Turn a 2D array of corners into an array of rectangular mesh elements&quot;&quot;&quot;</span>
     <span class="n">out_field</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
-        <span class="p">((</span><span class="n">in_field</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">in_field</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span> <span class="mi">4</span><span class="p">))</span>
+        <span class="p">((</span><span class="n">in_field</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">in_field</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span> <span class="mi">4</span><span class="p">)</span>
+    <span class="p">)</span>
     <span class="c1"># corners are counterclockwise</span>
     <span class="n">out_field</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">in_field</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">flat</span>
     <span class="n">out_field</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">in_field</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">flat</span>
@@ -209,8 +213,8 @@
 
 <span class="k">def</span><span class="w"> </span><span class="nf">round_res</span><span class="p">(</span><span class="n">res</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Round the resolution to a reasonable number for grid names&quot;&quot;&quot;</span>
-    <span class="n">rounded</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">res</span> <span class="o">*</span> <span class="mf">1000.</span><span class="p">)</span> <span class="o">/</span> <span class="mf">1000.</span>
-    <span class="k">return</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">rounded</span><span class="p">)</span>
+    <span class="n">rounded</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">res</span> <span class="o">*</span> <span class="mf">1000.0</span><span class="p">)</span> <span class="o">/</span> <span class="mf">1000.0</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">rounded</span><span class="si">}</span><span class="s1">&#39;</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">add_history</span><span class="p">(</span><span class="n">ds</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>

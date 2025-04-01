@@ -22,4 +22,12 @@
 
    
    
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~MpasCellMeshDescriptor.filename
+      ~MpasCellMeshDescriptor.mesh_name
+      ~MpasCellMeshDescriptor.history
+   
    

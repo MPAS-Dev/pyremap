@@ -107,8 +107,10 @@
     <span class="c1"># -------</span>
     <span class="c1"># Milena Veneziani</span>
 
-    <span class="n">projection</span> <span class="o">=</span> <span class="n">pyproj</span><span class="o">.</span><span class="n">Proj</span><span class="p">(</span><span class="s1">&#39;+proj=stere +lat_ts=75.0 +lat_0=90 +lon_0=0.0 &#39;</span>
-                             <span class="s1">&#39;+k_0=1.0 +x_0=0.0 +y_0=0.0 +ellps=WGS84&#39;</span><span class="p">)</span>
+    <span class="n">projection</span> <span class="o">=</span> <span class="n">pyproj</span><span class="o">.</span><span class="n">Proj</span><span class="p">(</span>
+        <span class="s1">&#39;+proj=stere +lat_ts=75.0 +lat_0=90 +lon_0=0.0 &#39;</span>
+        <span class="s1">&#39;+k_0=1.0 +x_0=0.0 +y_0=0.0 +ellps=WGS84&#39;</span>
+    <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">projection</span></div>
 
@@ -121,8 +123,10 @@
 <span class="sd">    Get a projection for an Antarctic steregraphic grid</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">projection</span> <span class="o">=</span> <span class="n">pyproj</span><span class="o">.</span><span class="n">Proj</span><span class="p">(</span><span class="s1">&#39;+proj=stere +lat_ts=-71.0 +lat_0=-90 +lon_0=0.0 &#39;</span>
-                             <span class="s1">&#39;+k_0=1.0 +x_0=0.0 +y_0=0.0 +ellps=WGS84&#39;</span><span class="p">)</span>
+    <span class="n">projection</span> <span class="o">=</span> <span class="n">pyproj</span><span class="o">.</span><span class="n">Proj</span><span class="p">(</span>
+        <span class="s1">&#39;+proj=stere +lat_ts=-71.0 +lat_0=-90 +lon_0=0.0 &#39;</span>
+        <span class="s1">&#39;+k_0=1.0 +x_0=0.0 +y_0=0.0 +ellps=WGS84&#39;</span>
+    <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">projection</span></div>
 
@@ -151,11 +155,11 @@
     <span class="n">ds_in</span> <span class="o">=</span> <span class="n">xarray</span><span class="o">.</span><span class="n">open_dataset</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
     <span class="n">x</span> <span class="o">=</span> <span class="n">ds_in</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">values</span>
     <span class="n">y</span> <span class="o">=</span> <span class="n">ds_in</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">values</span>
-    <span class="n">dx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="mf">1000.</span><span class="p">)</span>
-    <span class="n">lx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">x</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="mf">1000.</span><span class="p">)</span>
-    <span class="n">ly</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">y</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="mf">1000.</span><span class="p">)</span>
+    <span class="n">dx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="mf">1000.0</span><span class="p">)</span>
+    <span class="n">lx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">x</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="mf">1000.0</span><span class="p">)</span>
+    <span class="n">ly</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">y</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="mf">1000.0</span><span class="p">)</span>
 
-    <span class="n">mesh_name</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">x</span><span class="si">{}</span><span class="s1">km_</span><span class="si">{}</span><span class="s1">km_antarctic_stereo&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">lx</span><span class="p">,</span> <span class="n">ly</span><span class="p">,</span> <span class="n">dx</span><span class="p">)</span>
+    <span class="n">mesh_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">lx</span><span class="si">}</span><span class="s1">x</span><span class="si">{</span><span class="n">ly</span><span class="si">}</span><span class="s1">km_</span><span class="si">{</span><span class="n">dx</span><span class="si">}</span><span class="s1">km_antarctic_stereo&#39;</span>
 
     <span class="n">projection</span> <span class="o">=</span> <span class="n">_get_projection</span><span class="p">(</span><span class="n">projection</span><span class="p">)</span>
 
@@ -191,7 +195,7 @@
 
     <span class="n">upper_proj</span> <span class="o">=</span> <span class="n">projection</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">+</span> <span class="n">projection</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
 
-    <span class="n">mesh_name</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">x</span><span class="si">{}</span><span class="s1">km_</span><span class="si">{}</span><span class="s1">km_</span><span class="si">{}</span><span class="s1">_stereo&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">lx</span><span class="p">,</span> <span class="n">ly</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">upper_proj</span><span class="p">)</span>
+    <span class="n">mesh_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">lx</span><span class="si">}</span><span class="s1">x</span><span class="si">{</span><span class="n">ly</span><span class="si">}</span><span class="s1">km_</span><span class="si">{</span><span class="n">dx</span><span class="si">}</span><span class="s1">km_</span><span class="si">{</span><span class="n">upper_proj</span><span class="si">}</span><span class="s1">_stereo&#39;</span>
 
     <span class="n">x_max</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">lx</span> <span class="o">*</span> <span class="mf">1e3</span>
     <span class="n">nx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">lx</span> <span class="o">/</span> <span class="n">dx</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
@@ -244,7 +248,7 @@
         <span class="k">elif</span> <span class="n">projection</span> <span class="o">==</span> <span class="s1">&#39;antarctic&#39;</span><span class="p">:</span>
             <span class="n">projection</span> <span class="o">=</span> <span class="n">get_antarctic_stereographic_projection</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Bad projection name </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">projection</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Bad projection name </span><span class="si">{</span><span class="n">projection</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">projection</span>
 </pre></div>
 
