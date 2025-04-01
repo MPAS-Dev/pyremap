@@ -184,26 +184,25 @@ latitude and longitude to see if they cover the globe.</p>
           SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
-     
+   
 
-    <!-- Inject version info -->
-    <meta name="doc-version" content="main">
+  <!-- Meta tags for JS to use -->
+  <meta name="doc-version" content="main">
+  <meta name="doc-site-root" content="../../">
 
-    <!-- Create switcher container -->
-    <script>
-      // Inject the switcher div into the top of the sidebar
-      const sidebar = document.querySelector('.wy-side-nav-search');
-      if (sidebar) {
-        const versionDiv = document.createElement('div');
-        versionDiv.id = 'version-switcher';
-        versionDiv.style.marginTop = '1em';
-        sidebar.appendChild(versionDiv);
-      }
-    </script>
+  <!-- Create version switcher container -->
+  <script>
+    const sidebar = document.querySelector('.wy-side-nav-search');
+    if (sidebar) {
+      const versionDiv = document.createElement('div');
+      versionDiv.id = 'version-switcher';
+      versionDiv.style.marginTop = '1em';
+      sidebar.appendChild(versionDiv);
+    }
+  </script>
 
-    <!-- Load version switcher JS -->
-    <script src="/shared/version-switcher.js"></script>
-
+  <!-- Load version-switcher.js using the correct relative path -->
+  <script src="../../../shared/version-switcher.js"></script>
 
 
 </body>
