@@ -196,6 +196,5 @@ html_sidebars = {
 }
 
 html_context = {
-    'current_version': version if 'DOCS_VERSION' in os.environ else 'main',
-    # Other context variables
+    "current_version": os.getenv("DOC_VERSION", "main"),
 }
