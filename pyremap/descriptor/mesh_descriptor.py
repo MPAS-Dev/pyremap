@@ -45,6 +45,7 @@ class MeshDescriptor:
         A logger for command-line output.  If None, the logger will be set to
         stdout/stderr.
     """  # noqa: E501
+
     def __init__(self, mesh_name=None, regional=None):
         """
         Construct a mesh descriptor
@@ -86,7 +87,8 @@ class MeshDescriptor:
             If a ``numpy.ndarray``, one value per cell.
         """
         raise NotImplementedError(
-            'to_scrip is not implemented for this descriptor')
+            'to_scrip is not implemented for this descriptor'
+        )
 
     def write_netcdf(self, ds, filename):
         """
@@ -106,7 +108,7 @@ class MeshDescriptor:
             filename,
             format=self.format,
             engine=self.engine,
-            logger=self.logger
+            logger=self.logger,
         )
 
     def mesh_name_from_attr(self, ds):

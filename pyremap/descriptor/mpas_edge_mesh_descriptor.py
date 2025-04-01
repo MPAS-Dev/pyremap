@@ -9,6 +9,8 @@
 # distributed with this code, or at
 # https://raw.githubusercontent.com/MPAS-Dev/pyremap/main/LICENSE
 
+from typing import Optional
+
 import numpy as np
 import xarray as xr
 
@@ -28,6 +30,7 @@ class MpasEdgeMeshDescriptor(MeshDescriptor):
     history : str
         The history attribute written to SCRIP files
     """
+
     def __init__(self, filename, mesh_name=None):
         """
         Constructor stores the file name
@@ -45,8 +48,14 @@ class MpasEdgeMeshDescriptor(MeshDescriptor):
         """
         super().__init__()
 
-        with xr.open_dataset(filename) as ds:
+        self.mesh_name: Optional[str] = mesh_name
+        self.filename: Optional[str] = None
+        self.history: Optional[str] = None
+        self.coords: Optional[dict] = None
+        self.dims: Optional[list] = None
+        self.dim_sizes: Optional[list] = None
 
+        with xr.open_dataset(filename) as ds:
             self.mesh_name = mesh_name
             self.mesh_name_from_attr(ds)
             if self.mesh_name is None:
@@ -56,12 +65,18 @@ class MpasEdgeMeshDescriptor(MeshDescriptor):
             self.regional = True
 
             # build coords
-            self.coords = {'lat_edge': {'dims': 'nEdges',
-                                        'data': ds.latEdge.values,
-                                        'attrs': {'units': 'radians'}},
-                           'lon_edge': {'dims': 'nEdges',
-                                        'data': ds.lonEdge.values,
-                                        'attrs': {'units': 'radians'}}}
+            self.coords = {
+                'lat_edge': {
+                    'dims': 'nEdges',
+                    'data': ds.latEdge.values,
+                    'attrs': {'units': 'radians'},
+                },
+                'lon_edge': {
+                    'dims': 'nEdges',
+                    'data': ds.lonEdge.values,
+                    'attrs': {'units': 'radians'},
+                },
+            }
             self.dims = ['nEdges']
             self.dim_sizes = [ds.sizes[dim] for dim in self.dims]
 
@@ -84,6 +99,26 @@ class MpasEdgeMeshDescriptor(MeshDescriptor):
             A factor by which to expand each grid cell outward from the center.
             If a ``numpy.ndarray``, one value per cell.
         """
+
+        # Ensure required attributes are set
+        assert self.filename is not None, (
+            'filename must be set before calling to_scrip'
+        )
+        assert self.mesh_name is not None, (
+            'mesh_name must be set before calling to_scrip'
+        )
+        assert self.history is not None, (
+            'history must be set before calling to_scrip'
+        )
+        assert self.coords is not None, (
+            'coords must be set before calling to_scrip'
+        )
+        assert self.dims is not None, (
+            'dims must be set before calling to_scrip'
+        )
+        assert self.dim_sizes is not None, (
+            'dim_sizes must be set before calling to_scrip'
+        )
 
         ds_in = xr.open_dataset(self.filename)
         lat_cell = ds_in.latCell.values
@@ -109,7 +144,7 @@ class MpasEdgeMeshDescriptor(MeshDescriptor):
 
         ds_out['grid_area'] = (
             ('grid_size',),
-            0.5 * valid_cells_on_edge * dc_edge * dv_edge / (sphere_radius**2)
+            0.5 * valid_cells_on_edge * dc_edge * dv_edge / (sphere_radius**2),
         )
 
         ds_out['grid_center_lat'] = (('grid_size',), lat_edge)
@@ -142,20 +177,20 @@ class MpasEdgeMeshDescriptor(MeshDescriptor):
         grid_corner_lat[mask, 2] = lat_cell[cells]
 
         ds_out['grid_corner_lat'] = (
-            ('grid_size', 'grid_corners'), grid_corner_lat
+            ('grid_size', 'grid_corners'),
+            grid_corner_lat,
         )
         ds_out['grid_corner_lon'] = (
-            ('grid_size', 'grid_corners'), grid_corner_lon
+            ('grid_size', 'grid_corners'),
+            grid_corner_lon,
         )
 
         ds_out['grid_dims'] = xr.DataArray(
-            [n_edges],
-            dims=('grid_rank',)
+            [n_edges], dims=('grid_rank',)
         ).astype('int32')
 
         ds_out['grid_imask'] = xr.DataArray(
-            np.ones(n_edges, dtype='int32'),
-            dims=('grid_size',)
+            np.ones(n_edges, dtype='int32'), dims=('grid_size',)
         )
 
         if expand_dist is not None or expand_factor is not None:

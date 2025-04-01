@@ -38,16 +38,17 @@ def loaddatadir(request, tmpdir):
     print('test_dir: ', test_dir)
 
     if os.path.isdir(test_dir):
-        copytree(test_dir, str(tmpdir), dirs_exist_ok=True,
-                 ignore=ignore_patterns('__pycache__'))
+        copytree(
+            test_dir,
+            str(tmpdir),
+            dirs_exist_ok=True,
+            ignore=ignore_patterns('__pycache__'),
+        )
 
     request.cls.datadir = tmpdir
 
 
 class TestCase(unittest.TestCase):
-    def assertEqual(self, a1, a2):
-        assert a1 == a2 or (a1 != a1 and a2 != a2)
-
     def assertLessThan(self, a1, a2):
         assert a1 <= a2
 
@@ -66,10 +67,12 @@ class TestCase(unittest.TestCase):
         assert np.all(np.logical_or(close, oneIsNaN))
 
     def assertDatasetApproxEqual(self, ds1, ds2, rtol=1e-5, atol=1e-8):
-        assert ((isinstance(ds1, xarray.Dataset) and
-                 isinstance(ds2, xarray.Dataset)) or
-                (isinstance(ds1, xarray.DataArray) and
-                 isinstance(ds2, xarray.DataArray)))
+        assert (
+            isinstance(ds1, xarray.Dataset) and isinstance(ds2, xarray.Dataset)
+        ) or (
+            isinstance(ds1, xarray.DataArray)
+            and isinstance(ds2, xarray.DataArray)
+        )
 
         if isinstance(ds1, xarray.Dataset):
             assert set(ds1.data_vars.keys()) == set(ds2.data_vars.keys())
@@ -77,11 +80,13 @@ class TestCase(unittest.TestCase):
                 assert var in ds2.data_vars.keys()
                 if ds1[var].values.dtype.char == 'S':
                     continue
-                self.assertArrayApproxEqual(ds1[var].values, ds2[var].values,
-                                            rtol=rtol, atol=atol)
+                self.assertArrayApproxEqual(
+                    ds1[var].values, ds2[var].values, rtol=rtol, atol=atol
+                )
         else:
-            self.assertArrayApproxEqual(ds1.values, ds2.values,
-                                        rtol=rtol, atol=atol)
+            self.assertArrayApproxEqual(
+                ds1.values, ds2.values, rtol=rtol, atol=atol
+            )
 
     @contextmanager
     def assertWarns(self, message):

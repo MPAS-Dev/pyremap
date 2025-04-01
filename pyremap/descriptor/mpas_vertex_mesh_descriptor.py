@@ -9,6 +9,8 @@
 # distributed with this code, or at
 # https://raw.githubusercontent.com/MPAS-Dev/pyremap/main/LICENSE
 
+from typing import Optional
+
 import numpy as np
 import xarray as xr
 
@@ -22,12 +24,16 @@ class MpasVertexMeshDescriptor(MeshDescriptor):
 
     Attributes
     ----------
-    filename : str
+    filename : Optional[str]
         The path of the file containing the MPAS mesh
 
-    history : str
+    history : Optional[str]
         The history attribute written to SCRIP files
+
+    mesh_name : Optional[str]
+        The name of the MPAS mesh
     """
+
     def __init__(self, filename, mesh_name=None):
         """
         Constructor stores the file name
@@ -46,26 +52,31 @@ class MpasVertexMeshDescriptor(MeshDescriptor):
         super().__init__()
 
         with xr.open_dataset(filename) as ds:
-
-            self.mesh_name = mesh_name
+            self.mesh_name: Optional[str] = mesh_name
             self.mesh_name_from_attr(ds)
             if self.mesh_name is None:
                 raise ValueError('No mesh_name provided or found in file.')
 
-            self.filename = filename
-            self.regional = True
+            self.filename: Optional[str] = filename
+            self.regional: Optional[bool] = True
 
             # build coords
-            self.coords = {'lat_vertex': {'dims': 'nVertices',
-                                          'data': ds.latVertex.values,
-                                          'attrs': {'units': 'radians'}},
-                           'lon_vertex': {'dims': 'nVertices',
-                                          'data': ds.lonVertex.values,
-                                          'attrs': {'units': 'radians'}}}
+            self.coords = {
+                'lat_vertex': {
+                    'dims': 'nVertices',
+                    'data': ds.latVertex.values,
+                    'attrs': {'units': 'radians'},
+                },
+                'lon_vertex': {
+                    'dims': 'nVertices',
+                    'data': ds.lonVertex.values,
+                    'attrs': {'units': 'radians'},
+                },
+            }
             self.dims = ['nVertices']
             self.dim_sizes = [ds.sizes[dim] for dim in self.dims]
 
-            self.history = add_history(ds=ds)
+            self.history: Optional[str] = add_history(ds=ds)
 
     def to_scrip(self, scrip_filename, expand_dist=None, expand_factor=None):
         """
@@ -84,6 +95,15 @@ class MpasVertexMeshDescriptor(MeshDescriptor):
             A factor by which to expand each grid cell outward from the center.
             If a ``numpy.ndarray``, one value per cell.
         """
+        assert self.filename is not None, (
+            'filename must be set before calling to_scrip'
+        )
+        assert self.mesh_name is not None, (
+            'mesh_name must be set before calling to_scrip'
+        )
+        assert self.history is not None, (
+            'history must be set before calling to_scrip'
+        )
 
         ds_in = xr.open_dataset(self.filename)
         lat_cell = ds_in.latCell.values
@@ -102,8 +122,10 @@ class MpasVertexMeshDescriptor(MeshDescriptor):
         ds_out = xr.Dataset()
 
         if vertex_degree != 3:
-            raise ValueError(f'MpasVertexMeshDescriptor does not support '
-                             f'vertexDegree {vertex_degree}')
+            raise ValueError(
+                f'MpasVertexMeshDescriptor does not support '
+                f'vertexDegree {vertex_degree}'
+            )
 
         valid_cells_on_vertex = np.zeros(nvertices, dtype=int)
         vertex_area = np.zeros(nvertices)
@@ -116,7 +138,7 @@ class MpasVertexMeshDescriptor(MeshDescriptor):
 
         ds_out['grid_area'] = (
             ('grid_size',),
-            vertex_area / (sphere_radius**2)
+            vertex_area / (sphere_radius**2),
         )
 
         ds_out['grid_center_lat'] = (('grid_size',), lat_vertex)
@@ -148,20 +170,20 @@ class MpasVertexMeshDescriptor(MeshDescriptor):
             grid_corner_lat[mask, 2 * icell + 1] = lat_cell[cells]
 
         ds_out['grid_corner_lat'] = (
-            ('grid_size', 'grid_corners'), grid_corner_lat
+            ('grid_size', 'grid_corners'),
+            grid_corner_lat,
         )
         ds_out['grid_corner_lon'] = (
-            ('grid_size', 'grid_corners'), grid_corner_lon
+            ('grid_size', 'grid_corners'),
+            grid_corner_lon,
         )
 
         ds_out['grid_dims'] = xr.DataArray(
-            [nvertices],
-            dims=('grid_rank',)
+            [nvertices], dims=('grid_rank',)
         ).astype('int32')
 
         ds_out['grid_imask'] = xr.DataArray(
-            np.ones(nvertices, dtype='int32'),
-            dims=('grid_size',)
+            np.ones(nvertices, dtype='int32'), dims=('grid_size',)
         )
 
         if expand_dist is not None or expand_factor is not None:

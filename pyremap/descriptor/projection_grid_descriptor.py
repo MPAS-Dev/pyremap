@@ -9,6 +9,8 @@
 # distributed with this code, or at
 # https://raw.githubusercontent.com/MPAS-Dev/pyremap/main/LICENSE
 
+from typing import Optional
+
 import numpy as np
 import pyproj
 import xarray as xr
@@ -57,6 +59,7 @@ class ProjectionGridDescriptor(MeshDescriptor):
     y_var_name : str
         The name of the y variable
     """
+
     def __init__(self, projection, mesh_name=None):
         """
         Constructor stores the projection
@@ -75,17 +78,23 @@ class ProjectionGridDescriptor(MeshDescriptor):
         self.projection = projection
         self.lat_lon_projection = pyproj.Proj(proj='latlong', datum='WGS84')
 
-        self.x = None
-        self.y = None
-        self.x_corner = None
-        self.y_corner = None
-        self.history = None
-        self.x_var_name = None
-        self.y_var_name = None
+        self.x: Optional[np.ndarray] = None
+        self.y: Optional[np.ndarray] = None
+        self.x_corner: Optional[np.ndarray] = None
+        self.y_corner: Optional[np.ndarray] = None
+        self.history: Optional[str] = None
+        self.x_var_name: Optional[str] = None
+        self.y_var_name: Optional[str] = None
 
     @classmethod
-    def read(cls, projection, filename, mesh_name=None, x_var_name='x',
-             y_var_name='y'):
+    def read(
+        cls,
+        projection,
+        filename,
+        mesh_name=None,
+        x_var_name='x',
+        y_var_name='y',
+    ):
         """
         Given a grid file with x and y coordinates defining the axes of the
         logically rectangular grid, read in the x and y coordinates and
@@ -119,8 +128,12 @@ class ProjectionGridDescriptor(MeshDescriptor):
         descriptor.x = np.array(ds[x_var_name].values, float)
         descriptor.y = np.array(ds[y_var_name].values, float)
 
-        descriptor._set_coords(x_var_name, y_var_name, ds[x_var_name].dims[0],
-                               ds[y_var_name].dims[0])
+        descriptor._set_coords(
+            x_var_name,
+            y_var_name,
+            ds[x_var_name].dims[0],
+            ds[y_var_name].dims[0],
+        )
 
         # interp/extrap corners
         descriptor.x_corner = interp_extrap_corner(descriptor.x)
@@ -183,6 +196,14 @@ class ProjectionGridDescriptor(MeshDescriptor):
             A factor by which to expand each grid cell outward from the center.
             If a ``numpy.ndarray``, one value per cell.
         """
+        assert self.x is not None, 'x must be set before calling to_scrip'
+        assert self.y is not None, 'y must be set before calling to_scrip'
+        assert self.x_corner is not None, (
+            'x_corner must be set before calling to_scrip'
+        )
+        assert self.y_corner is not None, (
+            'y_corner must be set before calling to_scrip'
+        )
 
         ds = xr.Dataset()
 
@@ -200,20 +221,20 @@ class ProjectionGridDescriptor(MeshDescriptor):
         ds['grid_center_lat'] = (('grid_size',), center_lat.flat)
         ds['grid_center_lon'] = (('grid_size',), center_lon.flat)
         ds['grid_corner_lat'] = (
-            ('grid_size', 'grid_corners'), unwrap_corners(corner_lat)
+            ('grid_size', 'grid_corners'),
+            unwrap_corners(corner_lat),
         )
         ds['grid_corner_lon'] = (
-            ('grid_size', 'grid_corners'), unwrap_corners(corner_lon)
+            ('grid_size', 'grid_corners'),
+            unwrap_corners(corner_lon),
         )
 
-        ds['grid_dims'] = xr.DataArray(
-            [nx, ny],
-            dims=('grid_rank',)
-        ).astype('int32')
+        ds['grid_dims'] = xr.DataArray([nx, ny], dims=('grid_rank',)).astype(
+            'int32'
+        )
 
         ds['grid_imask'] = xr.DataArray(
-            np.ones(grid_size, dtype='int32'),
-            dims=('grid_size',)
+            np.ones(grid_size, dtype='int32'), dims=('grid_size',)
         )
 
         if expand_dist is not None or expand_factor is not None:
@@ -250,8 +271,9 @@ class ProjectionGridDescriptor(MeshDescriptor):
         lon : numpy.ndarray
             The longitude in degrees with the same size as x and y
         """
-        transformer = pyproj.Transformer.from_proj(self.projection,
-                                                   self.lat_lon_projection)
+        transformer = pyproj.Transformer.from_proj(
+            self.projection, self.lat_lon_projection
+        )
         lon, lat = transformer.transform(x, y)
 
         return lat, lon
@@ -260,23 +282,35 @@ class ProjectionGridDescriptor(MeshDescriptor):
         """
         Set up a coords dict with x, y, lat and lon
         """
+        assert self.x is not None, 'x must be set before calling to_scrip'
+        assert self.y is not None, 'y must be set before calling to_scrip'
         self.x_var_name = x_var_name
         self.y_var_name = y_var_name
         (x, y) = np.meshgrid(self.x, self.y)
         (lat, lon) = self.project_to_lat_lon(x, y)
 
-        self.coords = {x_var_name: {'dims': x_dim_name,
-                                    'data': self.x,
-                                    'attrs': {'units': 'meters'}},
-                       y_var_name: {'dims': y_dim_name,
-                                    'data': self.y,
-                                    'attrs': {'units': 'meters'}},
-                       'lat': {'dims': (y_dim_name, x_dim_name),
-                               'data': lat,
-                               'attrs': {'units': 'degrees'}},
-                       'lon': {'dims': (y_dim_name, x_dim_name),
-                               'data': lon,
-                               'attrs': {'units': 'degrees'}}}
+        self.coords = {
+            x_var_name: {
+                'dims': x_dim_name,
+                'data': self.x,
+                'attrs': {'units': 'meters'},
+            },
+            y_var_name: {
+                'dims': y_dim_name,
+                'data': self.y,
+                'attrs': {'units': 'meters'},
+            },
+            'lat': {
+                'dims': (y_dim_name, x_dim_name),
+                'data': lat,
+                'attrs': {'units': 'degrees'},
+            },
+            'lon': {
+                'dims': (y_dim_name, x_dim_name),
+                'data': lon,
+                'attrs': {'units': 'degrees'},
+            },
+        }
 
         self.dims = [y_dim_name, x_dim_name]
         self.dim_sizes = [len(self.y), len(self.x)]

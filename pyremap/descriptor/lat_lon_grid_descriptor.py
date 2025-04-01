@@ -9,6 +9,8 @@
 # distributed with this code, or at
 # https://raw.githubusercontent.com/MPAS-Dev/pyremap/main/LICENSE
 
+from typing import Optional
+
 import numpy as np
 import xarray as xr
 
@@ -23,12 +25,8 @@ from pyremap.descriptor.utility import (
 
 
 def get_lat_lon_descriptor(
-        dlon,
-        dlat,
-        lon_min=-180.0,
-        lon_max=180.0,
-        lat_min=-90.0,
-        lat_max=90.0):
+    dlon, dlat, lon_min=-180.0, lon_max=180.0, lat_min=-90.0, lat_max=90.0
+):
     """
     Get a descriptor of a lat-lon grid, used for remapping
 
@@ -73,21 +71,22 @@ class LatLonGridDescriptor(MeshDescriptor):
 
     Attributes
     ----------
-    lat : numpy.ndarray
+    lat : Optional[numpy.ndarray]
         The latitude coordinate at grid-cell centers
 
-    lon : numpy.ndarray
+    lon : Optional[numpy.ndarray]
         The longitude coordinate at grid-cell centers
 
-    lat_corner : numpy.ndarray
+    lat_corner : Optional[numpy.ndarray]
         The latitude coordinate at grid-cell corners
 
-    lon_corner : numpy.ndarray
+    lon_corner : Optional[numpy.ndarray]
         The longitude coordinate at grid-cell corners
 
-    history : str
+    history : Optional[str]
         The history attribute written to SCRIP files
     """
+
     def __init__(self, mesh_name=None, regional=None):
         """
         Construct a mesh descriptor
@@ -102,16 +101,23 @@ class LatLonGridDescriptor(MeshDescriptor):
             latitude and longitude to see if they cover the globe.
         """
         super().__init__(mesh_name=mesh_name, regional=regional)
-        self.lat = None
-        self.lon = None
-        self.units = None
-        self.lat_corner = None
-        self.lon_corner = None
-        self.history = None
+        self.lat: Optional[np.ndarray] = None
+        self.lon: Optional[np.ndarray] = None
+        self.units: Optional[str] = None
+        self.lat_corner: Optional[np.ndarray] = None
+        self.lon_corner: Optional[np.ndarray] = None
+        self.history: Optional[str] = None
 
     @classmethod
-    def read(cls, filename=None, ds=None, lat_var_name='lat',
-             lon_var_name='lon', mesh_name=None, regional=None):
+    def read(
+        cls,
+        filename=None,
+        ds=None,
+        lat_var_name='lat',
+        lon_var_name='lon',
+        mesh_name=None,
+        regional=None,
+    ):
         """
         Read the lat-lon grid from a file with the given lat/lon var names.
 
@@ -159,15 +165,21 @@ class LatLonGridDescriptor(MeshDescriptor):
             lat_var_name,
             lon_var_name,
             ds[lat_var_name].dims[0],
-            ds[lon_var_name].dims[0]
+            ds[lon_var_name].dims[0],
         )
 
         descriptor.history = add_history(ds=ds)
         return descriptor
 
     @classmethod
-    def create(cls, lat_corner, lon_corner, units='degrees', mesh_name=None,
-               regional=None):
+    def create(
+        cls,
+        lat_corner,
+        lon_corner,
+        units='degrees',
+        mesh_name=None,
+        regional=None,
+    ):
         """
         Create the lat-lon grid with the given arrays and units.
 
@@ -221,29 +233,42 @@ class LatLonGridDescriptor(MeshDescriptor):
             A factor by which to expand each grid cell outward from the center.
             If a ``numpy.ndarray``, one value per cell.
         """
+        assert self.lat is not None, 'lat must be set before calling to_scrip'
+        assert self.lon is not None, 'lon must be set before calling to_scrip'
+        assert self.lat_corner is not None, (
+            'lat_corner must be set before calling to_scrip'
+        )
+        assert self.lon_corner is not None, (
+            'lon_corner must be set before calling to_scrip'
+        )
+        assert self.units is not None, (
+            'units must be set before calling to_scrip'
+        )
+
         ds = xr.Dataset()
 
         (center_lon, center_lat) = np.meshgrid(self.lon, self.lat)
         (corner_lon, corner_lat) = np.meshgrid(
-            self.lon_corner, self.lat_corner)
+            self.lon_corner, self.lat_corner
+        )
 
         ds['grid_center_lat'] = (('grid_size',), center_lat.flat)
         ds['grid_center_lon'] = (('grid_size',), center_lon.flat)
         ds['grid_corner_lat'] = (
-            ('grid_size', 'grid_corners'), unwrap_corners(corner_lat)
+            ('grid_size', 'grid_corners'),
+            unwrap_corners(corner_lat),
         )
         ds['grid_corner_lon'] = (
-            ('grid_size', 'grid_corners'), unwrap_corners(corner_lon)
+            ('grid_size', 'grid_corners'),
+            unwrap_corners(corner_lon),
         )
 
         ds['grid_dims'] = xr.DataArray(
-            [len(self.lon), len(self.lat)],
-            dims=('grid_rank',)
+            [len(self.lon), len(self.lat)], dims=('grid_rank',)
         ).astype('int32')
 
         ds['grid_imask'] = xr.DataArray(
-            np.ones(ds.sizes['grid_size'], dtype='int32'),
-            dims=('grid_size',)
+            np.ones(ds.sizes['grid_size'], dtype='int32'), dims=('grid_size',)
         )
 
         if expand_dist is not None or expand_factor is not None:
@@ -259,19 +284,42 @@ class LatLonGridDescriptor(MeshDescriptor):
         ds.attrs['history'] = self.history
         self.write_netcdf(ds, scrip_filename)
 
-    def _set_coords(self, lat_var_name, lon_var_name, lat_dim_name,
-                    lon_dim_name):
+    def _set_coords(
+        self, lat_var_name, lon_var_name, lat_dim_name, lon_dim_name
+    ):
         """
         Set up a coords dict with lat and lon
         """
+        assert self.lat is not None, (
+            'lat must be set before calling _set_coords'
+        )
+        assert self.lon is not None, (
+            'lon must be set before calling _set_coords'
+        )
+        assert self.lat_corner is not None, (
+            'lat_corner must be set before calling _set_coords'
+        )
+        assert self.lon_corner is not None, (
+            'lon_corner must be set before calling _set_coords'
+        )
+        assert self.units is not None, (
+            'units must be set before calling _set_coords'
+        )
+
         self.lat_var_name = lat_var_name
         self.lon_var_name = lon_var_name
-        self.coords = {lat_var_name: {'dims': lat_dim_name,
-                                      'data': self.lat,
-                                      'attrs': {'units': self.units}},
-                       lon_var_name: {'dims': lon_dim_name,
-                                      'data': self.lon,
-                                      'attrs': {'units': self.units}}}
+        self.coords = {
+            lat_var_name: {
+                'dims': lat_dim_name,
+                'data': self.lat,
+                'attrs': {'units': self.units},
+            },
+            lon_var_name: {
+                'dims': lon_dim_name,
+                'data': self.lon,
+                'attrs': {'units': self.units},
+            },
+        }
 
         self.dims = [lat_dim_name, lon_dim_name]
         self.dim_sizes = [len(self.lat), len(self.lon)]
@@ -286,21 +334,21 @@ class LatLonGridDescriptor(MeshDescriptor):
         elif 'rad' in self.units:
             units = 'radian'
         else:
-            raise ValueError('Could not figure out units {}'.format(
-                self.units))
+            raise ValueError(f'Could not figure out units {self.units}')
 
         if self.regional is None:
             self.regional = False
             if units == 'degree':
-                if np.abs(lon_range - 360.) > 1e-10:
+                if np.abs(lon_range - 360.0) > 1e-10:
                     self.regional = True
-                if np.abs(lat_range - 180.) > 1e-10:
+                if np.abs(lat_range - 180.0) > 1e-10:
                     self.regional = True
             else:
-                if np.abs(lon_range - 2. * np.pi) > 1e-10:
+                if np.abs(lon_range - 2.0 * np.pi) > 1e-10:
                     self.regional = True
                 if np.abs(lat_range - np.pi) > 1e-10:
                     self.regional = True
         if self.mesh_name is None:
-            self.mesh_name = '{}x{}{}'.format(round_res(abs(dlat)),
-                                              round_res(abs(dlon)), units)
+            self.mesh_name = (
+                f'{round_res(abs(dlat))}x{round_res(abs(dlon))}{units}'
+            )

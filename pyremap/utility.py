@@ -6,7 +6,8 @@ import numpy as np
 
 
 def write_netcdf(
-        ds, filename, format, engine=None, logger=None, fillvalues=None):
+    ds, filename, format, engine=None, logger=None, fillvalues=None
+):
     """
     Write an xarray.Dataset to a file with NetCDF4 fill values.
 
@@ -42,8 +43,9 @@ def write_netcdf(
             dtype = ds[variable_name].dtype
             for fill_type in fillvalues:
                 if dtype == np.dtype(fill_type):
-                    encoding_dict[variable_name] = \
-                        {'_FillValue': fillvalues[fill_type]}
+                    encoding_dict[variable_name] = {
+                        '_FillValue': fillvalues[fill_type]
+                    }
                     break
         else:
             encoding_dict[variable_name] = {'_FillValue': None}
@@ -61,7 +63,8 @@ def write_netcdf(
         write_filename,
         encoding=encoding_dict,
         format=write_format,
-        engine=engine)
+        engine=engine,
+    )
 
     if format == 'NETCDF3_64BIT_DATA':
         # Still need to convert to NETCDF3_64BIT_DATA
@@ -110,7 +113,8 @@ def check_call(args, logger=None, log_command=True, **kwargs):
             handler.flush()
 
         process = subprocess.Popen(
-            args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, **kwargs)
+            args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, **kwargs
+        )
         stdout, stderr = process.communicate()
 
         if stdout:
@@ -124,17 +128,18 @@ def check_call(args, logger=None, log_command=True, **kwargs):
 
         if process.returncode != 0:
             raise subprocess.CalledProcessError(
-                process.returncode, ' '.join(args))
+                process.returncode, ' '.join(args)
+            )
 
 
 def _print_running(args, fn):
     if isinstance(args, str):
-        print_args = args
+        print_string = args
     else:
         print_args = []
         for arg in args:
             if ' ' in arg:
                 arg = f'"{arg}"'
             print_args.append(arg)
-        print_args = ' '.join(print_args)
-    fn(f'running: {print_args}')
+        print_string = ' '.join(print_args)
+    fn(f'running: {print_string}')

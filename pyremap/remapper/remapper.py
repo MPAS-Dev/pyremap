@@ -387,15 +387,16 @@ class Remapper:
         _build_map(self)
 
     def ncremap(
-            self,
-            in_filename,
-            out_filename,
-            variable_list=None,
-            overwrite=False,
-            renormalize=None,
-            logger=None,
-            replace_mpas_fill=False,
-            parallel_exec=None):
+        self,
+        in_filename,
+        out_filename,
+        variable_list=None,
+        overwrite=False,
+        renormalize=None,
+        logger=None,
+        replace_mpas_fill=False,
+        parallel_exec=None,
+    ):
         """
         Given a source file defining either an MPAS mesh or a lat-lon grid and
         a destination file or set of arrays defining a lat-lon grid, constructs
@@ -456,7 +457,7 @@ class Remapper:
             renormalize,
             logger,
             replace_mpas_fill,
-            parallel_exec
+            parallel_exec,
         )
 
     def remap_numpy(self, ds, renormalization_threshold=None):
