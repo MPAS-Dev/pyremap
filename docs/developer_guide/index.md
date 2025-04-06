@@ -18,7 +18,7 @@ Welcome to the Developer Guide for `pyremap`. This section provides resources an
 - Place tests in the `pyremap/tests/` directory.
 - Run tests locally before submitting changes:
   ```bash
-  pytest --pyargs pyremap
+  pytest --pyargs tests
   ```
 
 ## Contribution Guidelines

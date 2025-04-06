@@ -90,5 +90,5 @@ jobs:
           CHECK_IMAGES: False
         run: |
           conda activate pyremap_dev
-          pytest --pyargs pyremap
+          pytest --pyargs tests
 
