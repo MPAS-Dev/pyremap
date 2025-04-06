@@ -88,6 +88,18 @@ class TestCase(unittest.TestCase):
                 ds1.values, ds2.values, rtol=rtol, atol=atol
             )
 
+    def assertDimsEqual(self, ds1, ds2):
+        assert set(ds1.data_vars.keys()) == set(ds2.data_vars.keys()), (
+            'Variables in ds1 and ds2 do not match.'
+        )
+        for var in ds1.data_vars.keys():
+            dims1 = set(ds1[var].dims)
+            dims2 = set(ds2[var].dims)
+            assert dims1 == dims2, (
+                f"Dimensions for variable '{var}' do not match: "
+                f'{dims1} != {dims2}'
+            )
+
     @contextmanager
     def assertWarns(self, message):
         with warnings.catch_warnings(record=True) as w:

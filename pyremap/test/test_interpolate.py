@@ -233,8 +233,10 @@ class TestInterp(TestCase):
         ds_ref = xr.open_dataset(ref_filename)
         ds_ref = ds_ref.drop_vars([var for var in drop_vars if var in ds_ref])
         if remap_file:
+            self.assertDimsEqual(ds_remapped_file, ds_ref)
             self.assertDatasetApproxEqual(ds_remapped_file, ds_ref)
 
+        self.assertDimsEqual(ds_remapped, ds_ref)
         self.assertDatasetApproxEqual(ds_remapped, ds_ref)
 
     def test_latlon_file_scrip(self):
@@ -576,6 +578,31 @@ class TestInterp(TestCase):
             self.get_latlon_file_descriptor()
         )
         dst_descriptor = self.get_point_collection_descriptor()
+
+        remapper = self.build_remapper(
+            src_descriptor, dst_descriptor, weight_filename
+        )
+        self.check_remap(
+            latlon_grid_filename,
+            out_filename,
+            ref_filename,
+            remapper,
+            remap_file=True,
+        )
+
+    def test_latlon_to_mpas_cell(self):
+        """
+        test horizontal interpolation from a lat/lon grid to an MPAS cell mesh
+        """
+
+        weight_filename, out_filename, ref_filename = self.get_filenames(
+            suffix='latlon_to_mpas_cell'
+        )
+
+        src_descriptor, latlon_grid_filename = (
+            self.get_latlon_file_descriptor()
+        )
+        dst_descriptor, _, _ = self.get_mpas_cell_descriptor()
 
         remapper = self.build_remapper(
             src_descriptor, dst_descriptor, weight_filename
