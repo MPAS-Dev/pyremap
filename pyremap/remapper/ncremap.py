@@ -64,6 +64,12 @@ def _ncremap(
         MpasEdgeMeshDescriptor,
         MpasVertexMeshDescriptor,
     )
+    oned_descriptors = (
+        MpasCellMeshDescriptor,
+        MpasEdgeMeshDescriptor,
+        MpasVertexMeshDescriptor,
+        PointCollectionDescriptor
+    )
     if isinstance(src_descriptor, mpas_descriptors):
         args.extend(['-P', 'mpas'])
         if not replace_mpas_fill:
@@ -121,6 +127,12 @@ def _ncremap(
                 f'--rgr lon_dmn_nm={dst_descriptor.x_var_name}',
                 '--rgr lat_nm_out=lat',
                 '--rgr lon_nm_out=lon',
+            ]
+        )
+    elif isinstance(dst_descriptor, oned_descriptors):
+        regrid_args.extend(
+            [
+                f'--rgr col_nm={dst_descriptor.dims[0]}',
             ]
         )
     if isinstance(dst_descriptor, PointCollectionDescriptor):
