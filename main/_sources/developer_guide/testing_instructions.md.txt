@@ -18,7 +18,7 @@ This document provides detailed instructions for testing `pyremap`.
 
 3. Run the test suite using `pytest`:
    ```bash
-   pytest --pyargs pyremap
+   pytest --pyargs tests
    ```
 
 4. To run a specific test file, provide the file path:
@@ -28,7 +28,7 @@ This document provides detailed instructions for testing `pyremap`.
 
 5. For more verbose output, use the `-v` flag:
    ```bash
-   pytest -v --pyargs pyremap
+   pytest -v --pyargs tests
    ```
 
 ## Writing Tests
@@ -41,7 +41,7 @@ This document provides detailed instructions for testing `pyremap`.
 
 - Use the `--pdb` flag to drop into the Python debugger on test failure:
   ```bash
-  pytest --pdb --pyargs pyremap
+  pytest --pdb --pyargs tests
   ```
 
 - Review the stack trace provided by `pytest` to identify the source of the failure.
