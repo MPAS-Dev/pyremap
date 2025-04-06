@@ -589,3 +589,28 @@ class TestInterp(TestCase):
             remapper,
             remap_file=True,
         )
+
+    def test_latlon_to_mpas_cell(self):
+        """
+        test horizontal interpolation from a lat/lon grid to an MPAS cell mesh
+        """
+
+        weight_filename, out_filename, ref_filename = self.get_filenames(
+            suffix='latlon_to_mpas_cell'
+        )
+
+        src_descriptor, latlon_grid_filename = (
+            self.get_latlon_file_descriptor()
+        )
+        dst_descriptor, _, _ = self.get_mpas_cell_descriptor()
+
+        remapper = self.build_remapper(
+            src_descriptor, dst_descriptor, weight_filename
+        )
+        self.check_remap(
+            latlon_grid_filename,
+            out_filename,
+            ref_filename,
+            remapper,
+            remap_file=True,
+        )
