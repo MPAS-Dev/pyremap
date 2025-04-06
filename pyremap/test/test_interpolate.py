@@ -233,8 +233,10 @@ class TestInterp(TestCase):
         ds_ref = xr.open_dataset(ref_filename)
         ds_ref = ds_ref.drop_vars([var for var in drop_vars if var in ds_ref])
         if remap_file:
+            self.assertDimsEqual(ds_remapped_file, ds_ref)
             self.assertDatasetApproxEqual(ds_remapped_file, ds_ref)
 
+        self.assertDimsEqual(ds_remapped, ds_ref)
         self.assertDatasetApproxEqual(ds_remapped, ds_ref)
 
     def test_latlon_file_scrip(self):
