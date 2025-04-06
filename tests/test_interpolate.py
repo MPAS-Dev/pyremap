@@ -32,7 +32,7 @@ from pyremap import (
     ProjectionGridDescriptor,
     Remapper,
 )
-from pyremap.test import TestCase, loaddatadir  # noqa: F401
+from tests import TestCase, loaddatadir  # noqa: F401
 
 
 @pytest.mark.usefixtures('loaddatadir')

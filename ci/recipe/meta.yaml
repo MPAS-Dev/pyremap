@@ -1,5 +1,6 @@
 {% set name = "pyremap" %}
 {% set version = "1.4.1" %}
+{% set python_min = "3.9" %}
 
 package:
   name: {{ name|lower }}
@@ -15,11 +16,11 @@ build:
 
 requirements:
   host:
-    - python >=3.9
+    - python {{ python_min }}
     - pip
     - setuptools
   run:
-    - python >=3.9
+    - python >={{ python_min }}
     - numpy
     - scipy
     - netcdf4
@@ -32,8 +33,11 @@ requirements:
 test:
   requires:
     - pytest
+    - python {{ python_min }}
+  source_files:
+    - tests
   commands:
-    - pytest --pyargs pyremap
+    - pytest --pyargs tests
   imports:
     - pyremap
 
