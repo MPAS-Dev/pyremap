@@ -480,11 +480,16 @@
 
 <div class="viewcode-block" id="Remapper.build_map">
 <a class="viewcode-back" href="../../../developer_guide/generated/pyremap.remapper.Remapper.build_map.html#pyremap.remapper.Remapper.build_map">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">build_map</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">build_map</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Make the mapping file</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        logger : logging.Logger, optional</span>
+<span class="sd">            A logger to which ncclimo output should be redirected</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">_build_map</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+        <span class="n">_build_map</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Remapper.ncremap">
@@ -526,7 +531,7 @@
 <span class="sd">        renormalize : float, optional</span>
 <span class="sd">            A threshold to use to renormalize the data</span>
 
-<span class="sd">        logger : ``logging.Logger``, optional</span>
+<span class="sd">        logger : logging.Logger, optional</span>
 <span class="sd">            A logger to which ncclimo output should be redirected</span>
 
 <span class="sd">        replace_mpas_fill : bool, optional</span>
