@@ -237,14 +237,14 @@ class ProjectionGridDescriptor(MeshDescriptor):
             np.ones(grid_size, dtype='int32'), dims=('grid_size',)
         )
 
-        if expand_dist is not None or expand_factor is not None:
-            expand_scrip(ds, expand_dist, expand_factor)
-
         ds.grid_center_lat.attrs['units'] = 'degrees'
         ds.grid_center_lon.attrs['units'] = 'degrees'
         ds.grid_corner_lat.attrs['units'] = 'degrees'
         ds.grid_corner_lon.attrs['units'] = 'degrees'
         ds.grid_imask.attrs['units'] = 'unitless'
+
+        if expand_dist is not None or expand_factor is not None:
+            expand_scrip(ds, expand_dist, expand_factor)
 
         ds.attrs['mesh_name'] = self.mesh_name
         ds.attrs['history'] = self.history
