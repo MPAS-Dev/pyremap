@@ -5,9 +5,16 @@ from pyremap.remapper.setup import _setup_remapper
 from pyremap.utility import check_call
 
 
-def _build_map(remapper):
+def _build_map(remapper, logger=None):
     """
     Make the mapping file
+
+    Parameters
+    ----------
+    remapper : pyremap.remapper.MpasRemapper
+        The remapper object to use to create the mapping file
+    logger : logging.Logger, optional
+        A logger to which ncclimo output should be redirected
     """
     _setup_remapper(remapper)
     map_tool = remapper.map_tool
@@ -52,10 +59,10 @@ def _build_map(remapper):
     elif map_tool == 'moab':
         moab_path = remapper.moab_path
         src_scrip_filename = _moab_partition_scrip_file(
-            remapper, src_scrip_filename, moab_path
+            remapper, src_scrip_filename, moab_path, logger
         )
         dst_scrip_filename = _moab_partition_scrip_file(
-            remapper, dst_scrip_filename, moab_path
+            remapper, dst_scrip_filename, moab_path, logger
         )
         args = _moab_build_map_args(
             remapper, src_scrip_filename, dst_scrip_filename
@@ -80,13 +87,13 @@ def _build_map(remapper):
                 f'Valid values are "mpirun" or "srun".'
             )
 
-    check_call(args)
+    check_call(args, logger=logger)
 
     if tempobj is not None:
         tempobj.cleanup()
 
 
-def _moab_partition_scrip_file(remapper, in_filename, moab_path):
+def _moab_partition_scrip_file(remapper, in_filename, moab_path, logger):
     """
     Partition SCRIP file for parallel mbtempest use
     """
@@ -111,7 +118,7 @@ def _moab_partition_scrip_file(remapper, in_filename, moab_path):
         in_filename,
         h5m_filename,
     ]
-    check_call(args)
+    check_call(args, logger=logger)
 
     # Partition source SCRIP
     args = [
@@ -122,7 +129,7 @@ def _moab_partition_scrip_file(remapper, in_filename, moab_path):
         h5m_filename,
         h5m_part_filename,
     ]
-    check_call(args)
+    check_call(args, logger=logger)
 
     print('  Done.')
 

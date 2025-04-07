@@ -380,11 +380,16 @@ class Remapper:
         dst['mpas_mesh_type'] = mesh_type
         self.dst_grid_info = dst
 
-    def build_map(self):
+    def build_map(self, logger=None):
         """
         Make the mapping file
+
+        Parameters
+        ----------
+        logger : logging.Logger, optional
+            A logger to which ncclimo output should be redirected
         """
-        _build_map(self)
+        _build_map(self, logger=logger)
 
     def ncremap(
         self,
@@ -423,7 +428,7 @@ class Remapper:
         renormalize : float, optional
             A threshold to use to renormalize the data
 
-        logger : ``logging.Logger``, optional
+        logger : logging.Logger, optional
             A logger to which ncclimo output should be redirected
 
         replace_mpas_fill : bool, optional
