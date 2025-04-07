@@ -193,8 +193,12 @@
         <span class="n">direction</span><span class="o">=</span><span class="n">pyproj</span><span class="o">.</span><span class="n">enums</span><span class="o">.</span><span class="n">TransformDirection</span><span class="o">.</span><span class="n">INVERSE</span><span class="p">,</span>
     <span class="p">)</span>
 
+    <span class="n">attrs</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">grid_corner_lat</span><span class="o">.</span><span class="n">attrs</span>
     <span class="n">ds</span><span class="p">[</span><span class="s1">&#39;grid_corner_lat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">((</span><span class="s1">&#39;grid_size&#39;</span><span class="p">,</span> <span class="s1">&#39;grid_corners&#39;</span><span class="p">),</span> <span class="n">grid_corner_lat</span><span class="p">)</span>
+    <span class="n">ds</span><span class="o">.</span><span class="n">grid_corner_lat</span><span class="o">.</span><span class="n">attrs</span> <span class="o">=</span> <span class="n">attrs</span>
+    <span class="n">attrs</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">grid_corner_lon</span><span class="o">.</span><span class="n">attrs</span>
     <span class="n">ds</span><span class="p">[</span><span class="s1">&#39;grid_corner_lon&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">((</span><span class="s1">&#39;grid_size&#39;</span><span class="p">,</span> <span class="s1">&#39;grid_corners&#39;</span><span class="p">),</span> <span class="n">grid_corner_lon</span><span class="p">)</span>
+    <span class="n">ds</span><span class="o">.</span><span class="n">grid_corner_lon</span><span class="o">.</span><span class="n">attrs</span> <span class="o">=</span> <span class="n">attrs</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">unwrap_corners</span><span class="p">(</span><span class="n">in_field</span><span class="p">):</span>
