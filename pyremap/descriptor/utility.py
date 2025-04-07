@@ -110,8 +110,12 @@ def expand_scrip(ds, expand_dist, expand_factor):
         direction=pyproj.enums.TransformDirection.INVERSE,
     )
 
+    attrs = ds.grid_corner_lat.attrs
     ds['grid_corner_lat'] = (('grid_size', 'grid_corners'), grid_corner_lat)
+    ds.grid_corner_lat.attrs = attrs
+    attrs = ds.grid_corner_lon.attrs
     ds['grid_corner_lon'] = (('grid_size', 'grid_corners'), grid_corner_lon)
+    ds.grid_corner_lon.attrs = attrs
 
 
 def unwrap_corners(in_field):
