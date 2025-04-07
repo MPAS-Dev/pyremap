@@ -614,3 +614,40 @@ class TestInterp(TestCase):
             remapper,
             remap_file=True,
         )
+
+    def test_latlon_to_mpas_cell_expand(self):
+        """
+        test horizontal interpolation from a lat/lon grid to an MPAS cell mesh
+        including expanding destination grid cells
+        """
+
+        weight_filename, out_filename, ref_filename = self.get_filenames(
+            suffix='latlon_to_mpas_cell_expand'
+        )
+
+        src_descriptor, latlon_grid_filename = (
+            self.get_latlon_file_descriptor()
+        )
+        dst_descriptor, _, _ = self.get_mpas_cell_descriptor()
+
+        remapper = Remapper(
+            ntasks=1,
+            map_filename=weight_filename,
+            method='bilinear',
+            use_tmp=False,
+        )
+        remapper.expand_dist = 1e5
+        remapper.expand_factor = 1.2
+        remapper.src_descriptor = src_descriptor
+        remapper.dst_descriptor = dst_descriptor
+        remapper.build_map()
+
+        assert os.path.exists(remapper.map_filename)
+
+        self.check_remap(
+            latlon_grid_filename,
+            out_filename,
+            ref_filename,
+            remapper,
+            remap_file=True,
+        )
