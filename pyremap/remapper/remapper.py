@@ -78,6 +78,10 @@ class Remapper:
         ntasks=1,
         map_filename=None,
         method='bilinear',
+        src_descriptor=None,
+        dst_descriptor=None,
+        map_tool='esmf',
+        parallel_exec='mpirun',
         use_tmp=True,
     ):
         """
@@ -95,6 +99,20 @@ class Remapper:
         method : {'bilinear', 'neareststod', 'conserve'}, optional
             The method of interpolation used
 
+        src_descriptor: pyremap.descriptor.MeshDescriptor, optional
+            The source mesh descriptor
+
+        dst_descriptor: pyremap.descriptor.MeshDescriptor, optional
+            The destination mesh descriptor
+
+        map_tool : {'esmf', 'moab'}, optional
+            The tool to use for building the mapping file.  The default is
+            ``esmf``.
+
+        parallel_exec : {'mpirun', 'srun'}, optional
+            The command to use for running the mapping tool.  The default is
+            ``mpirun``.
+
         use_tmp : bool, optional
             If True, use a temporary directory for the SCRIP files.  The
             default is False, which means the SCRIP files will be created in
@@ -111,12 +129,12 @@ class Remapper:
         self.src_scrip_filename = 'src_mesh.nc'
         self.dst_scrip_filename = 'dst_mesh.nc'
         self.format = 'NETCDF3_64BIT_DATA'
-        self.src_descriptor = None
-        self.dst_descriptor = None
-        self.map_tool = 'esmf'
+        self.src_descriptor = src_descriptor
+        self.dst_descriptor = dst_descriptor
+        self.map_tool = map_tool
         self.esmf_path = None
         self.moab_path = None
-        self.parallel_exec = 'mpirun'
+        self.parallel_exec = parallel_exec
         self._ds_map = None
         self._matrix = None
 
