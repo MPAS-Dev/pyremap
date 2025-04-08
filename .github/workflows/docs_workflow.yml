@@ -25,27 +25,27 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Conda Environment
-        uses: conda-incubator/setup-miniconda@v3
+        uses: mamba-org/setup-micromamba@v2
         with:
-          activate-environment: "pyremap_ci"
-          miniforge-version: latest
-          channels: conda-forge
-          channel-priority: strict
-          auto-update-conda: true
-          python-version: ${{ env.PYTHON_VERSION }}
+          environment-name: pyremap_dev
+          init-shell: bash
+          condarc: |
+            channel_priority: strict
+            channels:
+                - conda-forge
+          create-args: >-
+            python=${{ env.PYTHON_VERSION }}
 
       - name: Install pyremap
         run: |
           git config --global url."https://github.com/".insteadOf "git@github.com:"
-          conda create -n pyremap_dev --file dev-spec.txt \
+          conda install -y --file dev-spec.txt \
             python=${{ env.PYTHON_VERSION }}
-          conda activate pyremap_dev
           python -m pip install -vv --no-deps --no-build-isolation -e .
 
       - name: Build Sphinx Docs
         run: |
           set -e
-          conda activate pyremap_dev
           pip check
           cd docs
           DOCS_VERSION=${{ github.ref_name }} make versioned-html
@@ -53,7 +53,6 @@ jobs:
       - name: Copy Docs and Commit
         run: |
           set -e
-          conda activate pyremap_dev
           cd docs
           # gh-pages branch must already exist
           git clone https://github.com/MPAS-Dev/pyremap.git --branch gh-pages --single-branch gh-pages
