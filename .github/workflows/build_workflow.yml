@@ -68,27 +68,26 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up Conda Environment
-        uses: conda-incubator/setup-miniconda@v3
+        uses: mamba-org/setup-micromamba@v2
         with:
-          activate-environment: "pyremap_ci"
-          miniforge-variant: Miniforge3
-          miniforge-version: latest
-          channels: conda-forge
-          channel-priority: strict
-          auto-update-conda: true
-          python-version: ${{ matrix.python-version }}
+          environment-name: pyremap_dev
+          init-shell: bash
+          condarc: |
+            channel_priority: strict
+            channels:
+                - conda-forge
+          create-args: >-
+            python=${{ matrix.python-version }}
 
       - name: Install pyremap
         run: |
-          conda create -n pyremap_dev --file dev-spec.txt \
+          conda install -y --file dev-spec.txt \
             python=${{ matrix.python-version }}
-          conda activate pyremap_dev
           python -m pip install -vv --no-deps --no-build-isolation .
 
       - name: Run Tests
         env:
           CHECK_IMAGES: False
         run: |
-          conda activate pyremap_dev
           pytest --pyargs tests
 
