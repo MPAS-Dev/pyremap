@@ -155,6 +155,10 @@
         <span class="n">ntasks</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
         <span class="n">map_filename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">method</span><span class="o">=</span><span class="s1">&#39;bilinear&#39;</span><span class="p">,</span>
+        <span class="n">src_descriptor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">dst_descriptor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">map_tool</span><span class="o">=</span><span class="s1">&#39;esmf&#39;</span><span class="p">,</span>
+        <span class="n">parallel_exec</span><span class="o">=</span><span class="s1">&#39;mpirun&#39;</span><span class="p">,</span>
         <span class="n">use_tmp</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -172,6 +176,20 @@
 <span class="sd">        method : {&#39;bilinear&#39;, &#39;neareststod&#39;, &#39;conserve&#39;}, optional</span>
 <span class="sd">            The method of interpolation used</span>
 
+<span class="sd">        src_descriptor: pyremap.descriptor.MeshDescriptor, optional</span>
+<span class="sd">            The source mesh descriptor</span>
+
+<span class="sd">        dst_descriptor: pyremap.descriptor.MeshDescriptor, optional</span>
+<span class="sd">            The destination mesh descriptor</span>
+
+<span class="sd">        map_tool : {&#39;esmf&#39;, &#39;moab&#39;}, optional</span>
+<span class="sd">            The tool to use for building the mapping file.  The default is</span>
+<span class="sd">            ``esmf``.</span>
+
+<span class="sd">        parallel_exec : {&#39;mpirun&#39;, &#39;srun&#39;}, optional</span>
+<span class="sd">            The command to use for running the mapping tool.  The default is</span>
+<span class="sd">            ``mpirun``.</span>
+
 <span class="sd">        use_tmp : bool, optional</span>
 <span class="sd">            If True, use a temporary directory for the SCRIP files.  The</span>
 <span class="sd">            default is False, which means the SCRIP files will be created in</span>
@@ -188,12 +206,12 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">src_scrip_filename</span> <span class="o">=</span> <span class="s1">&#39;src_mesh.nc&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dst_scrip_filename</span> <span class="o">=</span> <span class="s1">&#39;dst_mesh.nc&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">format</span> <span class="o">=</span> <span class="s1">&#39;NETCDF3_64BIT_DATA&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">src_descriptor</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dst_descriptor</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">map_tool</span> <span class="o">=</span> <span class="s1">&#39;esmf&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">src_descriptor</span> <span class="o">=</span> <span class="n">src_descriptor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dst_descriptor</span> <span class="o">=</span> <span class="n">dst_descriptor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">map_tool</span> <span class="o">=</span> <span class="n">map_tool</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">esmf_path</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">moab_path</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">parallel_exec</span> <span class="o">=</span> <span class="s1">&#39;mpirun&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parallel_exec</span> <span class="o">=</span> <span class="n">parallel_exec</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_ds_map</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_matrix</span> <span class="o">=</span> <span class="kc">None</span>
 
