@@ -1,0 +1,185 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smoothing with expand_dist and expand_factor &mdash; pyremap 2.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=51b770b3"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Building the Mapping" href="building_mapping.html" />
+    <link rel="prev" title="Destination Grid Setup" href="destination_grid_setup.html" />
+    <link href="../_static/style.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            pyremap
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../quick_start.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mesh_descriptors/index.html">Mesh Descriptors</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Remapper</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="source_grid_setup.html">Source Grid Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="destination_grid_setup.html">Destination Grid Setup</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Smoothing with <code class="docutils literal notranslate"><span class="pre">expand_dist</span></code> and <code class="docutils literal notranslate"><span class="pre">expand_factor</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#attributes-overview">Attributes Overview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#usage-and-behavior">Usage and Behavior</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#important-notes">Important Notes</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="building_mapping.html">Building the Mapping</a></li>
+<li class="toctree-l2"><a class="reference internal" href="remapping_data.html">Remapping Data</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../polar_projections/index.html">Polar Projections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developer_guide/index.html">Developer Guide</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">pyremap</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Remapper</a></li>
+      <li class="breadcrumb-item active">Smoothing with <code class="docutils literal notranslate"><span class="pre">expand_dist</span></code> and <code class="docutils literal notranslate"><span class="pre">expand_factor</span></code></li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/remapper/smoothing.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section class="tex2jax_ignore mathjax_ignore" id="smoothing-with-expand-dist-and-expand-factor">
+<h1>Smoothing with <code class="docutils literal notranslate"><span class="pre">expand_dist</span></code> and <code class="docutils literal notranslate"><span class="pre">expand_factor</span></code><a class="headerlink" href="#smoothing-with-expand-dist-and-expand-factor" title="Link to this heading"></a></h1>
+<p id="index-0"><code class="docutils literal notranslate"><span class="pre">pyremap</span></code> provides a unique capability for controlled smoothing when writing out the destination mesh descriptor. This is achieved through the use of two optional attributes: <code class="docutils literal notranslate"><span class="pre">expand_dist</span></code> and <code class="docutils literal notranslate"><span class="pre">expand_factor</span></code>. These attributes can be specified either as part of the destination descriptor or as attributes of the <code class="docutils literal notranslate"><span class="pre">remapper</span></code>, which will then pass them along to the destination descriptor.</p>
+<section id="attributes-overview">
+<h2>Attributes Overview<a class="headerlink" href="#attributes-overview" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">expand_dist</span></code></strong>:
+Specifies a distance in meters by which each grid cell is expanded. This can be provided as:</p>
+<ul>
+<li><p>A single float value, which applies the same expansion distance to all grid cells.</p></li>
+<li><p>A <code class="docutils literal notranslate"><span class="pre">numpy.ndarray</span></code> with the same size as the latitude and longitude coordinates of the mesh or grid, allowing for cell-specific expansion distances.</p></li>
+</ul>
+</li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">expand_factor</span></code></strong>:
+Specifies a fraction of the cell size by which to expand each grid cell. This can also be provided as:</p>
+<ul>
+<li><p>A single float value, applying a uniform expansion factor to all grid cells.</p></li>
+<li><p>A <code class="docutils literal notranslate"><span class="pre">numpy.ndarray</span></code> with the same size as the latitude and longitude coordinates of the mesh or grid, enabling cell-specific expansion factors.</p></li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<div><p><strong>Note</strong>: The default values are <code class="docutils literal notranslate"><span class="pre">expand_dist</span> <span class="pre">=</span> <span class="pre">0.0</span></code> and <code class="docutils literal notranslate"><span class="pre">expand_factor</span> <span class="pre">=</span> <span class="pre">1.0</span></code>, which result in no smoothing.</p>
+</div></blockquote>
+</section>
+<section id="usage-and-behavior">
+<h2>Usage and Behavior<a class="headerlink" href="#usage-and-behavior" title="Link to this heading"></a></h2>
+<p>These attributes are particularly useful for producing highly controlled smoothing as part of the remapping process. By expanding grid cells either by a fixed distance (<code class="docutils literal notranslate"><span class="pre">expand_dist</span></code>) or by a fraction of their size (<code class="docutils literal notranslate"><span class="pre">expand_factor</span></code>), users can fine-tune the smoothing effect to meet specific requirements.</p>
+</section>
+<section id="important-notes">
+<h2>Important Notes<a class="headerlink" href="#important-notes" title="Link to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p><strong>Combination with the <code class="docutils literal notranslate"><span class="pre">conserve</span></code> Method</strong>:
+The <code class="docutils literal notranslate"><span class="pre">expand_dist</span></code> and <code class="docutils literal notranslate"><span class="pre">expand_factor</span></code> attributes must be used in combination with the <code class="docutils literal notranslate"><span class="pre">conserve</span></code> remapping method. This is because they leverage the area-weighted interpolation mechanism inherent to this method.</p></li>
+<li><p><strong>Flexibility</strong>:
+The ability to specify these attributes as either floats or <code class="docutils literal notranslate"><span class="pre">numpy.ndarray</span></code> fields provides flexibility for both uniform and non-uniform smoothing across the grid.</p></li>
+</ol>
+<p>By using these attributes, <code class="docutils literal notranslate"><span class="pre">pyremap</span></code> enables advanced control over the remapping process, making it a powerful tool for applications requiring precise smoothing adjustments.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="destination_grid_setup.html" class="btn btn-neutral float-left" title="Destination Grid Setup" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="building_mapping.html" class="btn btn-neutral float-right" title="Building the Mapping" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright This software is open source software available under the BSD-3license. Copyright (c) 2025.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+   
+
+  <!-- Meta tags for JS to use -->
+  <meta name="doc-version" content="main">
+  <meta name="doc-site-root" content="../">
+
+  <!-- Create version switcher container -->
+  <script>
+    const sidebar = document.querySelector('.wy-side-nav-search');
+    if (sidebar) {
+      const versionDiv = document.createElement('div');
+      versionDiv.id = 'version-switcher';
+      versionDiv.style.marginTop = '1em';
+      sidebar.appendChild(versionDiv);
+    }
+  </script>
+
+  <!-- Load version-switcher.js using the correct relative path -->
+  <script src="../../shared/version-switcher.js"></script>
+
+
+</body>
+</html>

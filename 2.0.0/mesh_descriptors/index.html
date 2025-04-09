@@ -1,0 +1,212 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mesh Descriptors &mdash; pyremap 2.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=51b770b3"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="LatLonGridDescriptor" href="lat_lon_grid_descriptor.html" />
+    <link rel="prev" title="Quick Start" href="../quick_start.html" />
+    <link href="../_static/style.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            pyremap
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../quick_start.html">Quick Start</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Mesh Descriptors</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="lat_lon_grid_descriptor.html">LatLonGridDescriptor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lat_lon_2d_grid_descriptor.html">LatLon2DGridDescriptor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mpas_cell_mesh_descriptor.html">MpasCellMeshDescriptor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mpas_edge_mesh_descriptor.html">MpasEdgeMeshDescriptor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mpas_vertex_mesh_descriptor.html">MpasVertexMeshDescriptor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="point_collection_descriptor.html">PointCollectionDescriptor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="projection_grid_descriptor.html">ProjectionGridDescriptor</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../remapper/index.html">Remapper</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../polar_projections/index.html">Polar Projections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developer_guide/index.html">Developer Guide</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">pyremap</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Mesh Descriptors</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/mesh_descriptors/index.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section class="tex2jax_ignore mathjax_ignore" id="mesh-descriptors">
+<h1>Mesh Descriptors<a class="headerlink" href="#mesh-descriptors" title="Link to this heading"></a></h1>
+<p id="index-0">Overview of mesh descriptors used in pyremap.</p>
+<p>In order to perform remapping, we need a description of both the source and
+destination mesh or grid. Here, we think of a mesh as being potentially
+unstructured, whereas a grid is always structured. Mesh descriptors provide the
+necessary metadata and functionality to describe these meshes or grids, enabling
+remapping between different representations of spatial data.</p>
+<p>The subclasses of <code class="docutils literal notranslate"><span class="pre">MeshDescriptor</span></code>, described in detail below, are used to
+create grid files in
+<a class="reference external" href="https://earthsystemmodeling.org/docs/release/ESMF_8_8_0/ESMF_refdoc/node3.html#SECTION03028100000000000000">SCRIP format</a>
+for use in generating mapping (weight) files with tools like
+<a class="reference external" href="https://earthsystemmodeling.org/">ESMF</a> or
+<a class="reference external" href="https://sigma.mcs.anl.gov/moab-library/">MOAB</a>. These mapping files can then
+be used to remap datasets using either the
+<a class="reference external" href="http://nco.sourceforge.net/nco.html#ncremap">NCO <code class="docutils literal notranslate"><span class="pre">ncremap</span></code> tool</a> or sparse
+matrix multiplication in <a class="reference external" href="https://numpy.org/"><code class="docutils literal notranslate"><span class="pre">numpy</span></code></a>.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="lat_lon_grid_descriptor.html">LatLonGridDescriptor</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="lat_lon_grid_descriptor.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lat_lon_grid_descriptor.html#attributes">Attributes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lat_lon_grid_descriptor.html#methods">Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lat_lon_grid_descriptor.html#example">Example</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="lat_lon_2d_grid_descriptor.html">LatLon2DGridDescriptor</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="lat_lon_2d_grid_descriptor.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lat_lon_2d_grid_descriptor.html#attributes">Attributes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lat_lon_2d_grid_descriptor.html#methods">Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lat_lon_2d_grid_descriptor.html#example">Example</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="mpas_cell_mesh_descriptor.html">MpasCellMeshDescriptor</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="mpas_cell_mesh_descriptor.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mpas_cell_mesh_descriptor.html#attributes">Attributes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mpas_cell_mesh_descriptor.html#methods">Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mpas_cell_mesh_descriptor.html#example">Example</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="mpas_edge_mesh_descriptor.html">MpasEdgeMeshDescriptor</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="mpas_edge_mesh_descriptor.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mpas_edge_mesh_descriptor.html#attributes">Attributes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mpas_edge_mesh_descriptor.html#methods">Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mpas_edge_mesh_descriptor.html#example">Example</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="mpas_vertex_mesh_descriptor.html">MpasVertexMeshDescriptor</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="mpas_vertex_mesh_descriptor.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mpas_vertex_mesh_descriptor.html#attributes">Attributes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mpas_vertex_mesh_descriptor.html#methods">Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mpas_vertex_mesh_descriptor.html#example">Example</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="point_collection_descriptor.html">PointCollectionDescriptor</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="point_collection_descriptor.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="point_collection_descriptor.html#attributes">Attributes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="point_collection_descriptor.html#methods">Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="point_collection_descriptor.html#example">Example</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="projection_grid_descriptor.html">ProjectionGridDescriptor</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="projection_grid_descriptor.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="projection_grid_descriptor.html#attributes">Attributes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="projection_grid_descriptor.html#methods">Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="projection_grid_descriptor.html#example">Example</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../quick_start.html" class="btn btn-neutral float-left" title="Quick Start" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="lat_lon_grid_descriptor.html" class="btn btn-neutral float-right" title="LatLonGridDescriptor" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright This software is open source software available under the BSD-3license. Copyright (c) 2025.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+   
+
+  <!-- Meta tags for JS to use -->
+  <meta name="doc-version" content="main">
+  <meta name="doc-site-root" content="../">
+
+  <!-- Create version switcher container -->
+  <script>
+    const sidebar = document.querySelector('.wy-side-nav-search');
+    if (sidebar) {
+      const versionDiv = document.createElement('div');
+      versionDiv.id = 'version-switcher';
+      versionDiv.style.marginTop = '1em';
+      sidebar.appendChild(versionDiv);
+    }
+  </script>
+
+  <!-- Load version-switcher.js using the correct relative path -->
+  <script src="../../shared/version-switcher.js"></script>
+
+
+</body>
+</html>

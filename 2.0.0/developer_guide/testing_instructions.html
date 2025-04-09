@@ -1,0 +1,210 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Testing Instructions &mdash; pyremap 2.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=51b770b3"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Generating and Previewing Documentation" href="generate_preview_docs.html" />
+    <link rel="prev" title="Contribution Workflow" href="contribution_workflow.html" />
+    <link href="../_static/style.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            pyremap
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../quick_start.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mesh_descriptors/index.html">Mesh Descriptors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../remapper/index.html">Remapper</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../polar_projections/index.html">Polar Projections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/index.html">Examples</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Developer Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="index.html#coding-standards">Coding Standards</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#testing">Testing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#contribution-guidelines">Contribution Guidelines</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html#additional-resources">Additional Resources</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="contribution_workflow.html">Contribution Workflow</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Testing Instructions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#running-tests">Running Tests</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#writing-tests">Writing Tests</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#debugging-failures">Debugging Failures</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#additional-resources">Additional Resources</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="generate_preview_docs.html">Generating and Previewing Documentation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api.html">API reference</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">pyremap</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Developer Guide</a></li>
+      <li class="breadcrumb-item active">Testing Instructions</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/developer_guide/testing_instructions.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section class="tex2jax_ignore mathjax_ignore" id="testing-instructions">
+<h1>Testing Instructions<a class="headerlink" href="#testing-instructions" title="Link to this heading"></a></h1>
+<p id="index-0">This document provides detailed instructions for testing <code class="docutils literal notranslate"><span class="pre">pyremap</span></code>.</p>
+<section id="running-tests">
+<h2>Running Tests<a class="headerlink" href="#running-tests" title="Link to this heading"></a></h2>
+<ol class="arabic">
+<li><p>Ensure all dependencies are installed. You can use <code class="docutils literal notranslate"><span class="pre">conda</span></code> to install any missing dependencies:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>install<span class="w"> </span>--file<span class="w"> </span>dev-spec.txt
+</pre></div>
+</div>
+</li>
+<li><p>Install pyremap in edit mode:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>--no-deps<span class="w"> </span>--no-build-isolation<span class="w"> </span>-e<span class="w"> </span>.
+</pre></div>
+</div>
+</li>
+<li><p>Run the test suite using <code class="docutils literal notranslate"><span class="pre">pytest</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pytest<span class="w"> </span>--pyargs<span class="w"> </span>tests
+</pre></div>
+</div>
+</li>
+<li><p>To run a specific test file, provide the file path:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pytest<span class="w"> </span>path/to/test_file.py
+</pre></div>
+</div>
+</li>
+<li><p>For more verbose output, use the <code class="docutils literal notranslate"><span class="pre">-v</span></code> flag:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pytest<span class="w"> </span>-v<span class="w"> </span>--pyargs<span class="w"> </span>tests
+</pre></div>
+</div>
+</li>
+</ol>
+</section>
+<section id="writing-tests">
+<h2>Writing Tests<a class="headerlink" href="#writing-tests" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Place all test files in the <code class="docutils literal notranslate"><span class="pre">pyremap/tests/</span></code> directory.</p></li>
+<li><p>Use descriptive names for test functions and files.</p></li>
+<li><p>Follow the <code class="docutils literal notranslate"><span class="pre">pytest</span></code> conventions for writing tests.</p></li>
+</ul>
+</section>
+<section id="debugging-failures">
+<h2>Debugging Failures<a class="headerlink" href="#debugging-failures" title="Link to this heading"></a></h2>
+<ul>
+<li><p>Use the <code class="docutils literal notranslate"><span class="pre">--pdb</span></code> flag to drop into the Python debugger on test failure:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pytest<span class="w"> </span>--pdb<span class="w"> </span>--pyargs<span class="w"> </span>tests
+</pre></div>
+</div>
+</li>
+<li><p>Review the stack trace provided by <code class="docutils literal notranslate"><span class="pre">pytest</span></code> to identify the source of the failure.</p></li>
+</ul>
+</section>
+<section id="additional-resources">
+<h2>Additional Resources<a class="headerlink" href="#additional-resources" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Refer to the <a class="reference external" href="https://docs.pytest.org/en/latest/">pytest documentation</a> for advanced usage and features.</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="contribution_workflow.html" class="btn btn-neutral float-left" title="Contribution Workflow" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="generate_preview_docs.html" class="btn btn-neutral float-right" title="Generating and Previewing Documentation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright This software is open source software available under the BSD-3license. Copyright (c) 2025.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+   
+
+  <!-- Meta tags for JS to use -->
+  <meta name="doc-version" content="main">
+  <meta name="doc-site-root" content="../">
+
+  <!-- Create version switcher container -->
+  <script>
+    const sidebar = document.querySelector('.wy-side-nav-search');
+    if (sidebar) {
+      const versionDiv = document.createElement('div');
+      versionDiv.id = 'version-switcher';
+      versionDiv.style.marginTop = '1em';
+      sidebar.appendChild(versionDiv);
+    }
+  </script>
+
+  <!-- Load version-switcher.js using the correct relative path -->
+  <script src="../../shared/version-switcher.js"></script>
+
+
+</body>
+</html>

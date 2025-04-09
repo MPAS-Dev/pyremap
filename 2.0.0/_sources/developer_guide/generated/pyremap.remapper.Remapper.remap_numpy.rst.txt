@@ -1,0 +1,6 @@
+﻿pyremap.remapper.Remapper.remap\_numpy
+======================================
+
+.. currentmodule:: pyremap.remapper
+
+.. automethod:: Remapper.remap_numpy
