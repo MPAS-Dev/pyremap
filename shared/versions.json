@@ -36,6 +36,34 @@
     "url": "/pyremap/1.0.0/"
   },
   {
+    "version": "0.0.16",
+    "url": "/pyremap/0.0.16/"
+  },
+  {
+    "version": "0.0.15",
+    "url": "/pyremap/0.0.15/"
+  },
+  {
+    "version": "0.0.14",
+    "url": "/pyremap/0.0.14/"
+  },
+  {
+    "version": "0.0.13",
+    "url": "/pyremap/0.0.13/"
+  },
+  {
+    "version": "0.0.12",
+    "url": "/pyremap/0.0.12/"
+  },
+  {
+    "version": "0.0.11",
+    "url": "/pyremap/0.0.11/"
+  },
+  {
+    "version": "0.0.10",
+    "url": "/pyremap/0.0.10/"
+  },
+  {
     "version": "0.0.9",
     "url": "/pyremap/0.0.9/"
   },
@@ -66,33 +94,5 @@
   {
     "version": "0.0.2",
     "url": "/pyremap/0.0.2/"
-  },
-  {
-    "version": "0.0.16",
-    "url": "/pyremap/0.0.16/"
-  },
-  {
-    "version": "0.0.15",
-    "url": "/pyremap/0.0.15/"
-  },
-  {
-    "version": "0.0.14",
-    "url": "/pyremap/0.0.14/"
-  },
-  {
-    "version": "0.0.13",
-    "url": "/pyremap/0.0.13/"
-  },
-  {
-    "version": "0.0.12",
-    "url": "/pyremap/0.0.12/"
-  },
-  {
-    "version": "0.0.11",
-    "url": "/pyremap/0.0.11/"
-  },
-  {
-    "version": "0.0.10",
-    "url": "/pyremap/0.0.10/"
   }
 ]
