@@ -196,5 +196,5 @@ html_sidebars = {
 }
 
 html_context = {
-    "current_version": os.getenv("DOC_VERSION", "main"),
+    "current_version": os.getenv("DOCS_VERSION", "main"),
 }

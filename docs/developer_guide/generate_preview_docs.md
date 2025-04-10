@@ -20,7 +20,7 @@ Ensure you have the following installed:
 To build the documentation, run the following command:
 ```bash
 cd docs
-DOC_VERSION=main make versioned-html
+DOCS_VERSION=main make versioned-html
 ```
 This will generate the static site in the `_build/html/main` directory.
 
