@@ -1,5 +1,5 @@
 ![pyremap logo](_static/logo.png)
-=(pyremap)
+(pyremap)=
 
 # pyremap
 
