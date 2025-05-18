@@ -58,12 +58,18 @@ def _build_map(remapper, logger=None):
 
     elif map_tool == 'moab':
         moab_path = remapper.moab_path
-        src_scrip_filename = _moab_partition_scrip_file(
-            remapper, src_scrip_filename, moab_path, logger
-        )
-        dst_scrip_filename = _moab_partition_scrip_file(
-            remapper, dst_scrip_filename, moab_path, logger
-        )
+        if src_descriptor.format != 'NETCDF3_64BIT_DATA':
+            # we need to convert to CDF5 for moab compatibility
+            cdf_filename = src_scrip_filename.replace('.nc', '.cdf5.nc')
+            src_scrip_filename = _convert_to_cdf5(
+                src_scrip_filename, cdf_filename, logger
+            )
+        if dst_descriptor.format != 'NETCDF3_64BIT_DATA':
+            # we need to convert to CDF5 for moab compatibility
+            cdf_filename = dst_scrip_filename.replace('.nc', '.cdf5.nc')
+            dst_scrip_filename = _convert_to_cdf5(
+                dst_scrip_filename, cdf_filename, logger
+            )
         args = _moab_build_map_args(
             remapper, src_scrip_filename, dst_scrip_filename
         )
@@ -93,47 +99,18 @@ def _build_map(remapper, logger=None):
         tempobj.cleanup()
 
 
-def _moab_partition_scrip_file(remapper, in_filename, moab_path, logger):
+def _convert_to_cdf5(in_filename, out_filename, logger):
     """
-    Partition SCRIP file for parallel mbtempest use
+    Convert SCRIP file to NetCDF3_64BIT_DATA
     """
-    ntasks = remapper.ntasks
+    print(f'Converting {in_filename} to CDF5 format in {out_filename}')
 
-    print(f'Partition SCRIP file {in_filename}')
-
-    h5m_filename = in_filename.replace('.nc', '.h5m')
-    h5m_part_filename = in_filename.replace('.nc', f'.p{ntasks}.h5m')
-
-    if moab_path is None:
-        mbconvert = 'mbconvert'
-        mbpart = 'mbpart'
-    else:
-        mbconvert = os.path.join(moab_path, 'bin', 'mbconvert')
-        mbpart = os.path.join(moab_path, 'bin', 'mbpart')
-
-    # Convert source SCRIP to mbtempest
-    args = [
-        mbconvert,
-        '-B',
-        in_filename,
-        h5m_filename,
-    ]
-    check_call(args, logger=logger)
-
-    # Partition source SCRIP
-    args = [
-        mbpart,
-        f'{ntasks}',
-        '-z',
-        'RCB',
-        h5m_filename,
-        h5m_part_filename,
-    ]
+    args = ['ncks', '-O', '-5', in_filename, out_filename]
     check_call(args, logger=logger)
 
     print('  Done.')
 
-    return h5m_part_filename
+    return out_filename
 
 
 def _esmf_build_map_args(remapper, src_scrip_filename, dst_scrip_filename):
