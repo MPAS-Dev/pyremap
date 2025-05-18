@@ -1,5 +1,3 @@
-import os
-
 from pyremap.remapper.build_map import _build_map
 from pyremap.remapper.ncremap import _ncremap
 from pyremap.remapper.remap_numpy import _remap_numpy
@@ -468,8 +466,6 @@ class Remapper:
             needed).
         """
         _setup_remapper(self)
-        if not os.path.exists(self.map_filename):
-            _build_map(self)
 
         _ncremap(
             self,
