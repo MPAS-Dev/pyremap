@@ -127,7 +127,12 @@ class MpasCellMeshDescriptor(MeshDescriptor):
 
         ds_out = xr.Dataset()
 
-        ds_out['grid_area'] = (('grid_size',), area_cell / (sphere_radius**2))
+        if sphere_radius > 0:
+            ds_out['grid_area'] = (
+                ('grid_size',),
+                area_cell / (sphere_radius**2),
+            )
+            ds_out.grid_area.attrs['units'] = 'radians^2'
 
         ds_out['grid_center_lat'] = (('grid_size',), lat_cell)
         ds_out['grid_center_lon'] = (('grid_size',), lon_cell)
@@ -165,7 +170,6 @@ class MpasCellMeshDescriptor(MeshDescriptor):
         ds_out.grid_corner_lat.attrs['units'] = 'radians'
         ds_out.grid_corner_lon.attrs['units'] = 'radians'
         ds_out.grid_imask.attrs['units'] = 'unitless'
-        ds_out.grid_area.attrs['units'] = 'radians^2'
 
         if expand_dist is not None or expand_factor is not None:
             expand_scrip(ds_out, expand_dist, expand_factor)
