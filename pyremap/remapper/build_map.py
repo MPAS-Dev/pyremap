@@ -77,14 +77,15 @@ def _build_map(remapper, logger=None):
     ntasks = remapper.ntasks
     if ntasks > 1:
         parallel_exec = remapper.parallel_exec
-        if parallel_exec == 'srun':
-            args = [parallel_exec, '-n', str(ntasks)] + args
-        elif parallel_exec == 'mpirun':
-            args = [parallel_exec, '-np', str(ntasks)] + args
+        parallel_args = parallel_exec.split(' ')
+        if parallel_args[0] == 'srun':
+            args = parallel_args + ['-n', str(ntasks)] + args
+        elif parallel_args[0] == 'mpirun':
+            args = parallel_args + ['-np', str(ntasks)] + args
         else:
             raise ValueError(
                 f'Unexpected parallel_exec {parallel_exec}. '
-                f'Valid values are "mpirun" or "srun".'
+                f'Valid values are "mpirun" or "srun" with optional flags.'
             )
 
     check_call(args, logger=logger)
