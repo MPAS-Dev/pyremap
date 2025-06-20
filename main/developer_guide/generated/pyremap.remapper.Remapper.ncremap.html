@@ -121,7 +121,9 @@ the function does nothing and returns immediately</p></li>
 from MPAS output).  If this has been handled before the call,
 replacing the fill value again may cause errors.</p></li>
 <li><p><strong>parallel_exec</strong> (<em>{'srun'}</em><em>, </em><em>optional</em>) – The name of the parallel executable to use to launch ncremap.
-By default, none is used.</p></li>
+By default, none is used.  Note that <code class="docutils literal notranslate"><span class="pre">self.parallel_exec</span></code> is
+not used, since that attribute is used to build mapping files, not
+for ncremap.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>

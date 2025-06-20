@@ -144,8 +144,8 @@
 <span class="sd">        MOAB tools must be in the PATH.</span>
 
 <span class="sd">    parallel_exec : {&#39;mpirun&#39;, &#39;srun&#39;}</span>
-<span class="sd">        The command to use for running the mapping tool.  The default is</span>
-<span class="sd">        ``mpirun``.</span>
+<span class="sd">        The command to use for running the mapping tool, possibly with</span>
+<span class="sd">        additional flags.</span>
 <span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -185,8 +185,8 @@
 <span class="sd">            ``esmf``.</span>
 
 <span class="sd">        parallel_exec : {&#39;mpirun&#39;, &#39;srun&#39;}, optional</span>
-<span class="sd">            The command to use for running the mapping tool.  The default is</span>
-<span class="sd">            ``mpirun``.</span>
+<span class="sd">            The command to use for running the mapping tool, possibly with</span>
+<span class="sd">            additional flags.  The default is ``mpirun``.</span>
 
 <span class="sd">        use_tmp : bool, optional</span>
 <span class="sd">            If True, use a temporary directory for the SCRIP files.  The</span>
@@ -557,7 +557,9 @@
 
 <span class="sd">        parallel_exec : {&#39;srun&#39;}, optional</span>
 <span class="sd">            The name of the parallel executable to use to launch ncremap.</span>
-<span class="sd">            By default, none is used.</span>
+<span class="sd">            By default, none is used.  Note that ``self.parallel_exec`` is</span>
+<span class="sd">            not used, since that attribute is used to build mapping files, not</span>
+<span class="sd">            for ncremap.</span>
 
 <span class="sd">        Raises</span>
 <span class="sd">        ------</span>
