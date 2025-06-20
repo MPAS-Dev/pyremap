@@ -23,7 +23,8 @@ tool.
 - `moab_path`: The path to the MOAB installation, if `mptempest` is not in
   your path.
 - `parallel_exec`: The parallel executable (e.g. `srun` or `mpirun`) to use
-  to run the mapping tool.
+  to run the mapping tool.  This may include additional flags, e.g.
+  `srun --mpi=pmi2`.
 - `use_tmp`: Whether to use a temporary directory for intermediate files.
 
 ## Example

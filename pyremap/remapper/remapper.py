@@ -67,8 +67,8 @@ class Remapper:
         MOAB tools must be in the PATH.
 
     parallel_exec : {'mpirun', 'srun'}
-        The command to use for running the mapping tool.  The default is
-        ``mpirun``.
+        The command to use for running the mapping tool, possibly with
+        additional flags.
     """  # noqa: E501
 
     def __init__(
@@ -108,8 +108,8 @@ class Remapper:
             ``esmf``.
 
         parallel_exec : {'mpirun', 'srun'}, optional
-            The command to use for running the mapping tool.  The default is
-            ``mpirun``.
+            The command to use for running the mapping tool, possibly with
+            additional flags.  The default is ``mpirun``.
 
         use_tmp : bool, optional
             If True, use a temporary directory for the SCRIP files.  The
@@ -454,7 +454,9 @@ class Remapper:
 
         parallel_exec : {'srun'}, optional
             The name of the parallel executable to use to launch ncremap.
-            By default, none is used.
+            By default, none is used.  Note that ``self.parallel_exec`` is
+            not used, since that attribute is used to build mapping files, not
+            for ncremap.
 
         Raises
         ------
