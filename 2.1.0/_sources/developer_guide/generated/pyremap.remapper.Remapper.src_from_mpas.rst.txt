@@ -1,0 +1,6 @@
+﻿pyremap.remapper.Remapper.src\_from\_mpas
+=========================================
+
+.. currentmodule:: pyremap.remapper
+
+.. automethod:: Remapper.src_from_mpas

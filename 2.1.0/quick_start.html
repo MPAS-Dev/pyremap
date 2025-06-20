@@ -1,0 +1,198 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quick Start &mdash; pyremap 2.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=20623aea"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Mesh Descriptors" href="mesh_descriptors/index.html" />
+    <link rel="prev" title="pyremap" href="index.html" />
+    <link href="_static/style.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            pyremap
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Quick Start</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#basic-usage">Basic Usage</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#step-1-define-source-and-destination-grids">Step 1: Define Source and Destination Grids</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#step-2-generate-a-mapping-file">Step 2: Generate a Mapping File</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#step-3-apply-the-mapping">Step 3: Apply the Mapping</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#additional-resources">Additional Resources</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="mesh_descriptors/index.html">Mesh Descriptors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="remapper/index.html">Remapper</a></li>
+<li class="toctree-l1"><a class="reference internal" href="polar_projections/index.html">Polar Projections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developer_guide/index.html">Developer Guide</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">pyremap</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Quick Start</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/quick_start.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section class="tex2jax_ignore mathjax_ignore" id="quick-start">
+<h1>Quick Start<a class="headerlink" href="#quick-start" title="Link to this heading"></a></h1>
+<p>This guide will help you get started with <code class="docutils literal notranslate"><span class="pre">pyremap</span></code> for remapping data between different spatial representations.</p>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h2>
+<p>To install <code class="docutils literal notranslate"><span class="pre">pyremap</span></code>, use <code class="docutils literal notranslate"><span class="pre">conda</span></code> (from the <code class="docutils literal notranslate"><span class="pre">conda-forge</span></code> channel):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>install<span class="w"> </span>pyremap
+</pre></div>
+</div>
+</section>
+<section id="basic-usage">
+<h2>Basic Usage<a class="headerlink" href="#basic-usage" title="Link to this heading"></a></h2>
+<p>Here is a simple example of how to use <code class="docutils literal notranslate"><span class="pre">pyremap</span></code> to remap data from a source grid to a destination grid.</p>
+<section id="step-1-define-source-and-destination-grids">
+<h3>Step 1: Define Source and Destination Grids<a class="headerlink" href="#step-1-define-source-and-destination-grids" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyremap</span><span class="w"> </span><span class="kn">import</span> <span class="n">LatLonGridDescriptor</span><span class="p">,</span> <span class="n">MpasCellMeshDescriptor</span>
+
+<span class="c1"># Define a source grid (e.g., a regular latitude-longitude grid)</span>
+<span class="n">source_grid</span> <span class="o">=</span> <span class="n">LatLonGridDescriptor</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">file_name</span><span class="o">=</span><span class="s1">&#39;source_grid.nc&#39;</span><span class="p">)</span>
+
+<span class="c1"># Define a destination grid (e.g., an unstructured mesh)</span>
+<span class="n">destination_grid</span> <span class="o">=</span> <span class="n">MpasCellMeshDescriptor</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">file_name</span><span class="o">=</span><span class="s1">&#39;destination_grid.nc&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="step-2-generate-a-mapping-file">
+<h3>Step 2: Generate a Mapping File<a class="headerlink" href="#step-2-generate-a-mapping-file" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyremap</span><span class="w"> </span><span class="kn">import</span> <span class="n">Remapper</span>
+
+<span class="c1"># Create a remapper object</span>
+<span class="n">remapper</span> <span class="o">=</span> <span class="n">Remapper</span><span class="p">(</span><span class="n">map_filename</span><span class="o">=</span><span class="s1">&#39;map_source_to_dest.nc&#39;</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;bilinear&#39;</span><span class="p">)</span>
+<span class="n">remapper</span><span class="o">.</span><span class="n">src_descriptor</span> <span class="o">=</span> <span class="n">source_grid</span>
+<span class="n">remapper</span><span class="o">.</span><span class="n">dst_descriptor</span> <span class="o">=</span> <span class="n">destination_grid</span>
+
+<span class="c1"># Generate the mapping file</span>
+<span class="n">remapper</span><span class="o">.</span><span class="n">build_map</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="step-3-apply-the-mapping">
+<h3>Step 3: Apply the Mapping<a class="headerlink" href="#step-3-apply-the-mapping" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Remap data from the source grid to the destination grid</span>
+<span class="n">remapper</span><span class="o">.</span><span class="n">ncremap</span><span class="p">(</span>
+    <span class="n">in_filename</span><span class="o">=</span><span class="s1">&#39;source_data.nc&#39;</span><span class="p">,</span>
+    <span class="n">out_filename</span><span class="o">=</span><span class="s1">&#39;remapped_data.nc&#39;</span><span class="p">,</span>
+    <span class="n">variable_list</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;temperature&#39;</span><span class="p">,</span> <span class="s1">&#39;salinity&#39;</span><span class="p">]</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="additional-resources">
+<h2>Additional Resources<a class="headerlink" href="#additional-resources" title="Link to this heading"></a></h2>
+<p>For more detailed examples and advanced usage, refer to the <a class="reference internal" href="index.html#id1"><span class="std std-ref">documentation</span></a>.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="pyremap" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="mesh_descriptors/index.html" class="btn btn-neutral float-right" title="Mesh Descriptors" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright This software is open source software available under the BSD-3license. Copyright (c) 2025.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+   
+
+  <!-- Meta tags for JS to use -->
+  <meta name="doc-version" content="2.1.0">
+  <meta name="doc-site-root" content="./">
+
+  <!-- Create version switcher container -->
+  <script>
+    const sidebar = document.querySelector('.wy-side-nav-search');
+    if (sidebar) {
+      const versionDiv = document.createElement('div');
+      versionDiv.id = 'version-switcher';
+      versionDiv.style.marginTop = '1em';
+      sidebar.appendChild(versionDiv);
+    }
+  </script>
+
+  <!-- Load version-switcher.js using the correct relative path -->
+  <script src="../shared/version-switcher.js"></script>
+
+
+</body>
+</html>

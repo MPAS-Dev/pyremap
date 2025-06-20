@@ -1,0 +1,228 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pyremap &mdash; pyremap 2.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=20623aea"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Quick Start" href="quick_start.html" />
+    <link href="_static/style.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="#" class="icon icon-home">
+            pyremap
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="quick_start.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mesh_descriptors/index.html">Mesh Descriptors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="remapper/index.html">Remapper</a></li>
+<li class="toctree-l1"><a class="reference internal" href="polar_projections/index.html">Polar Projections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developer_guide/index.html">Developer Guide</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">pyremap</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">pyremap</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/index.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <p><img alt="pyremap logo" src="_images/logo.png" /></p>
+<section class="tex2jax_ignore mathjax_ignore" id="pyremap">
+<span id="id1"></span><h1>pyremap<a class="headerlink" href="#pyremap" title="Link to this heading"></a></h1>
+<p>Python remapping tools for climate and earth system models.</p>
+<section id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading"></a></h2>
+<p id="index-0"><code class="docutils literal notranslate"><span class="pre">pyremap</span></code> is a Python library designed to facilitate the remapping
+(interpolation) of data between different spatial representations, such as
+grids and meshes. Remapping is a critical step in climate and Earth system
+modeling, where data from various sources—such as models, observations, or
+reanalysis products—often need to be compared, combined, or transformed to a
+common spatial domain.</p>
+<p>The library provides a high-level interface for defining source and
+destination grids or meshes, generating mapping (weight) files, and applying
+these mappings to remap data. It supports structured grids (e.g., regular
+latitude-longitude grids) and unstructured meshes (e.g., MPAS meshes), making
+it a versatile tool for a wide range of applications.</p>
+<p>Key features of <code class="docutils literal notranslate"><span class="pre">pyremap</span></code> include:</p>
+<ul class="simple">
+<li><p><strong>Support for multiple grid types</strong>: Structured grids, unstructured meshes,
+and projected grids.</p></li>
+<li><p><strong>Flexible remapping methods</strong>: Bilinear, conservative, and nearest-neighbor
+interpolation.</p></li>
+<li><p><strong>Integration with external tools</strong>: Leverages tools like ESMF (Earth System
+Modeling Framework) and MOAB for generating mapping files.</p></li>
+<li><p><strong>Ease of use</strong>: High-level Python API for defining grids, building
+mappings, and remapping data.</p></li>
+</ul>
+<p>Whether you are working with climate model output, observational data, or
+custom spatial datasets, <code class="docutils literal notranslate"><span class="pre">pyremap</span></code> provides the tools you need to perform
+accurate and efficient remapping.</p>
+</section>
+<section id="documentation-overview">
+<h2>Documentation Overview<a class="headerlink" href="#documentation-overview" title="Link to this heading"></a></h2>
+<p id="index-1">This documentation is organized into the following sections:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="quick_start.html">Quick Start</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="quick_start.html#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quick_start.html#basic-usage">Basic Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quick_start.html#additional-resources">Additional Resources</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="mesh_descriptors/index.html">Mesh Descriptors</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="mesh_descriptors/lat_lon_grid_descriptor.html">LatLonGridDescriptor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mesh_descriptors/lat_lon_2d_grid_descriptor.html">LatLon2DGridDescriptor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mesh_descriptors/mpas_cell_mesh_descriptor.html">MpasCellMeshDescriptor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mesh_descriptors/mpas_edge_mesh_descriptor.html">MpasEdgeMeshDescriptor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mesh_descriptors/mpas_vertex_mesh_descriptor.html">MpasVertexMeshDescriptor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mesh_descriptors/point_collection_descriptor.html">PointCollectionDescriptor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mesh_descriptors/projection_grid_descriptor.html">ProjectionGridDescriptor</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="remapper/index.html">Remapper</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="remapper/source_grid_setup.html">Source Grid Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="remapper/destination_grid_setup.html">Destination Grid Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="remapper/smoothing.html">Smoothing with <code class="docutils literal notranslate"><span class="pre">expand_dist</span></code> and <code class="docutils literal notranslate"><span class="pre">expand_factor</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="remapper/building_mapping.html">Building the Mapping</a></li>
+<li class="toctree-l2"><a class="reference internal" href="remapper/remapping_data.html">Remapping Data</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="polar_projections/index.html">Polar Projections</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="polar_projections/polar_descriptor.html">Polar Descriptor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="polar_projections/arctic_stereographic.html">Arctic Stereographic Projection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="polar_projections/antarctic_stereographic.html">Antarctic Stereographic Projection</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples/index.html">Examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="examples/make_mpas_to_lat_lon_mapping.html">Make MPAS to Lat-Lon Mapping</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/make_mpas_to_antarctic_stereo_mapping.html">Make MPAS to Antarctic Stereo Mapping</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/make_mpas_vertex_to_antarctic_stereo_mapping.html">Make MPAS Vertex to Antarctic Stereo Mapping</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="developer_guide/index.html">Developer Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="developer_guide/index.html#coding-standards">Coding Standards</a></li>
+<li class="toctree-l2"><a class="reference internal" href="developer_guide/index.html#testing">Testing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="developer_guide/index.html#contribution-guidelines">Contribution Guidelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="developer_guide/index.html#additional-resources">Additional Resources</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<ul class="simple">
+<li><p><strong>Quick Start</strong>: A brief guide to get you started with <code class="docutils literal notranslate"><span class="pre">pyremap</span></code>.</p></li>
+<li><p><strong>Mesh Descriptors</strong>: Detailed descriptions of the different types of grids and meshes supported by <code class="docutils literal notranslate"><span class="pre">pyremap</span></code>.</p></li>
+<li><p><strong>Remapper</strong>: An overview of the remapping process, including source and destination grid setup, mapping file generation, and data remapping.</p></li>
+<li><p><strong>Polar Projections</strong>: Information on working with polar stereographic projections.</p></li>
+<li><p><strong>Examples</strong>: Step-by-step examples demonstrating common use cases.</p></li>
+<li><p><strong>Developer Guide</strong>: Resources for contributors, including API references, testing instructions, contribution guidelines, and coding standards.</p></li>
+</ul>
+</section>
+</section>
+<section class="tex2jax_ignore mathjax_ignore" id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Link to this heading"></a></h1>
+<ul class="simple" id="index-2">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="quick_start.html" class="btn btn-neutral float-right" title="Quick Start" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright This software is open source software available under the BSD-3license. Copyright (c) 2025.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+   
+
+  <!-- Meta tags for JS to use -->
+  <meta name="doc-version" content="2.1.0">
+  <meta name="doc-site-root" content="./">
+
+  <!-- Create version switcher container -->
+  <script>
+    const sidebar = document.querySelector('.wy-side-nav-search');
+    if (sidebar) {
+      const versionDiv = document.createElement('div');
+      versionDiv.id = 'version-switcher';
+      versionDiv.style.marginTop = '1em';
+      sidebar.appendChild(versionDiv);
+    }
+  </script>
+
+  <!-- Load version-switcher.js using the correct relative path -->
+  <script src="../shared/version-switcher.js"></script>
+
+
+</body>
+</html>
