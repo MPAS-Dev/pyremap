@@ -37,5 +37,6 @@ Welcome to the Developer Guide for `pyremap`. This section provides resources an
 contribution_workflow
 testing_instructions
 generate_preview_docs
+releasing
 api
 ```
