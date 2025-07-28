@@ -60,8 +60,10 @@
 <li class="toctree-l3"><a class="reference internal" href="generate_preview_docs.html">Generating and Previewing Documentation</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">Releasing a New Version</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#version-bump-and-dependency-updates">Version Bump and Dependency Updates</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#tagging-release-candidates-and-stable-releases">Tagging Release Candidates and Stable Releases</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#updating-the-conda-forge-feedstock">Updating the conda-forge Feedstock</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tagging-and-publishing-a-release-candidate">Tagging and Publishing a Release Candidate</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#updating-the-conda-forge-feedstock-for-a-release-candidate">Updating the conda-forge Feedstock for a Release Candidate</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#releasing-a-stable-version">Releasing a Stable Version</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#updating-the-conda-forge-feedstock-for-a-stable-release">Updating the conda-forge Feedstock for a Stable Release</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#post-release-actions">Post Release Actions</a></li>
 </ul>
 </li>
@@ -139,16 +141,16 @@ approved.</p></li>
 </li>
 </ol>
 </section>
-<section id="tagging-release-candidates-and-stable-releases">
-<h2>Tagging Release Candidates and Stable Releases<a class="headerlink" href="#tagging-release-candidates-and-stable-releases" title="Link to this heading"></a></h2>
+<section id="tagging-and-publishing-a-release-candidate">
+<h2>Tagging and Publishing a Release Candidate<a class="headerlink" href="#tagging-and-publishing-a-release-candidate" title="Link to this heading"></a></h2>
 <ol class="arabic" start="4">
 <li><p><strong>Tagging a Release Candidate</strong></p>
 <ul>
 <li><p>For release candidates, <strong>do not create a GitHub release page</strong>. Just
 create a tag from the command line:</p>
 <ul>
-<li><p>Make sure your changes are merged into <code class="docutils literal notranslate"><span class="pre">main</span></code>  or your own update
-branch (e.g. <code class="docutils literal notranslate"><span class="pre">update-to-2.1.0</span></code>) and your local repo is up to date.</p></li>
+<li><p>Make sure your changes are merged into <code class="docutils literal notranslate"><span class="pre">main</span></code> or your own update branch
+(e.g. <code class="docutils literal notranslate"><span class="pre">update-to-2.1.0</span></code>) and your local repo is up to date.</p></li>
 <li><p>Tag the release candidate (e.g., <code class="docutils literal notranslate"><span class="pre">2.1.0rc1</span></code>):</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>checkout<span class="w"> </span>main
 git<span class="w"> </span>fetch<span class="w"> </span>--all<span class="w"> </span>-p
@@ -157,17 +159,57 @@ git<span class="w"> </span>tag<span class="w"> </span><span class="m">2</span>.1
 git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </span><span class="m">2</span>.1.0rc1
 </pre></div>
 </div>
-<p>(Replace <code class="docutils literal notranslate"><span class="pre">2.1.0rc1</span></code> with your actual version, and <code class="docutils literal notranslate"><span class="pre">main</span></code> with
-your branch if needed.)</p>
+<p>(Replace <code class="docutils literal notranslate"><span class="pre">2.1.0rc1</span></code> with your actual version, and <code class="docutils literal notranslate"><span class="pre">main</span></code> with your
+branch if needed.)</p>
 </li>
 </ul>
-<blockquote>
-<div><p><strong>Note:</strong> This will only create a tag. No release page will be created
-on GitHub.</p>
-</div></blockquote>
+<p><strong>Note:</strong> This will only create a tag. No release page will be created on
+GitHub.</p>
 </li>
 </ul>
 </li>
+</ol>
+</section>
+<section id="updating-the-conda-forge-feedstock-for-a-release-candidate">
+<h2>Updating the conda-forge Feedstock for a Release Candidate<a class="headerlink" href="#updating-the-conda-forge-feedstock-for-a-release-candidate" title="Link to this heading"></a></h2>
+<ol class="arabic" start="5">
+<li><p><strong>Manual Feedstock Update (Required for Release Candidates)</strong></p>
+<ul class="simple">
+<li><p>The conda-forge feedstock does <strong>not</strong> update automatically for release
+candidates.</p></li>
+<li><p>You must always create a PR manually, and it must target the <code class="docutils literal notranslate"><span class="pre">dev</span></code>
+branch of the feedstock.</p></li>
+</ul>
+<p>Steps:</p>
+<ul>
+<li><p>Download the release tarball:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>wget<span class="w"> </span>https://github.com/MPAS-Dev/pyremap/archive/refs/tags/&lt;version&gt;.tar.gz
+</pre></div>
+</div>
+</li>
+<li><p>Compute the SHA256 checksum:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>shasum<span class="w"> </span>-a<span class="w"> </span><span class="m">256</span><span class="w"> </span>&lt;version&gt;.tar.gz
+</pre></div>
+</div>
+</li>
+<li><p>In the <code class="docutils literal notranslate"><span class="pre">meta.yaml</span></code> of the feedstock recipe:</p>
+<ul class="simple">
+<li><p>Set <code class="docutils literal notranslate"><span class="pre">{%</span> <span class="pre">set</span> <span class="pre">version</span> <span class="pre">=</span> <span class="pre">&quot;&lt;version&gt;&quot;</span> <span class="pre">%}</span></code></p></li>
+<li><p>Set the new <code class="docutils literal notranslate"><span class="pre">sha256</span></code> value</p></li>
+<li><p>Update dependencies if needed</p></li>
+</ul>
+</li>
+<li><p>Commit, push to a new branch, and open a PR <strong>against the <code class="docutils literal notranslate"><span class="pre">dev</span></code> branch</strong>
+of the feedstock:
+https://github.com/conda-forge/pyremap-feedstock</p></li>
+<li><p>Follow any instructions in the PR template and merge once approved</p></li>
+</ul>
+</li>
+</ol>
+</section>
+<section id="releasing-a-stable-version">
+<h2>Releasing a Stable Version<a class="headerlink" href="#releasing-a-stable-version" title="Link to this heading"></a></h2>
+<ol class="arabic simple" start="6">
 <li><p><strong>Publishing a Stable Release</strong></p>
 <ul class="simple">
 <li><p>For stable releases, create a GitHub release page as follows:</p>
@@ -184,9 +226,9 @@ on GitHub.</p>
 </li>
 </ol>
 </section>
-<section id="updating-the-conda-forge-feedstock">
-<h2>Updating the conda-forge Feedstock<a class="headerlink" href="#updating-the-conda-forge-feedstock" title="Link to this heading"></a></h2>
-<ol class="arabic" start="6">
+<section id="updating-the-conda-forge-feedstock-for-a-stable-release">
+<h2>Updating the conda-forge Feedstock for a Stable Release<a class="headerlink" href="#updating-the-conda-forge-feedstock-for-a-stable-release" title="Link to this heading"></a></h2>
+<ol class="arabic" start="7">
 <li><p><strong>Automatic Feedstock Update (Preferred Method)</strong></p>
 <ul class="simple">
 <li><p>Wait for the <code class="docutils literal notranslate"><span class="pre">regro-cf-autotick-bot</span></code> to open a PR at:
@@ -199,34 +241,15 @@ on GitHub.</p>
 </ul>
 </li>
 </ul>
-<p><strong>Note:</strong> If you are impatient, you can accellerate this process by creating
+<p><strong>Note:</strong> If you are impatient, you can accelerate this process by creating
 a bot issue at:
 <a class="reference external" href="https://github.com/conda-forge/pyremap-feedstock/issues">https://github.com/conda-forge/pyremap-feedstock/issues</a>
-with the subject <code class="docutils literal notranslate"><span class="pre">&#64;conda-forge-admin,</span> <span class="pre">please</span> <span class="pre">update</span> <span class="pre">version</span></code>.  This
-will open a new PR with the version within a few minutes.</p>
-</li>
-<li><p><strong>Manual Feedstock Update (Fallback Method)</strong></p>
-<p>If the bot PR does not appear or is too slow, update manually:</p>
-<ul>
-<li><p>Download the release tarball:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">wget</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">MPAS</span><span class="o">-</span><span class="n">Dev</span><span class="o">/</span><span class="n">pyremap</span><span class="o">/</span><span class="n">archive</span><span class="o">/</span><span class="n">refs</span><span class="o">/</span><span class="n">tags</span><span class="o">/&lt;</span><span class="n">version</span><span class="o">&gt;.</span><span class="n">tar</span><span class="o">.</span><span class="n">gz</span>
-</pre></div>
-</div>
-</li>
-<li><p>Compute the SHA256 checksum:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">shasum</span> <span class="o">-</span><span class="n">a</span> <span class="mi">256</span> <span class="o">&lt;</span><span class="n">version</span><span class="o">&gt;.</span><span class="n">tar</span><span class="o">.</span><span class="n">gz</span>
-</pre></div>
-</div>
-</li>
-<li><p>In the <code class="docutils literal notranslate"><span class="pre">meta.yaml</span></code> of the feedstock recipe:</p>
+with the subject <code class="docutils literal notranslate"><span class="pre">&#64;conda-forge-admin,</span> <span class="pre">please</span> <span class="pre">update</span> <span class="pre">version</span></code>. This will open
+a new PR with the version within a few minutes.</p>
 <ul class="simple">
-<li><p>Set <code class="docutils literal notranslate"><span class="pre">{%</span> <span class="pre">set</span> <span class="pre">version</span> <span class="pre">=</span> <span class="pre">&quot;&lt;version&gt;&quot;</span> <span class="pre">%}</span></code></p></li>
-<li><p>Set the new <code class="docutils literal notranslate"><span class="pre">sha256</span></code> value</p></li>
-<li><p>Update dependencies if needed</p></li>
-</ul>
-</li>
-<li><p>Commit, push to a new branch, and open a PR against the feedstock</p></li>
-<li><p>Follow any instructions in the PR template and merge once approved</p></li>
+<li><p>If the bot PR does not appear or is too slow, you may update manually (see
+the manual steps for release candidates above, but target the <code class="docutils literal notranslate"><span class="pre">main</span></code>
+branch of the feedstock).</p></li>
 </ul>
 </li>
 </ol>
@@ -237,7 +260,7 @@ will open a new PR with the version within a few minutes.</p>
 <li><p><strong>Verify and Announce</strong></p>
 <ul>
 <li><p>Install the package in a clean environment to test:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">create</span> <span class="o">-</span><span class="n">n</span> <span class="n">test</span><span class="o">-</span><span class="n">pyremap</span> <span class="o">-</span><span class="n">c</span> <span class="n">conda</span><span class="o">-</span><span class="n">forge</span> <span class="n">pyremap</span><span class="o">=&lt;</span><span class="n">version</span><span class="o">&gt;</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>create<span class="w"> </span>-n<span class="w"> </span>test-pyremap<span class="w"> </span>-c<span class="w"> </span>conda-forge<span class="w"> </span><span class="nv">pyremap</span><span class="o">=</span>&lt;version&gt;
 </pre></div>
 </div>
 </li>
