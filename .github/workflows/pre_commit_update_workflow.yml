@@ -12,7 +12,8 @@ on:
 
 env:
   UP_TO_DATE: false
-  PYTHON_VERSION: "3.10"
+  PYTHON_VERSION: "3.13"
+  REVIEWERS: "altheaden,xylar,andrewdnolan"
 
 jobs:
   auto-update:
@@ -62,7 +63,7 @@ jobs:
           --title "Update pre-commit and its dependencies" \
           --body "This PR was auto-generated to update pre-commit and its dependencies." \
           --head update-pre-commit-deps \
-          --reviewer altheaden,xylar,andrewdnolan \
+          --reviewer ${{ env.REVIEWERS }} \
           --label ci
         env:
           GH_TOKEN: ${{ github.token }}
