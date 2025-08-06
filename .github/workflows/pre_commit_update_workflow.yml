@@ -23,30 +23,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Conda Environment
-        uses: mamba-org/setup-micromamba@v2
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
-          environment-name: pre_commit_dev
-          init-shell: bash
-          condarc: |
-            channel_priority: strict
-            channels:
-                - conda-forge
-          create-args: >-
-            python=${{ env.PYTHON_VERSION }}
+          python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: Install pre-commit and gh
-        run: |
-          eval "$(micromamba shell hook --shell bash)"
-          micromamba activate pre_commit_dev
-          # permissions issue with gh 2.76.0
-          conda install -y pre-commit "gh !=2.76.0"
-          gh --version
+      - name: Install pre-commit
+        run: pip install pre-commit
 
       - name: Apply and commit updates
         run: |
-          eval "$(micromamba shell hook --shell bash)"
-          micromamba activate pre_commit_dev
           git clone https://github.com/MPAS-Dev/pyremap.git update-pre-commit-deps
           cd update-pre-commit-deps
           # Configure git using GitHub Actions credentials.
@@ -60,7 +46,7 @@ jobs:
           git commit -m "Update pre-commit dependencies" \
           || ( echo "UP_TO_DATE=true" >> "$GITHUB_ENV")
 
-      - name: Push Changes
+      - name: Push Changes with github-actions bot
         if: ${{ env.UP_TO_DATE == 'false' }}
         uses: ad-m/github-push-action@master
         with:
@@ -71,16 +57,30 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
 
-      - name: Make PR and add reviewers and labels
+      - name: Create PR with github-actions bot
         if: ${{ env.UP_TO_DATE == 'false' }}
         run: |
           cd update-pre-commit-deps
           gh pr create \
-          --title "Update pre-commit and its dependencies" \
-          --body "This PR was auto-generated to update pre-commit and its dependencies." \
-          --head update-pre-commit-deps \
-          --reviewer ${{ env.REVIEWERS }} \
-          --label ci
+            --title "Update pre-commit and its dependencies" \
+            --body "This PR was auto-generated to update pre-commit and its dependencies." \
+            --head update-pre-commit-deps
         env:
           GH_TOKEN: ${{ github.token }}
 
+      - name: Add reviewers and labels with PAT
+        if: ${{ env.UP_TO_DATE == 'false' }}
+        run: |
+          cd update-pre-commit-deps
+
+          gh pr edit --add-label ci
+
+          IFS=',' read -ra reviewers <<< "${REVIEWERS}"
+          for reviewer in "${reviewers[@]}"; do
+            echo "Adding reviewer: $reviewer"
+            gh pr edit --add-reviewer "$reviewer"
+          done
+
+        env:
+          REVIEWERS: ${{ env.REVIEWERS }}
+          GH_TOKEN: ${{ secrets.GH_CLI_TOKEN }}
