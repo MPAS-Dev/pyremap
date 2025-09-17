@@ -14,23 +14,40 @@ import argparse
 import numpy as np
 import xarray as xr
 
-from pyremap import Remapper, ProjectionGridDescriptor
+from pyremap import ProjectionGridDescriptor, Remapper
 from pyremap.polar import get_antarctic_stereographic_projection
 
-
 parser = argparse.ArgumentParser(
-    description=__doc__, formatter_class=argparse.RawTextHelpFormatter)
-parser.add_argument('-i', dest='in_filename', required=True, type=str,
-                    help='Input file name')
-parser.add_argument('-o', dest='out_filename', required=True, type=str,
-                    help='Output file name')
-parser.add_argument('-r', dest='resolution', required=True, type=float,
-                    help='Output resolution')
-parser.add_argument('-m', dest='method', required=False, default='bilinear',
-                    help='Method: {"bilinear", "neareststod", "conserve"}')
-parser.add_argument('-t', dest='mpi_tasks', required=False, type=int,
-                    default=1,
-                    help='Number of MPI tasks (default = 1)')
+    description=__doc__, formatter_class=argparse.RawTextHelpFormatter
+)
+parser.add_argument(
+    '-i', dest='in_filename', required=True, type=str, help='Input file name'
+)
+parser.add_argument(
+    '-o', dest='out_filename', required=True, type=str, help='Output file name'
+)
+parser.add_argument(
+    '-r',
+    dest='resolution',
+    required=True,
+    type=float,
+    help='Output resolution',
+)
+parser.add_argument(
+    '-m',
+    dest='method',
+    required=False,
+    default='bilinear',
+    help='Method: {"bilinear", "neareststod", "conserve"}',
+)
+parser.add_argument(
+    '-t',
+    dest='mpi_tasks',
+    required=False,
+    type=int,
+    default=1,
+    help='Number of MPI tasks (default = 1)',
+)
 args = parser.parse_args()
 
 
@@ -51,7 +68,8 @@ projection = get_antarctic_stereographic_projection()
 
 remapper = Remapper(ntasks=args.mpi_tasks, method=args.method)
 remapper.src_descriptor = ProjectionGridDescriptor.create(
-    projection, x, y, src_mesh_name)
+    projection, x, y, src_mesh_name
+)
 
 out_res = args.resolution * 1e3
 
@@ -64,7 +82,8 @@ y_out = y[0] + out_res * np.arange(ny_out)
 dst_mesh_name = f'{lx}x{ly}km_{args.resolution}km_Antarctic_stereo'
 
 remapper.dst_descriptor = ProjectionGridDescriptor.create(
-    projection, x_out, y_out, dst_mesh_name)
+    projection, x_out, y_out, dst_mesh_name
+)
 
 remapper.build_map()
 
