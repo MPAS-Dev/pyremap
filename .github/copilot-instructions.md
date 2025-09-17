@@ -13,7 +13,7 @@ Always reference these instructions first and fallback to search or bash command
   conda config --set channel_priority strict
   conda create -y -n pyremap --file dev-spec.txt
   ```
-  - NEVER CANCEL: Environment creation takes 15-20 minutes. Set timeout to 30+ minutes.
+  - NEVER CANCEL: Environment creation takes ~1-2 minutes. Set timeout to 5+ minutes.
 - Activate environment and install package:
   ```bash
   source /usr/share/miniconda/etc/profile.d/conda.sh  # if conda init wasn't run
@@ -132,7 +132,7 @@ pyremap/
 - Documentation is auto-deployed from main branch
 
 ### Timing expectations
-- **Environment setup**: 15-20 minutes (conda create)
+- **Environment setup**: ~1-2 minutes (conda create)
 - **Package installation**: ~30 seconds
 - **Test suite**: ~15 seconds (18 tests)
 - **Documentation build**: ~4 minutes
