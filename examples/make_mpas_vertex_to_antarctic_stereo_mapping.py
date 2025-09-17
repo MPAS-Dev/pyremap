@@ -24,7 +24,6 @@ import xarray as xr
 
 from pyremap import Remapper, get_polar_descriptor
 
-
 # replace with the MPAS mesh name
 src_mesh_name = 'oQU240_vertex'
 
@@ -37,12 +36,14 @@ src_mesh_filename = 'ocean.QU.240km.151209.nc'
 # conservative remapping
 remapper = Remapper(ntasks=4, method='conserve')
 
-remapper.src_from_mpas(filename=src_mesh_filename, mesh_name=src_mesh_name,
-                       mesh_type='vertex')
+remapper.src_from_mpas(
+    filename=src_mesh_filename, mesh_name=src_mesh_name, mesh_type='vertex'
+)
 
 # modify the size and resolution of the Antarctic grid as desired
 remapper.dst_descriptor = get_polar_descriptor(
-    lx=6000., ly=5000., dx=10., dy=10., projection='antarctic')
+    lx=6000.0, ly=5000.0, dx=10.0, dy=10.0, projection='antarctic'
+)
 
 dst_grid_name = remapper.dst_descriptor.mesh_name
 
