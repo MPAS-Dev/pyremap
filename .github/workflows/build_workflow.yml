@@ -28,7 +28,7 @@ jobs:
           paths_ignore: ${{ env.PATHS_IGNORE }}
 
       - name: Checkout Code Repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Set up Python ${{ env.PYTHON_VERSION }}
         uses: actions/setup-python@v6
@@ -67,7 +67,7 @@ jobs:
           paths_ignore: ${{ env.PATHS_IGNORE }}
 
       - name: Checkout Code Repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Set up Conda Environment
         uses: mamba-org/setup-micromamba@v2
