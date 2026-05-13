@@ -28,8 +28,8 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: Install pre-commit
-        run: pip install pre-commit
+      - name: Install pre-commit and pre-commit-update
+        run: pip install pre-commit pre-commit-update
 
       - name: Apply and commit updates
         run: |
@@ -39,7 +39,8 @@ jobs:
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git checkout -b update-pre-commit-deps
-          pre-commit autoupdate
+          # pre-commit-update doesn't try to include non-release versions
+          pre-commit-update
           git add .
           # Either there are changes, in which case we commit them, or there are no changes,
           # in which case we can skip the push & pr-create jobs
