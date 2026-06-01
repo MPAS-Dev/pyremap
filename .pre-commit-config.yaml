@@ -3,35 +3,35 @@ default_stages: [pre-commit]
 fail_fast: true
 
 repos:
-  - repo: https://github.com/pre-commit/pre-commit-hooks
+-   repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
     hooks:
-      - id: trailing-whitespace
-      - id: end-of-file-fixer
-      - id: check-yaml
+    -   id: trailing-whitespace
+    -   id: end-of-file-fixer
+    -   id: check-yaml
 
     # Can run individually with `flynt [file]` or `flynt [source]`
-  - repo: https://github.com/ikamensh/flynt
+-   repo: https://github.com/ikamensh/flynt
     rev: '1.0.6'
     hooks:
-      - id: flynt
+    -   id: flynt
         args: ["--fail-on-change", "--verbose"]
         require_serial: true
 
-  - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.12
+-   repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.15.15
     hooks:
       # Run the linter.
-      - id: ruff-check
+    -   id: ruff-check
         args: [--fix]
       # Run the formatter.
-      - id: ruff-format
+    -   id: ruff-format
 
     # Can run individually with `pre-commit run mypy --all-files`
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.20.2
+-   repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v2.1.0
     hooks:
-      - id: mypy
+    -   id: mypy
         args: ["--config=pyproject.toml", "--show-error-codes"]
         verbose: true
         additional_dependencies: ['types-requests']
