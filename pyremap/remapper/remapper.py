@@ -137,7 +137,12 @@ class Remapper:
         self._matrix = None
 
     def src_from_lon_lat(
-        self, filename, mesh_name=None, lon_var='lon', lat_var='lat'
+        self,
+        filename,
+        mesh_name=None,
+        lon_var='lon',
+        lat_var='lat',
+        regional=None,
     ):
         """
         Set the source grid from a file with a longitude-latitude grid.  The
@@ -157,6 +162,11 @@ class Remapper:
 
         lat_var : str, optional
             The name of the latitude coordinate in the file
+
+        regional : bool or None, optional
+            Whether this is a regional or global grid.  If ``None``, this will
+            be determined automatically based on whether the grid is periodic
+            in longitude.
         """
         src = dict()
         src['type'] = 'lon-lat'
@@ -165,10 +175,17 @@ class Remapper:
         src['lat'] = lat_var
         if mesh_name is not None:
             src['name'] = mesh_name
+        if regional is not None:
+            src['regional'] = regional
         self.src_grid_info = src
 
     def dst_from_lon_lat(
-        self, filename, mesh_name=None, lon_var='lon', lat_var='lat'
+        self,
+        filename,
+        mesh_name=None,
+        lon_var='lon',
+        lat_var='lat',
+        regional=None,
     ):
         """
         Set the destination grid from a file with a longitude-latitude grid.
@@ -188,6 +205,11 @@ class Remapper:
 
         lat_var : str, optional
             The name of the latitude coordinate in the file
+
+        regional : bool or None, optional
+            Whether this is a regional or global grid.  If ``None``, this will
+            be determined automatically based on whether the grid is periodic
+            in longitude.
         """
         dst = dict()
         dst['type'] = 'lon-lat'
@@ -196,6 +218,8 @@ class Remapper:
         dst['lat'] = lat_var
         if mesh_name is not None:
             dst['name'] = mesh_name
+        if regional is not None:
+            dst['regional'] = regional
         self.dst_grid_info = dst
 
     def dst_global_lon_lat(self, dlon, dlat, lon_min=-180.0, mesh_name=None):

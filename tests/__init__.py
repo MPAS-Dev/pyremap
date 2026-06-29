@@ -14,8 +14,6 @@ Unit test infrastructure, adapted from approach of xarray.
 
 import os
 import unittest
-import warnings
-from contextlib import contextmanager
 from shutil import copytree, ignore_patterns
 
 import numpy as np
@@ -99,11 +97,3 @@ class TestCase(unittest.TestCase):
                 f"Dimensions for variable '{var}' do not match: "
                 f'{dims1} != {dims2}'
             )
-
-    @contextmanager
-    def assertWarns(self, message):
-        with warnings.catch_warnings(record=True) as w:
-            warnings.filterwarnings('always', message)
-            yield
-            assert len(w) > 0
-            assert all(message in str(wi.message) for wi in w)

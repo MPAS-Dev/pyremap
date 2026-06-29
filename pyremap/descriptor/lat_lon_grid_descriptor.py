@@ -327,8 +327,6 @@ class LatLonGridDescriptor(MeshDescriptor):
         # set the name of the grid
         dlat = self.lat[1] - self.lat[0]
         dlon = self.lon[1] - self.lon[0]
-        lon_range = self.lon_corner[-1] - self.lon_corner[0]
-        lat_range = self.lat_corner[-1] - self.lat_corner[0]
         if 'degree' in self.units:
             units = 'degree'
         elif 'rad' in self.units:
@@ -337,18 +335,31 @@ class LatLonGridDescriptor(MeshDescriptor):
             raise ValueError(f'Could not figure out units {self.units}')
 
         if self.regional is None:
-            self.regional = False
-            if units == 'degree':
-                if np.abs(lon_range - 360.0) > 1e-10:
-                    self.regional = True
-                if np.abs(lat_range - 180.0) > 1e-10:
-                    self.regional = True
-            else:
-                if np.abs(lon_range - 2.0 * np.pi) > 1e-10:
-                    self.regional = True
-                if np.abs(lat_range - np.pi) > 1e-10:
-                    self.regional = True
+            # A lat/lon grid is "global" (not regional) when it is
+            # periodic in longitude. Latitude is never periodic, so a
+            # latitude-bounded but zonally-periodic grid (polar cap,
+            # zonal band) is still global in the sense ESMF needs:
+            # longitude wraps across the antimeridian.
+            full_circle = 360.0 if units == 'degree' else 2.0 * np.pi
+            self.regional = not _is_lon_periodic(self.lon, full_circle)
         if self.mesh_name is None:
             self.mesh_name = (
                 f'{round_res(abs(dlat))}x{round_res(abs(dlon))}{units}'
             )
+
+
+def _is_lon_periodic(lon, full_circle):
+    """Return True if 1D longitude centers wrap a full circle.
+
+    Handles both the non-duplicate convention (centers span
+    ``full_circle - dlon``) and the duplicate-endpoint convention
+    (both -180 and +180 present, centers span ``full_circle``).
+    ``full_circle`` is 360.0 (degrees) or 2*pi (radians). Tolerance
+    scales with the cell size.
+    """
+    dlon = lon[1] - lon[0]
+    center_span = lon[-1] - lon[0]
+    tol = 1e-3 * abs(dlon)
+    closes = abs(abs(center_span) + abs(dlon) - full_circle) <= tol
+    duplicate = abs(abs(center_span) - full_circle) <= tol
+    return bool(closes or duplicate)

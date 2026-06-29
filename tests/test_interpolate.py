@@ -239,6 +239,62 @@ class TestInterp(TestCase):
         self.assertDimsEqual(ds_remapped, ds_ref)
         self.assertDatasetApproxEqual(ds_remapped, ds_ref)
 
+    def test_regional_classification(self):
+        """
+        test that the ``regional`` flag of a 1D lat/lon grid is governed by
+        longitude periodicity, not latitude extent, and that an explicit
+        ``regional=`` argument overrides the auto-detection
+        """
+        # ``create`` treats its inputs as corners and derives centers as
+        # midpoints, so corners are chosen so the centers reproduce each
+        # convention (1 degree resolution).
+
+        # (a) duplicate-endpoint global longitude (centers -180..180) with a
+        #     southern latitude cap (the OI_Climatology case) -> global
+        lon_corner = np.arange(-180.5, 181.0, 1.0)
+        lat_corner = np.arange(-90.0, -44.0, 1.0)
+        descriptor = LatLonGridDescriptor.create(lat_corner, lon_corner)
+        self.assertFalse(descriptor.regional)
+
+        # (b) standard non-duplicate global longitude (centers -180..179),
+        #     full globe -> global
+        lon_corner = np.arange(-180.5, 180.0, 1.0)
+        lat_corner = np.arange(-90.5, 91.0, 1.0)
+        descriptor = LatLonGridDescriptor.create(lat_corner, lon_corner)
+        self.assertFalse(descriptor.regional)
+
+        # (c) full globe via linspace -90..90 / -180..180 -> global
+        lat = np.linspace(-90.0, 90.0, 91)
+        lon = np.linspace(-180.0, 180.0, 181)
+        descriptor = LatLonGridDescriptor.create(lat, lon)
+        self.assertFalse(descriptor.regional)
+
+        # (d) a genuinely regional longitude box (0..90) -> regional
+        lon_corner = np.arange(0.0, 91.0, 1.0)
+        lat_corner = np.arange(-90.0, -44.0, 1.0)
+        descriptor = LatLonGridDescriptor.create(lat_corner, lon_corner)
+        self.assertTrue(descriptor.regional)
+
+        # (e) zonally periodic but latitude-capped (a northern zonal band)
+        #     -> global
+        lon_corner = np.arange(-180.5, 181.0, 1.0)
+        lat_corner = np.arange(40.0, 71.0, 1.0)
+        descriptor = LatLonGridDescriptor.create(lat_corner, lon_corner)
+        self.assertFalse(descriptor.regional)
+
+        # explicit override wins in both directions
+        lat = np.linspace(-90.0, 90.0, 91)
+        lon = np.linspace(-180.0, 180.0, 181)
+        descriptor = LatLonGridDescriptor.create(lat, lon, regional=True)
+        self.assertTrue(descriptor.regional)
+
+        lon_corner = np.arange(0.0, 91.0, 1.0)
+        lat_corner = np.arange(-90.0, -44.0, 1.0)
+        descriptor = LatLonGridDescriptor.create(
+            lat_corner, lon_corner, regional=False
+        )
+        self.assertFalse(descriptor.regional)
+
     def test_latlon_file_scrip(self):
         """
         test writing a SCRIP file for a lat/lon grid file
