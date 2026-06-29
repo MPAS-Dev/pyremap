@@ -1,0 +1,6 @@
+﻿pyremap.descriptor.ProjectionGridDescriptor.create
+==================================================
+
+.. currentmodule:: pyremap.descriptor
+
+.. automethod:: ProjectionGridDescriptor.create
