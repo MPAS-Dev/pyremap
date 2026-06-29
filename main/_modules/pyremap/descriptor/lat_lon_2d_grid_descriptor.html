@@ -131,7 +131,7 @@
 
 <div class="viewcode-block" id="LatLon2DGridDescriptor.__init__">
 <a class="viewcode-back" href="../../../developer_guide/generated/pyremap.descriptor.LatLon2DGridDescriptor.html#pyremap.descriptor.LatLon2DGridDescriptor.__init__">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mesh_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">regional</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mesh_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">regional</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Construct a mesh descriptor</span>
 
@@ -140,8 +140,13 @@
 <span class="sd">            names</span>
 
 <span class="sd">        regional : bool or None, optional</span>
-<span class="sd">            Whether this is a regional or global grid</span>
+<span class="sd">            Whether this is a regional or global grid.  Unlike the 1D</span>
+<span class="sd">            ``LatLonGridDescriptor``, a 2D grid cannot be classified</span>
+<span class="sd">            automatically, so ``None`` is treated as regional (the default).</span>
+<span class="sd">            Pass ``regional=False`` for global grids with 2D lat/lon.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">regional</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">regional</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">mesh_name</span><span class="o">=</span><span class="n">mesh_name</span><span class="p">,</span> <span class="n">regional</span><span class="o">=</span><span class="n">regional</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lat</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lon</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
@@ -161,7 +166,7 @@
         <span class="n">lat_var_name</span><span class="o">=</span><span class="s1">&#39;lat&#39;</span><span class="p">,</span>
         <span class="n">lon_var_name</span><span class="o">=</span><span class="s1">&#39;lon&#39;</span><span class="p">,</span>
         <span class="n">mesh_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">regional</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">regional</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Read the lat-lon grid from a file with the given lat/lon var names.</span>
@@ -187,7 +192,10 @@
 <span class="sd">            names</span>
 
 <span class="sd">        regional : bool or None, optional</span>
-<span class="sd">            Whether this is a regional or global grid</span>
+<span class="sd">            Whether this is a regional or global grid.  A 2D grid cannot be</span>
+<span class="sd">            classified automatically, so ``None`` is treated as regional (the</span>
+<span class="sd">            default).  Pass ``regional=False`` for global grids with 2D</span>
+<span class="sd">            lat/lon.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">ds</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">ds</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">open_dataset</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>

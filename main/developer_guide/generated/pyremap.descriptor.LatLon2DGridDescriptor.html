@@ -101,7 +101,7 @@
 <h1>pyremap.descriptor.LatLon2DGridDescriptor<a class="headerlink" href="#pyremap-descriptor-latlon2dgriddescriptor" title="Link to this heading"></a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyremap.descriptor.LatLon2DGridDescriptor">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyremap.descriptor.</span></span><span class="sig-name descname"><span class="pre">LatLon2DGridDescriptor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regional</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pyremap/descriptor/lat_lon_2d_grid_descriptor.html#LatLon2DGridDescriptor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyremap.descriptor.LatLon2DGridDescriptor" title="Link to this definition"></a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyremap.descriptor.</span></span><span class="sig-name descname"><span class="pre">LatLon2DGridDescriptor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regional</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pyremap/descriptor/lat_lon_2d_grid_descriptor.html#LatLon2DGridDescriptor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyremap.descriptor.LatLon2DGridDescriptor" title="Link to this definition"></a></dt>
 <dd><p>A class for describing a lat-lon grid that may not be a tensor grid
 (lat/lon are 2D arrays).  The grid is assumed to be regional, since this
 is difficult to determine just from the lat/lon values.  The calling code
@@ -110,23 +110,26 @@ global grids with 2D lat/lon.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Variables<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>lat</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>numpy.ndarray</em></a>) – The latitude coordinate at grid-cell centers</p></li>
-<li><p><strong>lon</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>numpy.ndarray</em></a>) – The longitude coordinate at grid-cell centers</p></li>
-<li><p><strong>lat_corner</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>numpy.ndarray</em></a>) – The latitude coordinate at grid-cell corners</p></li>
-<li><p><strong>lon_corner</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>numpy.ndarray</em></a>) – The longitude coordinate at grid-cell corners</p></li>
+<li><p><strong>lat</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><em>numpy.ndarray</em></a>) – The latitude coordinate at grid-cell centers</p></li>
+<li><p><strong>lon</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><em>numpy.ndarray</em></a>) – The longitude coordinate at grid-cell centers</p></li>
+<li><p><strong>lat_corner</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><em>numpy.ndarray</em></a>) – The latitude coordinate at grid-cell corners</p></li>
+<li><p><strong>lon_corner</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><em>numpy.ndarray</em></a>) – The longitude coordinate at grid-cell corners</p></li>
 <li><p><strong>history</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – The history attribute written to SCRIP files</p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="pyremap.descriptor.LatLon2DGridDescriptor.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regional</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pyremap/descriptor/lat_lon_2d_grid_descriptor.html#LatLon2DGridDescriptor.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyremap.descriptor.LatLon2DGridDescriptor.__init__" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regional</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pyremap/descriptor/lat_lon_2d_grid_descriptor.html#LatLon2DGridDescriptor.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyremap.descriptor.LatLon2DGridDescriptor.__init__" title="Link to this definition"></a></dt>
 <dd><p>Construct a mesh descriptor</p>
 <dl class="simple">
 <dt>mesh_name<span class="classifier">str or None, optional</span></dt><dd><p>The name of the mesh or grid, used to give mapping files unique
 names</p>
 </dd>
-<dt>regional<span class="classifier">bool or None, optional</span></dt><dd><p>Whether this is a regional or global grid</p>
+<dt>regional<span class="classifier">bool or None, optional</span></dt><dd><p>Whether this is a regional or global grid.  Unlike the 1D
+<code class="docutils literal notranslate"><span class="pre">LatLonGridDescriptor</span></code>, a 2D grid cannot be classified
+automatically, so <code class="docutils literal notranslate"><span class="pre">None</span></code> is treated as regional (the default).
+Pass <code class="docutils literal notranslate"><span class="pre">regional=False</span></code> for global grids with 2D lat/lon.</p>
 </dd>
 </dl>
 </dd></dl>

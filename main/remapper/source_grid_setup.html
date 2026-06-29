@@ -52,6 +52,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#overview">Overview</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#methods">Methods</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#example">Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#regional-vs-global-grids">Regional vs. Global Grids</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#setting-source-descriptor-directly">Setting Source Descriptor Directly</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#id1">Example</a></li>
 </ul>
@@ -115,6 +116,21 @@
 
 <span class="n">remapper</span> <span class="o">=</span> <span class="n">Remapper</span><span class="p">()</span>
 <span class="n">remapper</span><span class="o">.</span><span class="n">src_from_lon_lat</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="regional-vs-global-grids">
+<h2>Regional vs. Global Grids<a class="headerlink" href="#regional-vs-global-grids" title="Link to this heading"></a></h2>
+<p>By default, both <code class="docutils literal notranslate"><span class="pre">src_from_lon_lat</span></code> and <code class="docutils literal notranslate"><span class="pre">dst_from_lon_lat</span></code> determine whether a
+1D lat/lon grid is regional or global automatically, based on whether the grid
+is periodic in longitude (i.e. its longitudes wrap a full circle). Latitude
+extent does not affect this: a zonally periodic but latitude-bounded grid (a
+polar cap or zonal band) is treated as global so that longitude wraps across
+the antimeridian.</p>
+<p>The optional <code class="docutils literal notranslate"><span class="pre">regional</span></code> argument overrides this auto-detection. Pass
+<code class="docutils literal notranslate"><span class="pre">regional=True</span></code> to force a grid to be treated as regional or <code class="docutils literal notranslate"><span class="pre">regional=False</span></code>
+to force it to be treated as global:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">remapper</span><span class="o">.</span><span class="n">src_from_lon_lat</span><span class="p">(</span><span class="s1">&#39;grid_file.nc&#39;</span><span class="p">,</span> <span class="n">regional</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>

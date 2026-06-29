@@ -20,6 +20,21 @@ remapper = Remapper()
 remapper.src_from_lon_lat(lat, lon)
 ```
 
+## Regional vs. Global Grids
+By default, both `src_from_lon_lat` and `dst_from_lon_lat` determine whether a
+1D lat/lon grid is regional or global automatically, based on whether the grid
+is periodic in longitude (i.e. its longitudes wrap a full circle). Latitude
+extent does not affect this: a zonally periodic but latitude-bounded grid (a
+polar cap or zonal band) is treated as global so that longitude wraps across
+the antimeridian.
+
+The optional `regional` argument overrides this auto-detection. Pass
+`regional=True` to force a grid to be treated as regional or `regional=False`
+to force it to be treated as global:
+```python
+remapper.src_from_lon_lat('grid_file.nc', regional=False)
+```
+
 ## Setting Source Descriptor Directly
 The `src_descriptor` attribute can be set directly to define the source grid.
 This is useful when you already have a pre-defined grid descriptor or need

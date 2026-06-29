@@ -216,7 +216,12 @@
 <div class="viewcode-block" id="Remapper.src_from_lon_lat">
 <a class="viewcode-back" href="../../../developer_guide/generated/pyremap.remapper.Remapper.src_from_lon_lat.html#pyremap.remapper.Remapper.src_from_lon_lat">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">src_from_lon_lat</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">mesh_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lon_var</span><span class="o">=</span><span class="s1">&#39;lon&#39;</span><span class="p">,</span> <span class="n">lat_var</span><span class="o">=</span><span class="s1">&#39;lat&#39;</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">filename</span><span class="p">,</span>
+        <span class="n">mesh_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">lon_var</span><span class="o">=</span><span class="s1">&#39;lon&#39;</span><span class="p">,</span>
+        <span class="n">lat_var</span><span class="o">=</span><span class="s1">&#39;lat&#39;</span><span class="p">,</span>
+        <span class="n">regional</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Set the source grid from a file with a longitude-latitude grid.  The</span>
@@ -236,6 +241,11 @@
 
 <span class="sd">        lat_var : str, optional</span>
 <span class="sd">            The name of the latitude coordinate in the file</span>
+
+<span class="sd">        regional : bool or None, optional</span>
+<span class="sd">            Whether this is a regional or global grid.  If ``None``, this will</span>
+<span class="sd">            be determined automatically based on whether the grid is periodic</span>
+<span class="sd">            in longitude.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">src</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="n">src</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;lon-lat&#39;</span>
@@ -244,13 +254,20 @@
         <span class="n">src</span><span class="p">[</span><span class="s1">&#39;lat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lat_var</span>
         <span class="k">if</span> <span class="n">mesh_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">src</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mesh_name</span>
+        <span class="k">if</span> <span class="n">regional</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">src</span><span class="p">[</span><span class="s1">&#39;regional&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">regional</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">src_grid_info</span> <span class="o">=</span> <span class="n">src</span></div>
 
 
 <div class="viewcode-block" id="Remapper.dst_from_lon_lat">
 <a class="viewcode-back" href="../../../developer_guide/generated/pyremap.remapper.Remapper.dst_from_lon_lat.html#pyremap.remapper.Remapper.dst_from_lon_lat">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">dst_from_lon_lat</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">mesh_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lon_var</span><span class="o">=</span><span class="s1">&#39;lon&#39;</span><span class="p">,</span> <span class="n">lat_var</span><span class="o">=</span><span class="s1">&#39;lat&#39;</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">filename</span><span class="p">,</span>
+        <span class="n">mesh_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">lon_var</span><span class="o">=</span><span class="s1">&#39;lon&#39;</span><span class="p">,</span>
+        <span class="n">lat_var</span><span class="o">=</span><span class="s1">&#39;lat&#39;</span><span class="p">,</span>
+        <span class="n">regional</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Set the destination grid from a file with a longitude-latitude grid.</span>
@@ -270,6 +287,11 @@
 
 <span class="sd">        lat_var : str, optional</span>
 <span class="sd">            The name of the latitude coordinate in the file</span>
+
+<span class="sd">        regional : bool or None, optional</span>
+<span class="sd">            Whether this is a regional or global grid.  If ``None``, this will</span>
+<span class="sd">            be determined automatically based on whether the grid is periodic</span>
+<span class="sd">            in longitude.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">dst</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="n">dst</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;lon-lat&#39;</span>
@@ -278,6 +300,8 @@
         <span class="n">dst</span><span class="p">[</span><span class="s1">&#39;lat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lat_var</span>
         <span class="k">if</span> <span class="n">mesh_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">dst</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mesh_name</span>
+        <span class="k">if</span> <span class="n">regional</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dst</span><span class="p">[</span><span class="s1">&#39;regional&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">regional</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dst_grid_info</span> <span class="o">=</span> <span class="n">dst</span></div>
 
 

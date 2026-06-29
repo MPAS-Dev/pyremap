@@ -135,6 +135,14 @@ to run the mapping tool.  This may include additional flags, e.g.
 <span class="n">remapper</span><span class="o">.</span><span class="n">build_map</span><span class="p">()</span>
 </pre></div>
 </div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For 1D lat/lon grids, whether a grid is treated as regional or global is
+governed by longitude periodicity. Latitude extent does not force a grid to be
+regional, so a zonally periodic but latitude-bounded grid is still global. Use
+the <code class="docutils literal notranslate"><span class="pre">regional</span></code> argument of <code class="docutils literal notranslate"><span class="pre">src_from_lon_lat</span></code>/<code class="docutils literal notranslate"><span class="pre">dst_from_lon_lat</span></code> to override the
+auto-detection.</p>
+</div>
 </section>
 </section>
 
