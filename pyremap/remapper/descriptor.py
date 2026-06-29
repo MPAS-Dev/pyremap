@@ -110,13 +110,20 @@ def _get_lon_lat_descriptor(info) -> 'MeshDescriptor':
                     f'{len(ds[lat].dims)}.'
                 )
 
+        regional = info.get('regional', None)
         if lon_lat_1d:
             descriptor = LatLonGridDescriptor.read(
-                filename=filename, lon_var_name=lon, lat_var_name=lat
+                filename=filename,
+                lon_var_name=lon,
+                lat_var_name=lat,
+                regional=regional,
             )
         else:
             descriptor = LatLon2DGridDescriptor.read(
-                filename=filename, lon_var_name=lon, lat_var_name=lat
+                filename=filename,
+                lon_var_name=lon,
+                lat_var_name=lat,
+                regional=regional,
             )
 
     if 'name' in info:

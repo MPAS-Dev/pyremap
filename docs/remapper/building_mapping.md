@@ -37,3 +37,11 @@ remapper.src_from_lon_lat(lat, lon)
 remapper.dst_from_lon_lat(lat_out, lon_out)
 remapper.build_map()
 ```
+
+```{note}
+For 1D lat/lon grids, whether a grid is treated as regional or global is
+governed by longitude periodicity. Latitude extent does not force a grid to be
+regional, so a zonally periodic but latitude-bounded grid is still global. Use
+the `regional` argument of `src_from_lon_lat`/`dst_from_lon_lat` to override the
+auto-detection.
+```

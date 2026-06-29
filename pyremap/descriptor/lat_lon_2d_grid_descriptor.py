@@ -50,7 +50,7 @@ class LatLon2DGridDescriptor(MeshDescriptor):
         The history attribute written to SCRIP files
     """
 
-    def __init__(self, mesh_name=None, regional=True):
+    def __init__(self, mesh_name=None, regional=None):
         """
         Construct a mesh descriptor
 
@@ -59,8 +59,13 @@ class LatLon2DGridDescriptor(MeshDescriptor):
             names
 
         regional : bool or None, optional
-            Whether this is a regional or global grid
+            Whether this is a regional or global grid.  Unlike the 1D
+            ``LatLonGridDescriptor``, a 2D grid cannot be classified
+            automatically, so ``None`` is treated as regional (the default).
+            Pass ``regional=False`` for global grids with 2D lat/lon.
         """
+        if regional is None:
+            regional = True
         super().__init__(mesh_name=mesh_name, regional=regional)
         self.lat: Optional[np.ndarray] = None
         self.lon: Optional[np.ndarray] = None
@@ -77,7 +82,7 @@ class LatLon2DGridDescriptor(MeshDescriptor):
         lat_var_name='lat',
         lon_var_name='lon',
         mesh_name=None,
-        regional=True,
+        regional=None,
     ):
         """
         Read the lat-lon grid from a file with the given lat/lon var names.
@@ -103,7 +108,10 @@ class LatLon2DGridDescriptor(MeshDescriptor):
             names
 
         regional : bool or None, optional
-            Whether this is a regional or global grid
+            Whether this is a regional or global grid.  A 2D grid cannot be
+            classified automatically, so ``None`` is treated as regional (the
+            default).  Pass ``regional=False`` for global grids with 2D
+            lat/lon.
         """
         if ds is None:
             ds = xr.open_dataset(filename)
