@@ -118,6 +118,9 @@ tool.</p></li>
 not in your path.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">moab_path</span></code>: The path to the MOAB installation, if <code class="docutils literal notranslate"><span class="pre">mptempest</span></code> is not in
 your path.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ntasks</span></code>: The number of MPI tasks to use to build the mapping file.  With
+<code class="docutils literal notranslate"><span class="pre">ntasks=1</span></code>, the mapping tool is run in serial (without <code class="docutils literal notranslate"><span class="pre">parallel_exec</span></code>) and,
+for <code class="docutils literal notranslate"><span class="pre">moab</span></code>, the meshes are not partitioned.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">parallel_exec</span></code>: The parallel executable (e.g. <code class="docutils literal notranslate"><span class="pre">srun</span></code> or <code class="docutils literal notranslate"><span class="pre">mpirun</span></code>) to use
 to run the mapping tool.  This may include additional flags, e.g.
 <code class="docutils literal notranslate"><span class="pre">srun</span> <span class="pre">--mpi=pmi2</span></code>.</p></li>
