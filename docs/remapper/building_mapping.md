@@ -22,6 +22,9 @@ tool.
   not in your path.
 - `moab_path`: The path to the MOAB installation, if `mptempest` is not in
   your path.
+- `ntasks`: The number of MPI tasks to use to build the mapping file.  With
+  `ntasks=1`, the mapping tool is run in serial (without `parallel_exec`) and,
+  for `moab`, the meshes are not partitioned.
 - `parallel_exec`: The parallel executable (e.g. `srun` or `mpirun`) to use
   to run the mapping tool.  This may include additional flags, e.g.
   `srun --mpi=pmi2`.

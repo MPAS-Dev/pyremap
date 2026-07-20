@@ -58,10 +58,10 @@ def _build_map(remapper, logger=None):
 
     elif map_tool == 'moab':
         moab_path = remapper.moab_path
-        src_scrip_filename = _moab_partition_scrip_file(
+        src_scrip_filename = _moab_convert_scrip_file(
             remapper, src_scrip_filename, moab_path, logger
         )
-        dst_scrip_filename = _moab_partition_scrip_file(
+        dst_scrip_filename = _moab_convert_scrip_file(
             remapper, dst_scrip_filename, moab_path, logger
         )
         args = _moab_build_map_args(
@@ -94,16 +94,16 @@ def _build_map(remapper, logger=None):
         tempobj.cleanup()
 
 
-def _moab_partition_scrip_file(remapper, in_filename, moab_path, logger):
+def _moab_convert_scrip_file(remapper, in_filename, moab_path, logger):
     """
-    Partition SCRIP file for parallel mbtempest use
+    Convert SCRIP file to HDF5 for mbtempest use, partitioning it if more than
+    one MPI task will be used
     """
     ntasks = remapper.ntasks
 
-    print(f'Partition SCRIP file {in_filename}')
+    print(f'Convert SCRIP file {in_filename}')
 
     h5m_filename = in_filename.replace('.nc', '.h5m')
-    h5m_part_filename = in_filename.replace('.nc', f'.p{ntasks}.h5m')
 
     if moab_path is None:
         mbconvert = 'mbconvert'
@@ -120,6 +120,17 @@ def _moab_partition_scrip_file(remapper, in_filename, moab_path, logger):
         h5m_filename,
     ]
     check_call(args, logger=logger)
+
+    if ntasks == 1:
+        # nothing to partition (mbpart requires more than one part), so
+        # mbtempest reads the unpartitioned mesh.  The conversion above is
+        # still needed: mbtempest fails to compute weights when a mesh with
+        # more than 4 vertices per cell (e.g. an MPAS cell mesh) is loaded
+        # directly from SCRIP as the destination mesh.
+        print('  Done.')
+        return h5m_filename
+
+    h5m_part_filename = in_filename.replace('.nc', f'.p{ntasks}.h5m')
 
     # Partition source SCRIP
     args = [
