@@ -14,6 +14,11 @@ env:
   PATHS_IGNORE: '["**/README.md", "**/docs/**", "**/examples/**"]'
   # Static python version for setting up pre-commit linting
   PYTHON_VERSION: "3.14"
+  # mpich >=5 is built as ch4:ucx,ofi, so UCX is the default netmod.  Azure-hosted
+  # GitHub runners expose a MANA RDMA device that UCX tries (and fails) to open,
+  # so MPI_Init() aborts inside ESMF_RegridWeightGen.  Restrict UCX to transports
+  # that actually work on the runners.
+  UCX_TLS: "tcp,self,sm"
 
 jobs:
   pre-commit-hooks:
