@@ -96,6 +96,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyremap.descriptor.utility</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">add_history</span><span class="p">,</span>
     <span class="n">expand_scrip</span><span class="p">,</span>
+    <span class="n">get_corners_1d</span><span class="p">,</span>
     <span class="n">interp_extrap_corner</span><span class="p">,</span>
     <span class="n">unwrap_corners</span><span class="p">,</span>
 <span class="p">)</span>
@@ -182,7 +183,11 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Given a grid file with x and y coordinates defining the axes of the</span>
 <span class="sd">        logically rectangular grid, read in the x and y coordinates and</span>
-<span class="sd">        interpolate/extrapolate to locate corners.</span>
+<span class="sd">        locate the corners.</span>
+
+<span class="sd">        Corners come from the CF ``bounds`` of the x and y variables if they</span>
+<span class="sd">        are available and describe contiguous cells.  Otherwise, corners are</span>
+<span class="sd">        interpolated and extrapolated from the cell centers.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -219,9 +224,9 @@
             <span class="n">ds</span><span class="p">[</span><span class="n">y_var_name</span><span class="p">]</span><span class="o">.</span><span class="n">dims</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
         <span class="p">)</span>
 
-        <span class="c1"># interp/extrap corners</span>
-        <span class="n">descriptor</span><span class="o">.</span><span class="n">x_corner</span> <span class="o">=</span> <span class="n">interp_extrap_corner</span><span class="p">(</span><span class="n">descriptor</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
-        <span class="n">descriptor</span><span class="o">.</span><span class="n">y_corner</span> <span class="o">=</span> <span class="n">interp_extrap_corner</span><span class="p">(</span><span class="n">descriptor</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+        <span class="c1"># use CF bounds if available, otherwise interp/extrap corners</span>
+        <span class="n">descriptor</span><span class="o">.</span><span class="n">x_corner</span> <span class="o">=</span> <span class="n">get_corners_1d</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">x_var_name</span><span class="p">)</span>
+        <span class="n">descriptor</span><span class="o">.</span><span class="n">y_corner</span> <span class="o">=</span> <span class="n">get_corners_1d</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">y_var_name</span><span class="p">)</span>
 
         <span class="n">descriptor</span><span class="o">.</span><span class="n">history</span> <span class="o">=</span> <span class="n">add_history</span><span class="p">(</span><span class="n">ds</span><span class="o">=</span><span class="n">ds</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">descriptor</span></div>

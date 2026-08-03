@@ -51,6 +51,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#overview">Overview</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#attributes">Attributes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#methods">Methods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#grid-cell-corners">Grid-Cell Corners</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#example">Example</a></li>
 </ul>
 </li>
@@ -114,6 +115,25 @@
 <li><p><code class="docutils literal notranslate"><span class="pre">create</span></code>: Creates a latitude-longitude grid programmatically.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">to_scrip</span></code>: Converts the grid to a SCRIP file.</p></li>
 </ul>
+</section>
+<section id="grid-cell-corners">
+<h2>Grid-Cell Corners<a class="headerlink" href="#grid-cell-corners" title="Link to this heading"></a></h2>
+<p>Remapping needs the corners of each grid cell, not just the cell centers.
+When <code class="docutils literal notranslate"><span class="pre">read()</span></code> is used, corners come from the CF <code class="docutils literal notranslate"><span class="pre">bounds</span></code> attribute of the
+latitude and longitude variables if it is present:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">double</span> <span class="n">lat</span><span class="p">(</span><span class="n">lat</span><span class="p">)</span> <span class="p">;</span>
+    <span class="n">lat</span><span class="p">:</span><span class="n">units</span> <span class="o">=</span> <span class="s2">&quot;degrees_north&quot;</span> <span class="p">;</span>
+    <span class="n">lat</span><span class="p">:</span><span class="n">bounds</span> <span class="o">=</span> <span class="s2">&quot;lat_bnds&quot;</span> <span class="p">;</span>
+<span class="n">double</span> <span class="n">lat_bnds</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">nbnd</span><span class="p">)</span> <span class="p">;</span>
+</pre></div>
+</div>
+<p>The bounds must describe contiguous cells (the upper edge of each cell is the
+lower edge of the next), since a 1D lat/lon grid is described by 1D arrays of
+corners.  If the <code class="docutils literal notranslate"><span class="pre">bounds</span></code> attribute is missing, points to a variable that is
+not in the file, has the wrong shape, or describes cells with gaps or overlaps
+between them, corners are instead interpolated between cell centers and
+extrapolated at the ends of the grid, and a warning is raised in all but the
+first of these cases.</p>
 </section>
 <section id="example">
 <h2>Example<a class="headerlink" href="#example" title="Link to this heading"></a></h2>

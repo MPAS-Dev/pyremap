@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pyremap.descriptor.LatLonGridDescriptor.read &mdash; pyremap main documentation</title>
+  <title>pyremap.descriptor.get_corners_2d &mdash; pyremap main documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
 
@@ -19,8 +19,8 @@
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="pyremap.descriptor.LatLonGridDescriptor.create" href="pyremap.descriptor.LatLonGridDescriptor.create.html" />
-    <link rel="prev" title="pyremap.descriptor.LatLonGridDescriptor" href="pyremap.descriptor.LatLonGridDescriptor.html" />
+    <link rel="next" title="pyremap.descriptor.interp_extrap_corner" href="pyremap.descriptor.interp_extrap_corner.html" />
+    <link rel="prev" title="pyremap.descriptor.get_corners_1d" href="pyremap.descriptor.get_corners_1d.html" />
     <link href="../../_static/style.css" rel="stylesheet" type="text/css">
 
 </head>
@@ -87,9 +87,9 @@
       <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../index.html">Developer Guide</a></li>
           <li class="breadcrumb-item"><a href="../api.html">API reference</a></li>
-      <li class="breadcrumb-item active">pyremap.descriptor.LatLonGridDescriptor.read</li>
+      <li class="breadcrumb-item active">pyremap.descriptor.get_corners_2d</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../../_sources/developer_guide/generated/pyremap.descriptor.LatLonGridDescriptor.read.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../../_sources/developer_guide/generated/pyremap.descriptor.get_corners_2d.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -97,31 +97,26 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="pyremap-descriptor-latlongriddescriptor-read">
-<h1>pyremap.descriptor.LatLonGridDescriptor.read<a class="headerlink" href="#pyremap-descriptor-latlongriddescriptor-read" title="Link to this heading"></a></h1>
-<dl class="py method">
-<dt class="sig sig-object py" id="pyremap.descriptor.LatLonGridDescriptor.read">
-<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">LatLonGridDescriptor.</span></span><span class="sig-name descname"><span class="pre">read</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lat_var_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'lat'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lon_var_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'lon'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mesh_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regional</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pyremap/descriptor/lat_lon_grid_descriptor.html#LatLonGridDescriptor.read"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyremap.descriptor.LatLonGridDescriptor.read" title="Link to this definition"></a></dt>
-<dd><p>Read the lat-lon grid from a file with the given lat/lon var names.</p>
-<p>Grid-cell corners come from the CF <code class="docutils literal notranslate"><span class="pre">bounds</span></code> of the latitude and
-longitude variables if they are available and describe contiguous
-cells.  Otherwise, corners are interpolated and extrapolated from the
-cell centers.</p>
+  <section id="pyremap-descriptor-get-corners-2d">
+<h1>pyremap.descriptor.get_corners_2d<a class="headerlink" href="#pyremap-descriptor-get-corners-2d" title="Link to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyremap.descriptor.get_corners_2d">
+<span class="sig-prename descclassname"><span class="pre">pyremap.descriptor.</span></span><span class="sig-name descname"><span class="pre">get_corners_2d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lat_var_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lon_var_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pyremap/descriptor/utility.html#get_corners_2d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyremap.descriptor.get_corners_2d" title="Link to this definition"></a></dt>
+<dd><p>Get the coordinates of grid-cell corners for 2D latitude and longitude
+coordinates, using the CF <code class="docutils literal notranslate"><span class="pre">bounds</span></code> of the coordinates if they are
+available and usable, and interpolating and extrapolating from cell
+centers if not.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>optional</em>) – The path of the file containing the lat-lon grid (if <code class="docutils literal notranslate"><span class="pre">ds</span></code> is not
-supplied directly)</p></li>
-<li><p><strong>ds</strong> (<a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2026.7.0)"><em>xarray.Dataset</em></a><em>, </em><em>optional</em>) – The path of the file containing the lat-lon grid (if supplied,
-<code class="docutils literal notranslate"><span class="pre">filename</span></code> will be ignored)</p></li>
-<li><p><strong>lat_var_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>optional</em>) – The name of the latitude and longitude variables in the grid file</p></li>
-<li><p><strong>lon_var_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>optional</em>) – The name of the latitude and longitude variables in the grid file</p></li>
-<li><p><strong>mesh_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – The name of the mesh or grid, used to give mapping files unique
-names</p></li>
-<li><p><strong>regional</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – Whether this is a regional or global grid.  If <code class="docutils literal notranslate"><span class="pre">None</span></code>, this will
-be determined automatically by checking the limits of the corner
-latitude and longitude to see if they cover the globe.</p></li>
+<li><p><strong>ds</strong> (<a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset" title="(in xarray v2026.7.0)"><em>xarray.Dataset</em></a>) – A dataset containing the coordinate variables</p></li>
+<li><p><strong>lat_var_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – The names of the 2D latitude and longitude variables</p></li>
+<li><p><strong>lon_var_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – The names of the 2D latitude and longitude variables</p></li>
 </ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>lat_corner, lon_corner</strong> (<em>numpy.ndarray</em>) – 2D arrays of corner coordinates with one more element than
+<code class="docutils literal notranslate"><span class="pre">ds[lat_var_name]</span></code> and <code class="docutils literal notranslate"><span class="pre">ds[lon_var_name]</span></code> along each dimension</p>
 </dd>
 </dl>
 </dd></dl>
@@ -132,8 +127,8 @@ latitude and longitude to see if they cover the globe.</p></li>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="pyremap.descriptor.LatLonGridDescriptor.html" class="btn btn-neutral float-left" title="pyremap.descriptor.LatLonGridDescriptor" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="pyremap.descriptor.LatLonGridDescriptor.create.html" class="btn btn-neutral float-right" title="pyremap.descriptor.LatLonGridDescriptor.create" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="pyremap.descriptor.get_corners_1d.html" class="btn btn-neutral float-left" title="pyremap.descriptor.get_corners_1d" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="pyremap.descriptor.interp_extrap_corner.html" class="btn btn-neutral float-right" title="pyremap.descriptor.interp_extrap_corner" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

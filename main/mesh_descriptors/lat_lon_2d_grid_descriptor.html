@@ -52,6 +52,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#overview">Overview</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#attributes">Attributes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#methods">Methods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#grid-cell-corners">Grid-Cell Corners</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#example">Example</a></li>
 </ul>
 </li>
@@ -113,6 +114,25 @@
 <li><p><code class="docutils literal notranslate"><span class="pre">read</span></code>: Reads a 2D latitude-longitude grid from a file.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">to_scrip</span></code>: Converts the grid to a SCRIP file.</p></li>
 </ul>
+</section>
+<section id="grid-cell-corners">
+<h2>Grid-Cell Corners<a class="headerlink" href="#grid-cell-corners" title="Link to this heading"></a></h2>
+<p>As with <code class="xref py py-class docutils literal notranslate"><span class="pre">LatLonGridDescriptor</span></code>,
+<code class="docutils literal notranslate"><span class="pre">read()</span></code> uses the CF <code class="docutils literal notranslate"><span class="pre">bounds</span></code> of the latitude and longitude variables to find
+grid-cell corners when they are available.  For 2D coordinates, the bounds
+give the 4 vertices of each cell:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">double</span> <span class="n">lat</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="p">;</span>
+    <span class="n">lat</span><span class="p">:</span><span class="n">units</span> <span class="o">=</span> <span class="s2">&quot;degrees_north&quot;</span> <span class="p">;</span>
+    <span class="n">lat</span><span class="p">:</span><span class="n">bounds</span> <span class="o">=</span> <span class="s2">&quot;lat_bnds&quot;</span> <span class="p">;</span>
+<span class="n">double</span> <span class="n">lat_bnds</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">nv</span><span class="p">)</span> <span class="p">;</span>
+</pre></div>
+</div>
+<p>CF does not say which vertex comes first or which direction the 4 vertices are
+traversed in, so pyremap works this out from the bounds themselves.  Both
+latitude and longitude must have bounds, and neighboring cells must share
+vertices, since the grid is described by 2D arrays of corners.  Otherwise,
+corners are interpolated and extrapolated from cell centers and a warning is
+raised.</p>
 </section>
 <section id="example">
 <h2>Example<a class="headerlink" href="#example" title="Link to this heading"></a></h2>

@@ -87,10 +87,217 @@
 <span class="c1"># https://raw.githubusercontent.com/MPAS-Dev/pyremap/main/LICENSE</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pyproj.enums</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyproj</span><span class="w"> </span><span class="kn">import</span> <span class="n">Transformer</span>
+
+
+<div class="viewcode-block" id="get_corners_1d">
+<a class="viewcode-back" href="../../../developer_guide/generated/pyremap.descriptor.get_corners_1d.html#pyremap.descriptor.get_corners_1d">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_corners_1d</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">var_name</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get the coordinates of grid-cell corners along a 1D coordinate, using the</span>
+<span class="sd">    CF ``bounds`` of the coordinate if they are available and usable, and</span>
+<span class="sd">    interpolating and extrapolating from cell centers if not.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    ds : xarray.Dataset</span>
+<span class="sd">        A dataset containing the coordinate variable ``var_name``</span>
+
+<span class="sd">    var_name : str</span>
+<span class="sd">        The name of the 1D coordinate variable</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    corner : numpy.ndarray</span>
+<span class="sd">        A 1D array of corner coordinates with one more element than</span>
+<span class="sd">        ``ds[var_name]``</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">center</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="n">var_name</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span>
+    <span class="n">bounds</span> <span class="o">=</span> <span class="n">_get_cf_bounds</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">var_name</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">center</span><span class="p">),</span> <span class="mi">2</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">bounds</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">corner</span> <span class="o">=</span> <span class="n">_corners_from_bounds_1d</span><span class="p">(</span><span class="n">bounds</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">corner</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">corner</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s1">&#39;The CF bounds of </span><span class="si">{</span><span class="n">var_name</span><span class="si">}</span><span class="s1"> are not contiguous so corners &#39;</span>
+            <span class="sa">f</span><span class="s1">&#39;will be interpolated and extrapolated from cell centers &#39;</span>
+            <span class="sa">f</span><span class="s1">&#39;instead.&#39;</span><span class="p">,</span>
+            <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">interp_extrap_corner</span><span class="p">(</span><span class="n">center</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="get_corners_2d">
+<a class="viewcode-back" href="../../../developer_guide/generated/pyremap.descriptor.get_corners_2d.html#pyremap.descriptor.get_corners_2d">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_corners_2d</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">lat_var_name</span><span class="p">,</span> <span class="n">lon_var_name</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get the coordinates of grid-cell corners for 2D latitude and longitude</span>
+<span class="sd">    coordinates, using the CF ``bounds`` of the coordinates if they are</span>
+<span class="sd">    available and usable, and interpolating and extrapolating from cell</span>
+<span class="sd">    centers if not.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    ds : xarray.Dataset</span>
+<span class="sd">        A dataset containing the coordinate variables</span>
+
+<span class="sd">    lat_var_name, lon_var_name : str</span>
+<span class="sd">        The names of the 2D latitude and longitude variables</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    lat_corner, lon_corner : numpy.ndarray</span>
+<span class="sd">        2D arrays of corner coordinates with one more element than</span>
+<span class="sd">        ``ds[lat_var_name]`` and ``ds[lon_var_name]`` along each dimension</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">lat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="n">lat_var_name</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span>
+    <span class="n">lon</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="n">lon_var_name</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span>
+    <span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">lat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">lat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">4</span><span class="p">)</span>
+    <span class="n">lat_bounds</span> <span class="o">=</span> <span class="n">_get_cf_bounds</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">lat_var_name</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">shape</span><span class="p">)</span>
+    <span class="n">lon_bounds</span> <span class="o">=</span> <span class="n">_get_cf_bounds</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">lon_var_name</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">shape</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">lat_bounds</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">lon_bounds</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">corners</span> <span class="o">=</span> <span class="n">_corners_from_bounds_2d</span><span class="p">(</span><span class="n">lat_bounds</span><span class="p">,</span> <span class="n">lon_bounds</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">corners</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">corners</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s1">&#39;The CF bounds of </span><span class="si">{</span><span class="n">lat_var_name</span><span class="si">}</span><span class="s1"> and </span><span class="si">{</span><span class="n">lon_var_name</span><span class="si">}</span><span class="s1"> do not &#39;</span>
+            <span class="sa">f</span><span class="s1">&#39;share vertices between neighboring cells so corners will be &#39;</span>
+            <span class="sa">f</span><span class="s1">&#39;interpolated and extrapolated from cell centers instead.&#39;</span><span class="p">,</span>
+            <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">elif</span> <span class="n">lat_bounds</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">lon_bounds</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s1">&#39;Only one of </span><span class="si">{</span><span class="n">lat_var_name</span><span class="si">}</span><span class="s1"> and </span><span class="si">{</span><span class="n">lon_var_name</span><span class="si">}</span><span class="s1"> has usable CF &#39;</span>
+            <span class="sa">f</span><span class="s1">&#39;bounds so corners will be interpolated and extrapolated from &#39;</span>
+            <span class="sa">f</span><span class="s1">&#39;cell centers instead.&#39;</span><span class="p">,</span>
+            <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">interp_extrap_corners_2d</span><span class="p">(</span><span class="n">lat</span><span class="p">),</span> <span class="n">interp_extrap_corners_2d</span><span class="p">(</span><span class="n">lon</span><span class="p">)</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_cf_bounds</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">var_name</span><span class="p">,</span> <span class="n">shape</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get the CF ``bounds`` of the given variable as a numpy array with the</span>
+<span class="sd">    expected shape, or ``None`` if they are not available</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">bounds_name</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="n">var_name</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;bounds&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">bounds_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="k">if</span> <span class="n">bounds_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ds</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">var_name</span><span class="si">}</span><span class="s1"> has a CF bounds attribute &quot;</span><span class="si">{</span><span class="n">bounds_name</span><span class="si">}</span><span class="s1">&quot; but no &#39;</span>
+            <span class="sa">f</span><span class="s1">&#39;such variable is present in the dataset.&#39;</span><span class="p">,</span>
+            <span class="n">stacklevel</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="n">bounds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="n">bounds_name</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">bounds</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">shape</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s1">&#39;The CF bounds variable </span><span class="si">{</span><span class="n">bounds_name</span><span class="si">}</span><span class="s1"> has shape &#39;</span>
+            <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">bounds</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s1">, not the expected </span><span class="si">{</span><span class="n">shape</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">,</span>
+            <span class="n">stacklevel</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="k">return</span> <span class="n">bounds</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_bounds_tolerance</span><span class="p">(</span><span class="n">bounds</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A tolerance for comparing bounds, based on the size of the cells&quot;&quot;&quot;</span>
+    <span class="n">center</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">bounds</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">scale</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">bounds</span> <span class="o">-</span> <span class="n">center</span><span class="p">))</span>
+    <span class="k">return</span> <span class="mf">1e-6</span> <span class="o">*</span> <span class="n">scale</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_corners_from_bounds_1d</span><span class="p">(</span><span class="n">bounds</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert CF bounds with shape ``(n, 2)`` to an array of ``n + 1`` corners,</span>
+<span class="sd">    or return ``None`` if the bounds are not contiguous (in which case they</span>
+<span class="sd">    cannot be described by a 1D array of corners)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">tol</span> <span class="o">=</span> <span class="n">_bounds_tolerance</span><span class="p">(</span><span class="n">bounds</span><span class="p">)</span>
+    <span class="c1"># bounds may be given in the direction of the coordinate or always from</span>
+    <span class="c1"># the lower to the upper edge, so try both orders</span>
+    <span class="k">for</span> <span class="n">flipped</span> <span class="ow">in</span> <span class="p">[</span><span class="n">bounds</span><span class="p">,</span> <span class="n">bounds</span><span class="p">[:,</span> <span class="p">::</span><span class="o">-</span><span class="mi">1</span><span class="p">]]:</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">flipped</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">flipped</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="mi">0</span><span class="p">])</span> <span class="o">&lt;=</span> <span class="n">tol</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">flipped</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">flipped</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="kc">None</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_corners_from_bounds_2d</span><span class="p">(</span><span class="n">lat_bounds</span><span class="p">,</span> <span class="n">lon_bounds</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert CF bounds with shape ``(ny, nx, 4)`` to arrays of corners with</span>
+<span class="sd">    shape ``(ny + 1, nx + 1)``, or return ``None`` if neighboring cells do not</span>
+<span class="sd">    share vertices (in which case they cannot be described by 2D arrays of</span>
+<span class="sd">    corners)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># CF requires the vertices of each cell to be traversed in order around</span>
+    <span class="c1"># the cell but does not say which vertex comes first or which direction</span>
+    <span class="c1"># the traversal goes, so try each of the 8 possibilities.  Each candidate</span>
+    <span class="c1"># gives the vertex indices of the lower-left, lower-right, upper-right and</span>
+    <span class="c1"># upper-left corners of the cell in index space.  Requiring neighboring</span>
+    <span class="c1"># cells to share vertices picks out the right candidate except on grids</span>
+    <span class="c1"># too small to have neighbors in one or both directions, where the CF</span>
+    <span class="c1"># recommendation (anticlockwise starting from the lower left) is assumed.</span>
+    <span class="n">candidates</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">base</span> <span class="ow">in</span> <span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]):</span>
+        <span class="k">for</span> <span class="n">shift</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">):</span>
+            <span class="n">candidates</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">base</span><span class="p">[</span><span class="n">shift</span><span class="p">:]</span> <span class="o">+</span> <span class="n">base</span><span class="p">[:</span><span class="n">shift</span><span class="p">])</span>
+
+    <span class="n">tol</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">_bounds_tolerance</span><span class="p">(</span><span class="n">lat_bounds</span><span class="p">),</span> <span class="n">_bounds_tolerance</span><span class="p">(</span><span class="n">lon_bounds</span><span class="p">))</span>
+
+    <span class="k">for</span> <span class="n">candidate</span> <span class="ow">in</span> <span class="n">candidates</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span>
+            <span class="n">_vertices_are_shared</span><span class="p">(</span><span class="n">bounds</span><span class="p">,</span> <span class="n">candidate</span><span class="p">,</span> <span class="n">tol</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">bounds</span> <span class="ow">in</span> <span class="p">[</span><span class="n">lat_bounds</span><span class="p">,</span> <span class="n">lon_bounds</span><span class="p">]</span>
+        <span class="p">):</span>
+            <span class="k">continue</span>
+
+        <span class="n">lower_left</span><span class="p">,</span> <span class="n">lower_right</span><span class="p">,</span> <span class="n">upper_right</span><span class="p">,</span> <span class="n">upper_left</span> <span class="o">=</span> <span class="n">candidate</span>
+        <span class="n">corners</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">bounds</span> <span class="ow">in</span> <span class="p">[</span><span class="n">lat_bounds</span><span class="p">,</span> <span class="n">lon_bounds</span><span class="p">]:</span>
+            <span class="n">ny</span><span class="p">,</span> <span class="n">nx</span> <span class="o">=</span> <span class="n">bounds</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">bounds</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">corner</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">ny</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">nx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+            <span class="n">corner</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">bounds</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">lower_left</span><span class="p">]</span>
+            <span class="n">corner</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">bounds</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">lower_right</span><span class="p">]</span>
+            <span class="n">corner</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">bounds</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:,</span> <span class="n">upper_left</span><span class="p">]</span>
+            <span class="n">corner</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">bounds</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">upper_right</span><span class="p">]</span>
+            <span class="n">corners</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">corner</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">corners</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">corners</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="kc">None</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_vertices_are_shared</span><span class="p">(</span><span class="n">bounds</span><span class="p">,</span> <span class="n">candidate</span><span class="p">,</span> <span class="n">tol</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Whether neighboring cells share vertices if the 4 vertices of each cell</span>
+<span class="sd">    are in the order given by ``candidate`` (lower-left, lower-right,</span>
+<span class="sd">    upper-right and upper-left in index space)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">lower_left</span><span class="p">,</span> <span class="n">lower_right</span><span class="p">,</span> <span class="n">upper_right</span><span class="p">,</span> <span class="n">upper_left</span> <span class="o">=</span> <span class="n">candidate</span>
+    <span class="c1"># neighbors in x share their left and right vertices while neighbors in y</span>
+    <span class="c1"># share their lower and upper vertices</span>
+    <span class="n">shared</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="n">bounds</span><span class="p">[:,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">lower_right</span><span class="p">],</span> <span class="n">bounds</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:,</span> <span class="n">lower_left</span><span class="p">]),</span>
+        <span class="p">(</span><span class="n">bounds</span><span class="p">[:,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">upper_right</span><span class="p">],</span> <span class="n">bounds</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:,</span> <span class="n">upper_left</span><span class="p">]),</span>
+        <span class="p">(</span><span class="n">bounds</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:,</span> <span class="n">upper_left</span><span class="p">],</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="p">:,</span> <span class="n">lower_left</span><span class="p">]),</span>
+        <span class="p">(</span><span class="n">bounds</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:,</span> <span class="n">upper_right</span><span class="p">],</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="p">:,</span> <span class="n">lower_right</span><span class="p">]),</span>
+    <span class="p">]</span>
+    <span class="k">return</span> <span class="nb">all</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">first</span> <span class="o">-</span> <span class="n">second</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">tol</span><span class="p">)</span> <span class="k">for</span> <span class="n">first</span><span class="p">,</span> <span class="n">second</span> <span class="ow">in</span> <span class="n">shared</span>
+    <span class="p">)</span>
 
 
 <div class="viewcode-block" id="interp_extrap_corner">

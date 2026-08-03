@@ -57,6 +57,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#overview">Overview</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#attributes">Attributes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#methods">Methods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#grid-cell-corners">Grid-Cell Corners</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#example">Example</a></li>
 </ul>
 </li>
@@ -113,6 +114,14 @@
 <li><p><code class="docutils literal notranslate"><span class="pre">create</span></code>: Creates a projection grid programmatically.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">to_scrip</span></code>: Converts the grid to a SCRIP file.</p></li>
 </ul>
+</section>
+<section id="grid-cell-corners">
+<h2>Grid-Cell Corners<a class="headerlink" href="#grid-cell-corners" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">read()</span></code> uses the CF <code class="docutils literal notranslate"><span class="pre">bounds</span></code> of the <code class="docutils literal notranslate"><span class="pre">x</span></code> and <code class="docutils literal notranslate"><span class="pre">y</span></code> variables to find the corners
+of each grid cell in projection space when they are available and describe
+contiguous cells.  Otherwise, corners are interpolated between cell centers
+and extrapolated at the ends of the grid.  Corners are transformed from
+projection space to latitude and longitude by <code class="docutils literal notranslate"><span class="pre">to_scrip()</span></code>.</p>
 </section>
 <section id="example">
 <h2>Example<a class="headerlink" href="#example" title="Link to this heading"></a></h2>

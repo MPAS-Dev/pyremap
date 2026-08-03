@@ -13,6 +13,8 @@ This page provides an auto-generated summary of the pyremap API.
    :toctree: generated/
 
 
+   get_corners_1d
+   get_corners_2d
    interp_extrap_corner
    interp_extrap_corners_2d
 

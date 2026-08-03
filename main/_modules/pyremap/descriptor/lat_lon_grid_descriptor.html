@@ -95,7 +95,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyremap.descriptor.utility</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">add_history</span><span class="p">,</span>
     <span class="n">expand_scrip</span><span class="p">,</span>
-    <span class="n">interp_extrap_corner</span><span class="p">,</span>
+    <span class="n">get_corners_1d</span><span class="p">,</span>
     <span class="n">round_res</span><span class="p">,</span>
     <span class="n">unwrap_corners</span><span class="p">,</span>
 <span class="p">)</span>
@@ -208,6 +208,11 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Read the lat-lon grid from a file with the given lat/lon var names.</span>
 
+<span class="sd">        Grid-cell corners come from the CF ``bounds`` of the latitude and</span>
+<span class="sd">        longitude variables if they are available and describe contiguous</span>
+<span class="sd">        cells.  Otherwise, corners are interpolated and extrapolated from the</span>
+<span class="sd">        cell centers.</span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        filename : str, optional</span>
@@ -244,9 +249,9 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">descriptor</span><span class="o">.</span><span class="n">units</span> <span class="o">=</span> <span class="s1">&#39;radians&#39;</span>
 
-        <span class="c1"># interp/extrap corners</span>
-        <span class="n">descriptor</span><span class="o">.</span><span class="n">lon_corner</span> <span class="o">=</span> <span class="n">interp_extrap_corner</span><span class="p">(</span><span class="n">descriptor</span><span class="o">.</span><span class="n">lon</span><span class="p">)</span>
-        <span class="n">descriptor</span><span class="o">.</span><span class="n">lat_corner</span> <span class="o">=</span> <span class="n">interp_extrap_corner</span><span class="p">(</span><span class="n">descriptor</span><span class="o">.</span><span class="n">lat</span><span class="p">)</span>
+        <span class="c1"># use CF bounds if available, otherwise interp/extrap corners</span>
+        <span class="n">descriptor</span><span class="o">.</span><span class="n">lon_corner</span> <span class="o">=</span> <span class="n">get_corners_1d</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">lon_var_name</span><span class="p">)</span>
+        <span class="n">descriptor</span><span class="o">.</span><span class="n">lat_corner</span> <span class="o">=</span> <span class="n">get_corners_1d</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">lat_var_name</span><span class="p">)</span>
 
         <span class="n">descriptor</span><span class="o">.</span><span class="n">_set_coords</span><span class="p">(</span>
             <span class="n">lat_var_name</span><span class="p">,</span>

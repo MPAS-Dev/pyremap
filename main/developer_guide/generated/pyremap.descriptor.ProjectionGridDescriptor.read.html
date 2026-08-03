@@ -104,7 +104,10 @@
 <span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">ProjectionGridDescriptor.</span></span><span class="sig-name descname"><span class="pre">read</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">projection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mesh_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_var_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'x'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_var_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'y'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pyremap/descriptor/projection_grid_descriptor.html#ProjectionGridDescriptor.read"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyremap.descriptor.ProjectionGridDescriptor.read" title="Link to this definition"></a></dt>
 <dd><p>Given a grid file with x and y coordinates defining the axes of the
 logically rectangular grid, read in the x and y coordinates and
-interpolate/extrapolate to locate corners.</p>
+locate the corners.</p>
+<p>Corners come from the CF <code class="docutils literal notranslate"><span class="pre">bounds</span></code> of the x and y variables if they
+are available and describe contiguous cells.  Otherwise, corners are
+interpolated and extrapolated from the cell centers.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
