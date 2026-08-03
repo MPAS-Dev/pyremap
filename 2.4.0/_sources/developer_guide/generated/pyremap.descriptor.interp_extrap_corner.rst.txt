@@ -1,0 +1,6 @@
+﻿pyremap.descriptor.interp\_extrap\_corner
+=========================================
+
+.. currentmodule:: pyremap.descriptor
+
+.. autofunction:: interp_extrap_corner
