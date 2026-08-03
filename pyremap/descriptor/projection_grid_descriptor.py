@@ -19,6 +19,7 @@ from pyremap.descriptor.mesh_descriptor import MeshDescriptor
 from pyremap.descriptor.utility import (
     add_history,
     expand_scrip,
+    get_corners_1d,
     interp_extrap_corner,
     unwrap_corners,
 )
@@ -98,7 +99,11 @@ class ProjectionGridDescriptor(MeshDescriptor):
         """
         Given a grid file with x and y coordinates defining the axes of the
         logically rectangular grid, read in the x and y coordinates and
-        interpolate/extrapolate to locate corners.
+        locate the corners.
+
+        Corners come from the CF ``bounds`` of the x and y variables if they
+        are available and describe contiguous cells.  Otherwise, corners are
+        interpolated and extrapolated from the cell centers.
 
         Parameters
         ----------
@@ -135,9 +140,9 @@ class ProjectionGridDescriptor(MeshDescriptor):
             ds[y_var_name].dims[0],
         )
 
-        # interp/extrap corners
-        descriptor.x_corner = interp_extrap_corner(descriptor.x)
-        descriptor.y_corner = interp_extrap_corner(descriptor.y)
+        # use CF bounds if available, otherwise interp/extrap corners
+        descriptor.x_corner = get_corners_1d(ds, x_var_name)
+        descriptor.y_corner = get_corners_1d(ds, y_var_name)
 
         descriptor.history = add_history(ds=ds)
         return descriptor
