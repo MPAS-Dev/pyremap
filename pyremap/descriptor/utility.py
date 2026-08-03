@@ -10,10 +10,211 @@
 # https://raw.githubusercontent.com/MPAS-Dev/pyremap/main/LICENSE
 
 import sys
+import warnings
 
 import numpy as np
 import pyproj.enums
 from pyproj import Transformer
+
+
+def get_corners_1d(ds, var_name):
+    """
+    Get the coordinates of grid-cell corners along a 1D coordinate, using the
+    CF ``bounds`` of the coordinate if they are available and usable, and
+    interpolating and extrapolating from cell centers if not.
+
+    Parameters
+    ----------
+    ds : xarray.Dataset
+        A dataset containing the coordinate variable ``var_name``
+
+    var_name : str
+        The name of the 1D coordinate variable
+
+    Returns
+    -------
+    corner : numpy.ndarray
+        A 1D array of corner coordinates with one more element than
+        ``ds[var_name]``
+    """
+    center = np.array(ds[var_name].values, float)
+    bounds = _get_cf_bounds(ds, var_name, shape=(len(center), 2))
+    if bounds is not None:
+        corner = _corners_from_bounds_1d(bounds)
+        if corner is not None:
+            return corner
+        warnings.warn(
+            f'The CF bounds of {var_name} are not contiguous so corners '
+            f'will be interpolated and extrapolated from cell centers '
+            f'instead.',
+            stacklevel=2,
+        )
+
+    return interp_extrap_corner(center)
+
+
+def get_corners_2d(ds, lat_var_name, lon_var_name):
+    """
+    Get the coordinates of grid-cell corners for 2D latitude and longitude
+    coordinates, using the CF ``bounds`` of the coordinates if they are
+    available and usable, and interpolating and extrapolating from cell
+    centers if not.
+
+    Parameters
+    ----------
+    ds : xarray.Dataset
+        A dataset containing the coordinate variables
+
+    lat_var_name, lon_var_name : str
+        The names of the 2D latitude and longitude variables
+
+    Returns
+    -------
+    lat_corner, lon_corner : numpy.ndarray
+        2D arrays of corner coordinates with one more element than
+        ``ds[lat_var_name]`` and ``ds[lon_var_name]`` along each dimension
+    """
+    lat = np.array(ds[lat_var_name].values, float)
+    lon = np.array(ds[lon_var_name].values, float)
+    shape = (lat.shape[0], lat.shape[1], 4)
+    lat_bounds = _get_cf_bounds(ds, lat_var_name, shape=shape)
+    lon_bounds = _get_cf_bounds(ds, lon_var_name, shape=shape)
+    if lat_bounds is not None and lon_bounds is not None:
+        corners = _corners_from_bounds_2d(lat_bounds, lon_bounds)
+        if corners is not None:
+            return corners
+        warnings.warn(
+            f'The CF bounds of {lat_var_name} and {lon_var_name} do not '
+            f'share vertices between neighboring cells so corners will be '
+            f'interpolated and extrapolated from cell centers instead.',
+            stacklevel=2,
+        )
+    elif lat_bounds is not None or lon_bounds is not None:
+        warnings.warn(
+            f'Only one of {lat_var_name} and {lon_var_name} has usable CF '
+            f'bounds so corners will be interpolated and extrapolated from '
+            f'cell centers instead.',
+            stacklevel=2,
+        )
+
+    return interp_extrap_corners_2d(lat), interp_extrap_corners_2d(lon)
+
+
+def _get_cf_bounds(ds, var_name, shape):
+    """
+    Get the CF ``bounds`` of the given variable as a numpy array with the
+    expected shape, or ``None`` if they are not available
+    """
+    bounds_name = ds[var_name].attrs.get('bounds')
+    if bounds_name is None:
+        return None
+
+    if bounds_name not in ds:
+        warnings.warn(
+            f'{var_name} has a CF bounds attribute "{bounds_name}" but no '
+            f'such variable is present in the dataset.',
+            stacklevel=3,
+        )
+        return None
+
+    bounds = np.array(ds[bounds_name].values, float)
+    if bounds.shape != shape:
+        warnings.warn(
+            f'The CF bounds variable {bounds_name} has shape '
+            f'{bounds.shape}, not the expected {shape}.',
+            stacklevel=3,
+        )
+        return None
+
+    return bounds
+
+
+def _bounds_tolerance(bounds):
+    """A tolerance for comparing bounds, based on the size of the cells"""
+    center = np.mean(bounds, axis=-1, keepdims=True)
+    scale = np.max(np.abs(bounds - center))
+    return 1e-6 * scale
+
+
+def _corners_from_bounds_1d(bounds):
+    """
+    Convert CF bounds with shape ``(n, 2)`` to an array of ``n + 1`` corners,
+    or return ``None`` if the bounds are not contiguous (in which case they
+    cannot be described by a 1D array of corners)
+    """
+    tol = _bounds_tolerance(bounds)
+    # bounds may be given in the direction of the coordinate or always from
+    # the lower to the upper edge, so try both orders
+    for flipped in [bounds, bounds[:, ::-1]]:
+        if np.all(np.abs(flipped[:-1, 1] - flipped[1:, 0]) <= tol):
+            return np.append(flipped[:, 0], flipped[-1, 1])
+
+    return None
+
+
+def _corners_from_bounds_2d(lat_bounds, lon_bounds):
+    """
+    Convert CF bounds with shape ``(ny, nx, 4)`` to arrays of corners with
+    shape ``(ny + 1, nx + 1)``, or return ``None`` if neighboring cells do not
+    share vertices (in which case they cannot be described by 2D arrays of
+    corners)
+    """
+    # CF requires the vertices of each cell to be traversed in order around
+    # the cell but does not say which vertex comes first or which direction
+    # the traversal goes, so try each of the 8 possibilities.  Each candidate
+    # gives the vertex indices of the lower-left, lower-right, upper-right and
+    # upper-left corners of the cell in index space.  Requiring neighboring
+    # cells to share vertices picks out the right candidate except on grids
+    # too small to have neighbors in one or both directions, where the CF
+    # recommendation (anticlockwise starting from the lower left) is assumed.
+    candidates = []
+    for base in ([0, 1, 2, 3], [0, 3, 2, 1]):
+        for shift in range(4):
+            candidates.append(base[shift:] + base[:shift])
+
+    tol = max(_bounds_tolerance(lat_bounds), _bounds_tolerance(lon_bounds))
+
+    for candidate in candidates:
+        if not all(
+            _vertices_are_shared(bounds, candidate, tol)
+            for bounds in [lat_bounds, lon_bounds]
+        ):
+            continue
+
+        lower_left, lower_right, upper_right, upper_left = candidate
+        corners = []
+        for bounds in [lat_bounds, lon_bounds]:
+            ny, nx = bounds.shape[0], bounds.shape[1]
+            corner = np.zeros((ny + 1, nx + 1))
+            corner[:-1, :-1] = bounds[:, :, lower_left]
+            corner[:-1, -1] = bounds[:, -1, lower_right]
+            corner[-1, :-1] = bounds[-1, :, upper_left]
+            corner[-1, -1] = bounds[-1, -1, upper_right]
+            corners.append(corner)
+
+        return corners[0], corners[1]
+
+    return None
+
+
+def _vertices_are_shared(bounds, candidate, tol):
+    """
+    Whether neighboring cells share vertices if the 4 vertices of each cell
+    are in the order given by ``candidate`` (lower-left, lower-right,
+    upper-right and upper-left in index space)
+    """
+    lower_left, lower_right, upper_right, upper_left = candidate
+    # neighbors in x share their left and right vertices while neighbors in y
+    # share their lower and upper vertices
+    shared = [
+        (bounds[:, :-1, lower_right], bounds[:, 1:, lower_left]),
+        (bounds[:, :-1, upper_right], bounds[:, 1:, upper_left]),
+        (bounds[:-1, :, upper_left], bounds[1:, :, lower_left]),
+        (bounds[:-1, :, upper_right], bounds[1:, :, lower_right]),
+    ]
+    return all(
+        np.all(np.abs(first - second) <= tol) for first, second in shared
+    )
 
 
 def interp_extrap_corner(in_field):

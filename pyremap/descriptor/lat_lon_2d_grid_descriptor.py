@@ -18,7 +18,7 @@ from pyremap.descriptor.mesh_descriptor import MeshDescriptor
 from pyremap.descriptor.utility import (
     add_history,
     expand_scrip,
-    interp_extrap_corners_2d,
+    get_corners_2d,
     round_res,
     unwrap_corners,
 )
@@ -87,6 +87,11 @@ class LatLon2DGridDescriptor(MeshDescriptor):
         """
         Read the lat-lon grid from a file with the given lat/lon var names.
 
+        Grid-cell corners come from the CF ``bounds`` of the latitude and
+        longitude variables if they are available and neighboring cells share
+        vertices.  Otherwise, corners are interpolated and extrapolated from
+        the cell centers.
+
         Parameters
         ----------
         filename : str, optional
@@ -127,9 +132,10 @@ class LatLon2DGridDescriptor(MeshDescriptor):
         else:
             descriptor.units = 'radians'
 
-        # interp/extrap corners
-        descriptor.lon_corner = interp_extrap_corners_2d(descriptor.lon)
-        descriptor.lat_corner = interp_extrap_corners_2d(descriptor.lat)
+        # use CF bounds if available, otherwise interp/extrap corners
+        descriptor.lat_corner, descriptor.lon_corner = get_corners_2d(
+            ds, lat_var_name, lon_var_name
+        )
 
         descriptor._set_coords(
             lat_var_name,

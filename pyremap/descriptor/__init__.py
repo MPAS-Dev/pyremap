@@ -37,6 +37,12 @@ from pyremap.descriptor.projection_grid_descriptor import (
     ProjectionGridDescriptor as ProjectionGridDescriptor,
 )
 from pyremap.descriptor.utility import (
+    get_corners_1d as get_corners_1d,
+)
+from pyremap.descriptor.utility import (
+    get_corners_2d as get_corners_2d,
+)
+from pyremap.descriptor.utility import (
     interp_extrap_corner as interp_extrap_corner,
 )
 from pyremap.descriptor.utility import (
