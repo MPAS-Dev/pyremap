@@ -105,10 +105,10 @@
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyremap</span><span class="w"> </span><span class="kn">import</span> <span class="n">LatLonGridDescriptor</span><span class="p">,</span> <span class="n">MpasCellMeshDescriptor</span>
 
 <span class="c1"># Define a source grid (e.g., a regular latitude-longitude grid)</span>
-<span class="n">source_grid</span> <span class="o">=</span> <span class="n">LatLonGridDescriptor</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">file_name</span><span class="o">=</span><span class="s1">&#39;source_grid.nc&#39;</span><span class="p">)</span>
+<span class="n">source_grid</span> <span class="o">=</span> <span class="n">LatLonGridDescriptor</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">file_name</span><span class="o">=</span><span class="s1">'source_grid.nc'</span><span class="p">)</span>
 
 <span class="c1"># Define a destination grid (e.g., an unstructured mesh)</span>
-<span class="n">destination_grid</span> <span class="o">=</span> <span class="n">MpasCellMeshDescriptor</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">file_name</span><span class="o">=</span><span class="s1">&#39;destination_grid.nc&#39;</span><span class="p">)</span>
+<span class="n">destination_grid</span> <span class="o">=</span> <span class="n">MpasCellMeshDescriptor</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">file_name</span><span class="o">=</span><span class="s1">'destination_grid.nc'</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -117,7 +117,7 @@
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyremap</span><span class="w"> </span><span class="kn">import</span> <span class="n">Remapper</span>
 
 <span class="c1"># Create a remapper object</span>
-<span class="n">remapper</span> <span class="o">=</span> <span class="n">Remapper</span><span class="p">(</span><span class="n">map_filename</span><span class="o">=</span><span class="s1">&#39;map_source_to_dest.nc&#39;</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;bilinear&#39;</span><span class="p">)</span>
+<span class="n">remapper</span> <span class="o">=</span> <span class="n">Remapper</span><span class="p">(</span><span class="n">map_filename</span><span class="o">=</span><span class="s1">'map_source_to_dest.nc'</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">'bilinear'</span><span class="p">)</span>
 <span class="n">remapper</span><span class="o">.</span><span class="n">src_descriptor</span> <span class="o">=</span> <span class="n">source_grid</span>
 <span class="n">remapper</span><span class="o">.</span><span class="n">dst_descriptor</span> <span class="o">=</span> <span class="n">destination_grid</span>
 
@@ -130,9 +130,9 @@
 <h3>Step 3: Apply the Mapping<a class="headerlink" href="#step-3-apply-the-mapping" title="Link to this heading"></a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Remap data from the source grid to the destination grid</span>
 <span class="n">remapper</span><span class="o">.</span><span class="n">ncremap</span><span class="p">(</span>
-    <span class="n">in_filename</span><span class="o">=</span><span class="s1">&#39;source_data.nc&#39;</span><span class="p">,</span>
-    <span class="n">out_filename</span><span class="o">=</span><span class="s1">&#39;remapped_data.nc&#39;</span><span class="p">,</span>
-    <span class="n">variable_list</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;temperature&#39;</span><span class="p">,</span> <span class="s1">&#39;salinity&#39;</span><span class="p">]</span>
+    <span class="n">in_filename</span><span class="o">=</span><span class="s1">'source_data.nc'</span><span class="p">,</span>
+    <span class="n">out_filename</span><span class="o">=</span><span class="s1">'remapped_data.nc'</span><span class="p">,</span>
+    <span class="n">variable_list</span><span class="o">=</span><span class="p">[</span><span class="s1">'temperature'</span><span class="p">,</span> <span class="s1">'salinity'</span><span class="p">]</span>
 <span class="p">)</span>
 </pre></div>
 </div>

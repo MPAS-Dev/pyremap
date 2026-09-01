@@ -122,8 +122,8 @@
 When <code class="docutils literal notranslate"><span class="pre">read()</span></code> is used, corners come from the CF <code class="docutils literal notranslate"><span class="pre">bounds</span></code> attribute of the
 latitude and longitude variables if it is present:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">double</span> <span class="n">lat</span><span class="p">(</span><span class="n">lat</span><span class="p">)</span> <span class="p">;</span>
-    <span class="n">lat</span><span class="p">:</span><span class="n">units</span> <span class="o">=</span> <span class="s2">&quot;degrees_north&quot;</span> <span class="p">;</span>
-    <span class="n">lat</span><span class="p">:</span><span class="n">bounds</span> <span class="o">=</span> <span class="s2">&quot;lat_bnds&quot;</span> <span class="p">;</span>
+    <span class="n">lat</span><span class="p">:</span><span class="n">units</span> <span class="o">=</span> <span class="s2">"degrees_north"</span> <span class="p">;</span>
+    <span class="n">lat</span><span class="p">:</span><span class="n">bounds</span> <span class="o">=</span> <span class="s2">"lat_bnds"</span> <span class="p">;</span>
 <span class="n">double</span> <span class="n">lat_bnds</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">nbnd</span><span class="p">)</span> <span class="p">;</span>
 </pre></div>
 </div>
@@ -140,7 +140,7 @@ first of these cases.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyremap</span><span class="w"> </span><span class="kn">import</span> <span class="n">LatLonGridDescriptor</span>
 
 <span class="n">descriptor</span> <span class="o">=</span> <span class="n">LatLonGridDescriptor</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">)</span>
-<span class="n">descriptor</span><span class="o">.</span><span class="n">to_scrip</span><span class="p">(</span><span class="s2">&quot;grid.scrip.nc&quot;</span><span class="p">)</span>
+<span class="n">descriptor</span><span class="o">.</span><span class="n">to_scrip</span><span class="p">(</span><span class="s2">"grid.scrip.nc"</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>

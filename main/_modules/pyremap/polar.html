@@ -95,21 +95,21 @@
 <div class="viewcode-block" id="get_arctic_stereographic_projection">
 <a class="viewcode-back" href="../../developer_guide/generated/pyremap.polar.get_arctic_stereographic_projection.html#pyremap.polar.get_arctic_stereographic_projection">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_arctic_stereographic_projection</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Get a projection for an Arctic stereographic comparison grid</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    projection : ``pyproj.Proj`` object</span>
 <span class="sd">        The projection</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># Authors</span>
     <span class="c1"># -------</span>
     <span class="c1"># Milena Veneziani</span>
 
     <span class="n">projection</span> <span class="o">=</span> <span class="n">pyproj</span><span class="o">.</span><span class="n">Proj</span><span class="p">(</span>
-        <span class="s1">&#39;+proj=stere +lat_ts=75.0 +lat_0=90 +lon_0=0.0 &#39;</span>
-        <span class="s1">&#39;+k_0=1.0 +x_0=0.0 +y_0=0.0 +ellps=WGS84&#39;</span>
+        <span class="s1">'+proj=stere +lat_ts=75.0 +lat_0=90 +lon_0=0.0 '</span>
+        <span class="s1">'+k_0=1.0 +x_0=0.0 +y_0=0.0 +ellps=WGS84'</span>
     <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">projection</span></div>
@@ -119,13 +119,13 @@
 <div class="viewcode-block" id="get_antarctic_stereographic_projection">
 <a class="viewcode-back" href="../../developer_guide/generated/pyremap.polar.get_antarctic_stereographic_projection.html#pyremap.polar.get_antarctic_stereographic_projection">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_antarctic_stereographic_projection</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Get a projection for an Antarctic steregraphic grid</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">projection</span> <span class="o">=</span> <span class="n">pyproj</span><span class="o">.</span><span class="n">Proj</span><span class="p">(</span>
-        <span class="s1">&#39;+proj=stere +lat_ts=-71.0 +lat_0=-90 +lon_0=0.0 &#39;</span>
-        <span class="s1">&#39;+k_0=1.0 +x_0=0.0 +y_0=0.0 +ellps=WGS84&#39;</span>
+        <span class="s1">'+proj=stere +lat_ts=-71.0 +lat_0=-90 +lon_0=0.0 '</span>
+        <span class="s1">'+k_0=1.0 +x_0=0.0 +y_0=0.0 +ellps=WGS84'</span>
     <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">projection</span></div>
@@ -134,8 +134,8 @@
 
 <div class="viewcode-block" id="get_polar_descriptor_from_file">
 <a class="viewcode-back" href="../../developer_guide/generated/pyremap.polar.get_polar_descriptor_from_file.html#pyremap.polar.get_polar_descriptor_from_file">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">get_polar_descriptor_from_file</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="s1">&#39;antarctic&#39;</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_polar_descriptor_from_file</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="s1">'antarctic'</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Get a descriptor of a polar stereographic grid used for remapping</span>
 
 <span class="sd">    Parameters</span>
@@ -143,15 +143,15 @@
 <span class="sd">    filename :  str</span>
 <span class="sd">        A file containing x and y coordinates for the grid</span>
 
-<span class="sd">    projection : {&#39;arctic&#39;, &#39;antarctic&#39;, pyproj.Proj}</span>
-<span class="sd">        The projection to use.  &#39;arctic&#39; and &#39;antarctic&#39; are polar</span>
+<span class="sd">    projection : {'arctic', 'antarctic', pyproj.Proj}</span>
+<span class="sd">        The projection to use.  'arctic' and 'antarctic' are polar</span>
 <span class="sd">        stereographic projections with reference latitude at +/- 71 degrees</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    descriptor : ``ProjectionGridDescriptor`` object</span>
 <span class="sd">        A descriptor of the polar grid</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">ds_in</span> <span class="o">=</span> <span class="n">xarray</span><span class="o">.</span><span class="n">open_dataset</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
     <span class="n">x</span> <span class="o">=</span> <span class="n">ds_in</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">values</span>
     <span class="n">y</span> <span class="o">=</span> <span class="n">ds_in</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">values</span>
@@ -159,7 +159,7 @@
     <span class="n">lx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">x</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="mf">1000.0</span><span class="p">)</span>
     <span class="n">ly</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">y</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="mf">1000.0</span><span class="p">)</span>
 
-    <span class="n">mesh_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">lx</span><span class="si">}</span><span class="s1">x</span><span class="si">{</span><span class="n">ly</span><span class="si">}</span><span class="s1">km_</span><span class="si">{</span><span class="n">dx</span><span class="si">}</span><span class="s1">km_antarctic_stereo&#39;</span>
+    <span class="n">mesh_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">lx</span><span class="si">}</span><span class="s1">x</span><span class="si">{</span><span class="n">ly</span><span class="si">}</span><span class="s1">km_</span><span class="si">{</span><span class="n">dx</span><span class="si">}</span><span class="s1">km_antarctic_stereo'</span>
 
     <span class="n">projection</span> <span class="o">=</span> <span class="n">_get_projection</span><span class="p">(</span><span class="n">projection</span><span class="p">)</span>
 
@@ -171,8 +171,8 @@
 
 <div class="viewcode-block" id="get_polar_descriptor">
 <a class="viewcode-back" href="../../developer_guide/generated/pyremap.polar.get_polar_descriptor.html#pyremap.polar.get_polar_descriptor">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">get_polar_descriptor</span><span class="p">(</span><span class="n">lx</span><span class="p">,</span> <span class="n">ly</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="s1">&#39;antarctic&#39;</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_polar_descriptor</span><span class="p">(</span><span class="n">lx</span><span class="p">,</span> <span class="n">ly</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="s1">'antarctic'</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Get a descriptor of a polar stereographic grid used for remapping</span>
 
 <span class="sd">    Parameters</span>
@@ -183,19 +183,19 @@
 <span class="sd">    dx, dy : double</span>
 <span class="sd">        Resolution of the grid in km</span>
 
-<span class="sd">    projection : {&#39;arctic&#39;, &#39;antarctic&#39;, pyproj.Proj}</span>
-<span class="sd">        The projection to use.  &#39;arctic&#39; and &#39;antarctic&#39; are polar</span>
+<span class="sd">    projection : {'arctic', 'antarctic', pyproj.Proj}</span>
+<span class="sd">        The projection to use.  'arctic' and 'antarctic' are polar</span>
 <span class="sd">        stereographic projections with reference latitude at +/- 71 degrees</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    descriptor : ``ProjectionGridDescriptor`` object</span>
 <span class="sd">        A descriptor of the Antarctic grid</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">upper_proj</span> <span class="o">=</span> <span class="n">projection</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">+</span> <span class="n">projection</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
 
-    <span class="n">mesh_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">lx</span><span class="si">}</span><span class="s1">x</span><span class="si">{</span><span class="n">ly</span><span class="si">}</span><span class="s1">km_</span><span class="si">{</span><span class="n">dx</span><span class="si">}</span><span class="s1">km_</span><span class="si">{</span><span class="n">upper_proj</span><span class="si">}</span><span class="s1">_stereo&#39;</span>
+    <span class="n">mesh_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">lx</span><span class="si">}</span><span class="s1">x</span><span class="si">{</span><span class="n">ly</span><span class="si">}</span><span class="s1">km_</span><span class="si">{</span><span class="n">dx</span><span class="si">}</span><span class="s1">km_</span><span class="si">{</span><span class="n">upper_proj</span><span class="si">}</span><span class="s1">_stereo'</span>
 
     <span class="n">x_max</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">lx</span> <span class="o">*</span> <span class="mf">1e3</span>
     <span class="n">nx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">lx</span> <span class="o">/</span> <span class="n">dx</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
@@ -217,7 +217,7 @@
 <a class="viewcode-back" href="../../developer_guide/generated/pyremap.polar.to_polar.html#pyremap.polar.to_polar">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">to_polar</span><span class="p">(</span><span class="n">points</span><span class="p">):</span>
     <span class="n">projection</span> <span class="o">=</span> <span class="n">get_antarctic_stereographic_projection</span><span class="p">()</span>
-    <span class="n">lat_lon_projection</span> <span class="o">=</span> <span class="n">pyproj</span><span class="o">.</span><span class="n">Proj</span><span class="p">(</span><span class="n">proj</span><span class="o">=</span><span class="s1">&#39;latlong&#39;</span><span class="p">,</span> <span class="n">datum</span><span class="o">=</span><span class="s1">&#39;WGS84&#39;</span><span class="p">)</span>
+    <span class="n">lat_lon_projection</span> <span class="o">=</span> <span class="n">pyproj</span><span class="o">.</span><span class="n">Proj</span><span class="p">(</span><span class="n">proj</span><span class="o">=</span><span class="s1">'latlong'</span><span class="p">,</span> <span class="n">datum</span><span class="o">=</span><span class="s1">'WGS84'</span><span class="p">)</span>
 
     <span class="n">transformer</span> <span class="o">=</span> <span class="n">pyproj</span><span class="o">.</span><span class="n">Transformer</span><span class="o">.</span><span class="n">from_proj</span><span class="p">(</span><span class="n">lat_lon_projection</span><span class="p">,</span> <span class="n">projection</span><span class="p">)</span>
     <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">transformer</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">points</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">points</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">radians</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -231,7 +231,7 @@
 <a class="viewcode-back" href="../../developer_guide/generated/pyremap.polar.from_polar.html#pyremap.polar.from_polar">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">from_polar</span><span class="p">(</span><span class="n">points</span><span class="p">):</span>
     <span class="n">projection</span> <span class="o">=</span> <span class="n">get_antarctic_stereographic_projection</span><span class="p">()</span>
-    <span class="n">lat_lon_projection</span> <span class="o">=</span> <span class="n">pyproj</span><span class="o">.</span><span class="n">Proj</span><span class="p">(</span><span class="n">proj</span><span class="o">=</span><span class="s1">&#39;latlong&#39;</span><span class="p">,</span> <span class="n">datum</span><span class="o">=</span><span class="s1">&#39;WGS84&#39;</span><span class="p">)</span>
+    <span class="n">lat_lon_projection</span> <span class="o">=</span> <span class="n">pyproj</span><span class="o">.</span><span class="n">Proj</span><span class="p">(</span><span class="n">proj</span><span class="o">=</span><span class="s1">'latlong'</span><span class="p">,</span> <span class="n">datum</span><span class="o">=</span><span class="s1">'WGS84'</span><span class="p">)</span>
 
     <span class="n">transformer</span> <span class="o">=</span> <span class="n">pyproj</span><span class="o">.</span><span class="n">Transformer</span><span class="o">.</span><span class="n">from_proj</span><span class="p">(</span><span class="n">projection</span><span class="p">,</span> <span class="n">lat_lon_projection</span><span class="p">)</span>
     <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span> <span class="o">=</span> <span class="n">transformer</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">points</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">points</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">radians</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -243,12 +243,12 @@
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_get_projection</span><span class="p">(</span><span class="n">projection</span><span class="p">):</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">projection</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">projection</span> <span class="o">==</span> <span class="s1">&#39;arctic&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">projection</span> <span class="o">==</span> <span class="s1">'arctic'</span><span class="p">:</span>
             <span class="n">projection</span> <span class="o">=</span> <span class="n">get_arctic_stereographic_projection</span><span class="p">()</span>
-        <span class="k">elif</span> <span class="n">projection</span> <span class="o">==</span> <span class="s1">&#39;antarctic&#39;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">projection</span> <span class="o">==</span> <span class="s1">'antarctic'</span><span class="p">:</span>
             <span class="n">projection</span> <span class="o">=</span> <span class="n">get_antarctic_stereographic_projection</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Bad projection name </span><span class="si">{</span><span class="n">projection</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Bad projection name </span><span class="si">{</span><span class="n">projection</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">projection</span>
 </pre></div>
 

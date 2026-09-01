@@ -131,8 +131,8 @@ to run the mapping tool.  This may include additional flags, e.g.
 <h2>Example<a class="headerlink" href="#example" title="Link to this heading"></a></h2>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyremap</span><span class="w"> </span><span class="kn">import</span> <span class="n">Remapper</span>
 
-<span class="n">remapper</span> <span class="o">=</span> <span class="n">Remapper</span><span class="p">(</span><span class="n">map_filename</span><span class="o">=</span><span class="s2">&quot;map.nc&quot;</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;bilinear&quot;</span><span class="p">)</span>
-<span class="n">remapper</span><span class="o">.</span><span class="n">map_tool</span> <span class="o">=</span> <span class="s2">&quot;esmf&quot;</span>
+<span class="n">remapper</span> <span class="o">=</span> <span class="n">Remapper</span><span class="p">(</span><span class="n">map_filename</span><span class="o">=</span><span class="s2">"map.nc"</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">"bilinear"</span><span class="p">)</span>
+<span class="n">remapper</span><span class="o">.</span><span class="n">map_tool</span> <span class="o">=</span> <span class="s2">"esmf"</span>
 <span class="n">remapper</span><span class="o">.</span><span class="n">src_from_lon_lat</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">)</span>
 <span class="n">remapper</span><span class="o">.</span><span class="n">dst_from_lon_lat</span><span class="p">(</span><span class="n">lat_out</span><span class="p">,</span> <span class="n">lon_out</span><span class="p">)</span>
 <span class="n">remapper</span><span class="o">.</span><span class="n">build_map</span><span class="p">()</span>

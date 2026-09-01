@@ -122,8 +122,8 @@
 grid-cell corners when they are available.  For 2D coordinates, the bounds
 give the 4 vertices of each cell:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">double</span> <span class="n">lat</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="p">;</span>
-    <span class="n">lat</span><span class="p">:</span><span class="n">units</span> <span class="o">=</span> <span class="s2">&quot;degrees_north&quot;</span> <span class="p">;</span>
-    <span class="n">lat</span><span class="p">:</span><span class="n">bounds</span> <span class="o">=</span> <span class="s2">&quot;lat_bnds&quot;</span> <span class="p">;</span>
+    <span class="n">lat</span><span class="p">:</span><span class="n">units</span> <span class="o">=</span> <span class="s2">"degrees_north"</span> <span class="p">;</span>
+    <span class="n">lat</span><span class="p">:</span><span class="n">bounds</span> <span class="o">=</span> <span class="s2">"lat_bnds"</span> <span class="p">;</span>
 <span class="n">double</span> <span class="n">lat_bnds</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">nv</span><span class="p">)</span> <span class="p">;</span>
 </pre></div>
 </div>
@@ -138,8 +138,8 @@ raised.</p>
 <h2>Example<a class="headerlink" href="#example" title="Link to this heading"></a></h2>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyremap</span><span class="w"> </span><span class="kn">import</span> <span class="n">LatLon2DGridDescriptor</span>
 
-<span class="n">descriptor</span> <span class="o">=</span> <span class="n">LatLon2DGridDescriptor</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s2">&quot;grid.nc&quot;</span><span class="p">)</span>
-<span class="n">descriptor</span><span class="o">.</span><span class="n">to_scrip</span><span class="p">(</span><span class="s2">&quot;grid.scrip.nc&quot;</span><span class="p">)</span>
+<span class="n">descriptor</span> <span class="o">=</span> <span class="n">LatLon2DGridDescriptor</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s2">"grid.nc"</span><span class="p">)</span>
+<span class="n">descriptor</span><span class="o">.</span><span class="n">to_scrip</span><span class="p">(</span><span class="s2">"grid.scrip.nc"</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
