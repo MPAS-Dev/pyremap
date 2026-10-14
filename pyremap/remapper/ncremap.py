@@ -53,7 +53,7 @@ def _build_args(
     if isinstance(src_descriptor, mpas_descriptors):
         args.extend(['-P', 'mpas'])
         if not replace_mpas_fill:
-            args.append('-C')
+            args.append('--mpa_flg')
     if isinstance(src_descriptor, MpasEdgeMeshDescriptor):
         regrid_args.extend(['--rgr col_nm=nEdges'])
     if (
