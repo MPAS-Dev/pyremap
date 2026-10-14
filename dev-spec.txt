@@ -5,7 +5,7 @@
 python >=3.10
 dask
 esmf
-nco >=4.8.1
+nco >=5.4.2
 netcdf4
 numpy
 scipy
