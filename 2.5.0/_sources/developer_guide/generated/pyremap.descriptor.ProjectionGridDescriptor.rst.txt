@@ -1,0 +1,28 @@
+﻿pyremap.descriptor.ProjectionGridDescriptor
+===========================================
+
+.. currentmodule:: pyremap.descriptor
+
+.. autoclass:: ProjectionGridDescriptor
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~ProjectionGridDescriptor.__init__
+      ~ProjectionGridDescriptor.create
+      ~ProjectionGridDescriptor.mesh_name_from_attr
+      ~ProjectionGridDescriptor.project_to_lat_lon
+      ~ProjectionGridDescriptor.read
+      ~ProjectionGridDescriptor.to_scrip
+      ~ProjectionGridDescriptor.write_netcdf
+   
+   
+
+   
+   
+   

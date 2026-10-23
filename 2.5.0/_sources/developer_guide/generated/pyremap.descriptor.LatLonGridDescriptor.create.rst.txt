@@ -1,0 +1,6 @@
+﻿pyremap.descriptor.LatLonGridDescriptor.create
+==============================================
+
+.. currentmodule:: pyremap.descriptor
+
+.. automethod:: LatLonGridDescriptor.create

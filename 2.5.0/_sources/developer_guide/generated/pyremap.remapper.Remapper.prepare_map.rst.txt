@@ -1,0 +1,6 @@
+﻿pyremap.remapper.Remapper.prepare\_map
+======================================
+
+.. currentmodule:: pyremap.remapper
+
+.. automethod:: Remapper.prepare_map

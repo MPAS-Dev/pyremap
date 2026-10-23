@@ -1,0 +1,6 @@
+﻿pyremap.descriptor.ProjectionGridDescriptor.to\_scrip
+=====================================================
+
+.. currentmodule:: pyremap.descriptor
+
+.. automethod:: ProjectionGridDescriptor.to_scrip

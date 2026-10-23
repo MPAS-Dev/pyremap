@@ -1,0 +1,6 @@
+﻿pyremap.polar.get\_antarctic\_stereographic\_projection
+=======================================================
+
+.. currentmodule:: pyremap.polar
+
+.. autofunction:: get_antarctic_stereographic_projection
