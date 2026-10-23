@@ -16,20 +16,51 @@ def _build_map(remapper, logger=None):
     logger : logging.Logger, optional
         A logger to which ncclimo output should be redirected
     """
+    if remapper.use_tmp:
+        with TemporaryDirectory() as tmp_dir:
+            args = _write_files_and_get_args(remapper, tmp_dir, logger)
+            _run_map_tool(remapper, args, logger)
+    else:
+        args = _write_files_and_get_args(remapper, '', logger)
+        _run_map_tool(remapper, args, logger)
+
+
+def _prepare_map(remapper, logger=None):
+    """
+    Write the files the mapping tool reads and get the command that makes
+    the mapping file, without running it
+
+    Parameters
+    ----------
+    remapper : pyremap.remapper.MpasRemapper
+        The remapper object to use to create the mapping file
+    logger : logging.Logger, optional
+        A logger to which output should be redirected
+
+    Returns
+    -------
+    args : list of str
+        The mapping tool and its arguments, with no parallel launcher
+    """
+    if remapper.use_tmp:
+        raise ValueError(
+            'prepare_map() requires use_tmp=False, since the mapping tool '
+            'reads the files it writes after it returns.'
+        )
+    return _write_files_and_get_args(remapper, '', logger)
+
+
+def _write_files_and_get_args(remapper, tmp_dir, logger):
+    """
+    Write the SCRIP files (and, for MOAB, the HDF5 files made from them) in
+    ``tmp_dir`` and get the command that makes the mapping file
+    """
     _setup_remapper(remapper)
     map_tool = remapper.map_tool
 
-    src_scrip_filename = remapper.src_scrip_filename
-    dst_scrip_filename = remapper.dst_scrip_filename
+    src_scrip_filename = os.path.join(tmp_dir, remapper.src_scrip_filename)
+    dst_scrip_filename = os.path.join(tmp_dir, remapper.dst_scrip_filename)
     scrip_dir = os.path.dirname(src_scrip_filename)
-
-    if remapper.use_tmp:
-        tempobj = TemporaryDirectory()
-        scrip_dir = os.path.join(tempobj.name, scrip_dir)
-        src_scrip_filename = os.path.join(tempobj.name, src_scrip_filename)
-        dst_scrip_filename = os.path.join(tempobj.name, dst_scrip_filename)
-    else:
-        tempobj = None
 
     if scrip_dir != '':
         os.makedirs(scrip_dir, exist_ok=True)
@@ -74,6 +105,14 @@ def _build_map(remapper, logger=None):
             moab_exe = os.path.join(moab_path, 'bin', 'mbtempest')
         args = [moab_exe] + args
 
+    return args
+
+
+def _run_map_tool(remapper, args, logger):
+    """
+    Run the mapping tool, with the parallel launcher if there is more than
+    one task
+    """
     ntasks = remapper.ntasks
     if ntasks > 1:
         parallel_exec = remapper.parallel_exec
@@ -89,9 +128,6 @@ def _build_map(remapper, logger=None):
             )
 
     check_call(args, logger=logger)
-
-    if tempobj is not None:
-        tempobj.cleanup()
 
 
 def _moab_convert_scrip_file(remapper, in_filename, moab_path, logger):

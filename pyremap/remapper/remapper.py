@@ -1,4 +1,4 @@
-from pyremap.remapper.build_map import _build_map
+from pyremap.remapper.build_map import _build_map, _prepare_map
 from pyremap.remapper.ncremap import _ncremap
 from pyremap.remapper.remap_numpy import _remap_numpy
 from pyremap.remapper.setup import _setup_remapper
@@ -430,6 +430,33 @@ class Remapper:
             A logger to which ncclimo output should be redirected
         """
         _build_map(self, logger=logger)
+
+    def prepare_map(self, logger=None):
+        """
+        Write the files the mapping tool reads and return the command that
+        makes the mapping file, without running it.
+
+        This is for callers that launch the mapping tool themselves, for
+        example a workflow that adds its own MPI launcher and flags.  The
+        command has no parallel launcher in front of it and must be run with
+        ``ntasks`` MPI tasks: for ``map_tool='moab'``, the meshes are
+        partitioned for that many.  ``parallel_exec`` is not used.
+
+        ``use_tmp`` must be False, because the mapping tool reads the files
+        after this method returns.
+
+        Parameters
+        ----------
+        logger : logging.Logger, optional
+            A logger to which output from converting and partitioning meshes
+            should be redirected
+
+        Returns
+        -------
+        args : list of str
+            The mapping tool and its command-line arguments
+        """
+        return _prepare_map(self, logger=logger)
 
     def ncremap(
         self,

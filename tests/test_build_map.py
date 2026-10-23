@@ -176,3 +176,123 @@ def test_moab_serial_args_match_parallel(ntasks):
         '--fvmethod',
         'bilin',
     ]
+
+
+def _prepare_map(ntasks, map_tool, use_tmp=False):
+    """
+    Prepare a map with ``check_call`` mocked out, returning the command
+    ``prepare_map()`` returns and the argument lists that would have been
+    passed to ``check_call``
+    """
+    src_descriptor, dst_descriptor = _get_descriptors()
+    remapper = Remapper(
+        ntasks=ntasks,
+        map_tool=map_tool,
+        src_descriptor=src_descriptor,
+        dst_descriptor=dst_descriptor,
+        use_tmp=use_tmp,
+    )
+    with mock.patch(
+        'pyremap.remapper.build_map.check_call'
+    ) as mock_check_call:
+        args = remapper.prepare_map()
+
+    calls = [call.args[0] for call in mock_check_call.call_args_list]
+    return args, calls
+
+
+class TestPrepareMap(TestCase):
+    """
+    Test that ``prepare_map()`` writes what the mapping tool reads and
+    returns its command without running it or adding a launcher
+    """
+
+    def setUp(self):
+        self.test_dir = tempfile.mkdtemp()
+        self.cwd = os.getcwd()
+        os.chdir(self.test_dir)
+
+    def tearDown(self):
+        os.chdir(self.cwd)
+        shutil.rmtree(self.test_dir)
+
+    def test_esmf(self):
+        """
+        The ESMF command is returned, not run, and its SCRIP files exist
+        """
+        args, calls = _prepare_map(ntasks=4, map_tool='esmf')
+
+        assert calls == []
+        assert os.path.basename(args[0]) == 'ESMF_RegridWeightGen'
+        for flag in ['--source', '--destination']:
+            filename = args[args.index(flag) + 1]
+            assert os.path.exists(filename)
+
+    def test_moab_parallel(self):
+        """
+        The meshes are converted and partitioned for ``ntasks``, and only
+        mbtempest itself is left for the caller to launch
+        """
+        ntasks = 2
+        args, calls = _prepare_map(ntasks=ntasks, map_tool='moab')
+
+        executables = [os.path.basename(call[0]) for call in calls]
+        assert executables == ['mbconvert', 'mbpart', 'mbconvert', 'mbpart']
+        assert os.path.basename(args[0]) == 'mbtempest'
+        loaded = [
+            args[index + 1]
+            for index, arg in enumerate(args)
+            if arg == '--load'
+        ]
+        assert loaded == [
+            f'src_mesh.p{ntasks}.h5m',
+            f'dst_mesh.p{ntasks}.h5m',
+        ]
+
+    def test_matches_build_map(self):
+        """
+        ``build_map()`` runs exactly the command ``prepare_map()`` returns,
+        behind the launcher
+        """
+        ntasks = 2
+        args, _ = _prepare_map(ntasks=ntasks, map_tool='moab')
+        built = _build_map_calls(ntasks=ntasks)[-1]
+        assert built == ['mpirun', '-np', f'{ntasks}'] + args
+
+    def test_use_tmp_rejected(self):
+        """
+        Files in a temporary directory would be gone before the caller could
+        run the command
+        """
+        with pytest.raises(ValueError, match='use_tmp=False'):
+            _prepare_map(ntasks=1, map_tool='esmf', use_tmp=True)
+
+
+def test_build_map_use_tmp_cleans_up():
+    """
+    With ``use_tmp``, the SCRIP files are written in a temporary directory
+    that is gone once the map is built
+    """
+    cwd = os.getcwd()
+    test_dir = tempfile.mkdtemp()
+    os.chdir(test_dir)
+    try:
+        src_descriptor, dst_descriptor = _get_descriptors()
+        remapper = Remapper(
+            map_tool='esmf',
+            src_descriptor=src_descriptor,
+            dst_descriptor=dst_descriptor,
+            use_tmp=True,
+        )
+        with mock.patch(
+            'pyremap.remapper.build_map.check_call'
+        ) as mock_check_call:
+            remapper.build_map()
+        args = mock_check_call.call_args.args[0]
+        src_scrip = args[args.index('--source') + 1]
+        assert os.path.dirname(src_scrip) != ''
+        assert not os.path.exists(src_scrip)
+        assert os.listdir(test_dir) == []
+    finally:
+        os.chdir(cwd)
+        shutil.rmtree(test_dir)
