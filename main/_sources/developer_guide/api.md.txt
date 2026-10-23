@@ -65,6 +65,7 @@ This page provides an auto-generated summary of the pyremap API.
    Remapper.dst_from_proj
 
    Remapper.build_map
+   Remapper.prepare_map
 
    Remapper.ncremap
    Remapper.remap_numpy

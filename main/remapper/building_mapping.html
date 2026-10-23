@@ -56,6 +56,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#methods">Methods</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#attributes">Attributes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#example">Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#launching-the-mapping-tool-yourself">Launching the mapping tool yourself</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="remapping_data.html">Remapping Data</a></li>
@@ -105,6 +106,9 @@ MOAB.</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">build_map</span></code>: Build the mapping file using the specified remapping method and
 tool.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">prepare_map</span></code>: Write the files the mapping tool needs and return the
+command that builds the mapping file, without running it.  This is for
+workflows that launch the tool themselves (see below).</p></li>
 </ul>
 </section>
 <section id="attributes">
@@ -136,6 +140,27 @@ to run the mapping tool.  This may include additional flags, e.g.
 <span class="n">remapper</span><span class="o">.</span><span class="n">src_from_lon_lat</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">)</span>
 <span class="n">remapper</span><span class="o">.</span><span class="n">dst_from_lon_lat</span><span class="p">(</span><span class="n">lat_out</span><span class="p">,</span> <span class="n">lon_out</span><span class="p">)</span>
 <span class="n">remapper</span><span class="o">.</span><span class="n">build_map</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="launching-the-mapping-tool-yourself">
+<h2>Launching the mapping tool yourself<a class="headerlink" href="#launching-the-mapping-tool-yourself" title="Link to this heading"></a></h2>
+<p>A workflow that runs MPI jobs with its own launcher and flags can call
+<code class="docutils literal notranslate"><span class="pre">prepare_map()</span></code> instead of <code class="docutils literal notranslate"><span class="pre">build_map()</span></code>.  It writes the SCRIP files (and, for
+<code class="docutils literal notranslate"><span class="pre">moab</span></code>, converts and partitions them) and returns the mapping tool’s command
+line.  The command has no parallel launcher in front of it, so the caller adds
+one and runs it with <code class="docutils literal notranslate"><span class="pre">ntasks</span></code> MPI tasks.  <code class="docutils literal notranslate"><span class="pre">use_tmp</span></code> must be <code class="docutils literal notranslate"><span class="pre">False</span></code>, since the
+tool reads the files after <code class="docutils literal notranslate"><span class="pre">prepare_map()</span></code> returns.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyremap</span><span class="w"> </span><span class="kn">import</span> <span class="n">Remapper</span>
+
+<span class="n">remapper</span> <span class="o">=</span> <span class="n">Remapper</span><span class="p">(</span><span class="n">ntasks</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">map_filename</span><span class="o">=</span><span class="s2">"map.nc"</span><span class="p">,</span> <span class="n">use_tmp</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">remapper</span><span class="o">.</span><span class="n">map_tool</span> <span class="o">=</span> <span class="s2">"moab"</span>
+<span class="n">remapper</span><span class="o">.</span><span class="n">src_from_lon_lat</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">)</span>
+<span class="n">remapper</span><span class="o">.</span><span class="n">dst_from_lon_lat</span><span class="p">(</span><span class="n">lat_out</span><span class="p">,</span> <span class="n">lon_out</span><span class="p">)</span>
+<span class="n">args</span> <span class="o">=</span> <span class="n">remapper</span><span class="o">.</span><span class="n">prepare_map</span><span class="p">()</span>
+<span class="n">subprocess</span><span class="o">.</span><span class="n">check_call</span><span class="p">([</span><span class="s2">"srun"</span><span class="p">,</span> <span class="s2">"-n"</span><span class="p">,</span> <span class="s2">"64"</span><span class="p">]</span> <span class="o">+</span> <span class="n">args</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="admonition note">

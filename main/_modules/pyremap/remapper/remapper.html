@@ -75,7 +75,7 @@
            <div itemprop="articleBody">
              
   <h1>Source code for pyremap.remapper.remapper</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyremap.remapper.build_map</span><span class="w"> </span><span class="kn">import</span> <span class="n">_build_map</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyremap.remapper.build_map</span><span class="w"> </span><span class="kn">import</span> <span class="n">_build_map</span><span class="p">,</span> <span class="n">_prepare_map</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyremap.remapper.ncremap</span><span class="w"> </span><span class="kn">import</span> <span class="n">_ncremap</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyremap.remapper.remap_numpy</span><span class="w"> </span><span class="kn">import</span> <span class="n">_remap_numpy</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyremap.remapper.setup</span><span class="w"> </span><span class="kn">import</span> <span class="n">_setup_remapper</span>
@@ -530,6 +530,36 @@
 <span class="sd">            A logger to which ncclimo output should be redirected</span>
 <span class="sd">        """</span>
         <span class="n">_build_map</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Remapper.prepare_map">
+<a class="viewcode-back" href="../../../developer_guide/generated/pyremap.remapper.Remapper.prepare_map.html#pyremap.remapper.Remapper.prepare_map">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">prepare_map</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Write the files the mapping tool reads and return the command that</span>
+<span class="sd">        makes the mapping file, without running it.</span>
+
+<span class="sd">        This is for callers that launch the mapping tool themselves, for</span>
+<span class="sd">        example a workflow that adds its own MPI launcher and flags.  The</span>
+<span class="sd">        command has no parallel launcher in front of it and must be run with</span>
+<span class="sd">        ``ntasks`` MPI tasks: for ``map_tool='moab'``, the meshes are</span>
+<span class="sd">        partitioned for that many.  ``parallel_exec`` is not used.</span>
+
+<span class="sd">        ``use_tmp`` must be False, because the mapping tool reads the files</span>
+<span class="sd">        after this method returns.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        logger : logging.Logger, optional</span>
+<span class="sd">            A logger to which output from converting and partitioning meshes</span>
+<span class="sd">            should be redirected</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        args : list of str</span>
+<span class="sd">            The mapping tool and its command-line arguments</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="n">_prepare_map</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Remapper.ncremap">

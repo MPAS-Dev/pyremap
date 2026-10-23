@@ -12,6 +12,9 @@ MOAB.
 ## Methods
 - `build_map`: Build the mapping file using the specified remapping method and
 tool.
+- `prepare_map`: Write the files the mapping tool needs and return the
+  command that builds the mapping file, without running it.  This is for
+  workflows that launch the tool themselves (see below).
 
 ## Attributes
 - `map_filename`: The name of the file where the mapping weights will be saved.
@@ -39,6 +42,27 @@ remapper.map_tool = "esmf"
 remapper.src_from_lon_lat(lat, lon)
 remapper.dst_from_lon_lat(lat_out, lon_out)
 remapper.build_map()
+```
+
+## Launching the mapping tool yourself
+A workflow that runs MPI jobs with its own launcher and flags can call
+`prepare_map()` instead of `build_map()`.  It writes the SCRIP files (and, for
+`moab`, converts and partitions them) and returns the mapping tool's command
+line.  The command has no parallel launcher in front of it, so the caller adds
+one and runs it with `ntasks` MPI tasks.  `use_tmp` must be `False`, since the
+tool reads the files after `prepare_map()` returns.
+
+```python
+import subprocess
+
+from pyremap import Remapper
+
+remapper = Remapper(ntasks=64, map_filename="map.nc", use_tmp=False)
+remapper.map_tool = "moab"
+remapper.src_from_lon_lat(lat, lon)
+remapper.dst_from_lon_lat(lat_out, lon_out)
+args = remapper.prepare_map()
+subprocess.check_call(["srun", "-n", "64"] + args)
 ```
 
 ```{note}
