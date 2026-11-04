@@ -1,0 +1,6 @@
+﻿pyremap.descriptor.LatLonGridDescriptor.to\_scrip
+=================================================
+
+.. currentmodule:: pyremap.descriptor
+
+.. automethod:: LatLonGridDescriptor.to_scrip

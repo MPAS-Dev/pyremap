@@ -1,0 +1,6 @@
+﻿pyremap.descriptor.get\_corners\_2d
+===================================
+
+.. currentmodule:: pyremap.descriptor
+
+.. autofunction:: get_corners_2d
